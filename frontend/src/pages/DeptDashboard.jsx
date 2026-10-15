@@ -310,6 +310,27 @@ export default function DeptDashboard({ deptId = 'pm', departments = [], filters
                     <div style={{ width: '100%', height: '220px' }}>
                       <ResponsiveContainer width="100%" height="100%">
                         <BarChart data={primaryData} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+                          <defs>
+                            <filter id="deptBar3d" x="-10%" y="-10%" width="130%" height="130%">
+                              <feDropShadow dx="2" dy="3" stdDeviation="2" floodColor="#0F2A4A" floodOpacity="0.20" />
+                            </filter>
+                            <linearGradient id="deptGradPurple" x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="0%" stopColor="#A78BFA" />
+                              <stop offset="100%" stopColor="#7C3AED" />
+                            </linearGradient>
+                            <linearGradient id="deptGradBlue" x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="0%" stopColor="#38BDF8" />
+                              <stop offset="100%" stopColor="#0284C7" />
+                            </linearGradient>
+                            <linearGradient id="deptGradGreen" x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="0%" stopColor="#34D399" />
+                              <stop offset="100%" stopColor="#059669" />
+                            </linearGradient>
+                            <linearGradient id="deptGradRose" x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="0%" stopColor="#FB7185" />
+                              <stop offset="100%" stopColor="#BE123C" />
+                            </linearGradient>
+                          </defs>
                           <CartesianGrid strokeDasharray="3 3" stroke="#EAEFF5" />
                           <XAxis dataKey="label" tickLine={{ stroke: '#000000' }} axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} tick={{ fontSize: 9.5, fill: '#0F2A4A' }} />
                           <YAxis tickFormatter={formatAxisINR} tickLine={{ stroke: '#000000' }} axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} tick={{ fontSize: 9.5, fill: '#0F2A4A' }} />
@@ -335,7 +356,7 @@ export default function DeptDashboard({ deptId = 'pm', departments = [], filters
                                       <span>{p.label || (label && String(label).match(/\b20\d\d\b/) ? label : `${label} ${p.year || activeYear}`)}</span>
                                     </div>
                                     <div style={{ display: 'flex', justifyContent: 'space-between', gap: '16px', marginBottom: '4px' }}>
-                                      <span style={{ color: '#4F46E5', fontWeight: '600' }}>Opening Balance:</span>
+                                      <span style={{ color: '#7C3AED', fontWeight: '600' }}>Opening Balance:</span>
                                       <strong>{formatINR(opVal)}</strong>
                                     </div>
                                     <div style={{ display: 'flex', justifyContent: 'space-between', gap: '16px', marginBottom: '4px' }}>
@@ -343,12 +364,12 @@ export default function DeptDashboard({ deptId = 'pm', departments = [], filters
                                       <strong>{formatINR(costVal)}</strong>
                                     </div>
                                     <div style={{ display: 'flex', justifyContent: 'space-between', gap: '16px', marginBottom: '4px' }}>
-                                      <span style={{ color: '#1F6FEB', fontWeight: '600' }}>Paid Amount:</span>
+                                      <span style={{ color: '#059669', fontWeight: '600' }}>Paid Amount:</span>
                                       <strong>{formatINR(paidVal)}</strong>
                                     </div>
                                     <div style={{ display: 'flex', justifyContent: 'space-between', gap: '16px', borderTop: '1px solid #E2E8F0', paddingTop: '4px', marginTop: '4px' }}>
-                                      <span style={{ color: '#C8423A', fontWeight: '700' }}>Closing Balance:</span>
-                                      <strong style={{ color: '#C8423A' }}>{formatINR(balVal)}</strong>
+                                      <span style={{ color: '#BE123C', fontWeight: '700' }}>Closing Balance:</span>
+                                      <strong style={{ color: '#BE123C' }}>{formatINR(balVal)}</strong>
                                     </div>
                                   </div>
                                 );
@@ -356,10 +377,10 @@ export default function DeptDashboard({ deptId = 'pm', departments = [], filters
                               return null;
                             }}
                           />
-                          <Bar dataKey="openingBalance" fill="#6366F1" name="Opening Balance (Rs.)" radius={[2, 2, 0, 0]} />
-                          <Bar dataKey="totalCost" fill="#0284C7" name="Total Amount (Fuel Cost) (Rs.)" radius={[2, 2, 0, 0]} />
-                          <Bar dataKey="val1" fill="#1F6FEB" name="Paid Amount (Rs.)" radius={[2, 2, 0, 0]} />
-                          <Bar dataKey="balance" fill="#C8423A" name="Closing Balance (Rs.)" radius={[2, 2, 0, 0]} />
+                          <Bar dataKey="openingBalance" fill="url(#deptGradPurple)" stroke="#5B21B6" strokeWidth={1} filter="url(#deptBar3d)" name="Opening Balance (Rs.)" radius={[2, 2, 0, 0]} />
+                          <Bar dataKey="totalCost" fill="url(#deptGradBlue)" stroke="#0369A1" strokeWidth={1} filter="url(#deptBar3d)" name="Total Amount (Fuel Cost) (Rs.)" radius={[2, 2, 0, 0]} />
+                          <Bar dataKey="val1" fill="url(#deptGradGreen)" stroke="#047857" strokeWidth={1} filter="url(#deptBar3d)" name="Paid Amount (Rs.)" radius={[2, 2, 0, 0]} />
+                          <Bar dataKey="balance" fill="url(#deptGradRose)" stroke="#9F1239" strokeWidth={1} filter="url(#deptBar3d)" name="Closing Balance (Rs.)" radius={[2, 2, 0, 0]} />
                         </BarChart>
                       </ResponsiveContainer>
                     </div>
@@ -446,14 +467,19 @@ export default function DeptDashboard({ deptId = 'pm', departments = [], filters
                     <div style={{ width: '100%', height: '220px' }}>
                       <ResponsiveContainer width="100%" height="100%">
                         <LineChart data={primaryData} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+                          <defs>
+                            <filter id="deptLine3d" x="-10%" y="-10%" width="120%" height="130%">
+                              <feDropShadow dx="1" dy="3" stdDeviation="2" floodColor="#047857" floodOpacity="0.30" />
+                            </filter>
+                          </defs>
                           <CartesianGrid strokeDasharray="3 3" stroke="#EAEFF5" />
                           <XAxis dataKey="label" tickLine={{ stroke: '#000000' }} axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} tick={{ fontSize: 9.5, fill: '#0F2A4A' }} />
-                          <YAxis tickFormatter={(v) => v >= 1000 ? `${(v / 1000).toFixed(0)}k L` : `${v} L`} tickLine={{ stroke: '#000000' }} axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} tick={{ fontSize: 9.5, fill: '#10B981' }} />
+                          <YAxis tickFormatter={(v) => v >= 1000 ? `${(v / 1000).toFixed(0)}k L` : `${v} L`} tickLine={{ stroke: '#000000' }} axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} tick={{ fontSize: 9.5, fill: '#059669' }} />
                           <Tooltip 
                             formatter={(val) => [`${formatNumber(val, 2)} Ltrs`, 'Fuel Quantity']}
                             contentStyle={{ fontSize: '11px', borderRadius: '4px' }} 
                           />
-                          <Line type="monotone" dataKey="val2" stroke="#10B981" strokeWidth={2.5} dot={{ fill: '#10B981', r: 3.5 }} activeDot={{ r: 5 }} name="Quantity (Ltrs)" />
+                          <Line type="monotone" dataKey="val2" stroke="#059669" strokeWidth={3.5} filter="url(#deptLine3d)" dot={{ fill: '#FFFFFF', stroke: '#059669', strokeWidth: 2.5, r: 4.5 }} activeDot={{ r: 6.5, fill: '#059669', stroke: '#FFFFFF', strokeWidth: 2.5 }} name="Quantity (Ltrs)" />
                         </LineChart>
                       </ResponsiveContainer>
                     </div>
@@ -507,6 +533,15 @@ export default function DeptDashboard({ deptId = 'pm', departments = [], filters
                     <div style={{ width: '100%', height: '200px' }}>
                       <ResponsiveContainer width="100%" height="100%">
                         <BarChart data={secondaryData} layout="vertical" margin={{ top: 10, right: 10, left: 30, bottom: 0 }}>
+                          <defs>
+                            <filter id="deptSecBar3d" x="-10%" y="-10%" width="130%" height="130%">
+                              <feDropShadow dx="2" dy="3" stdDeviation="2" floodColor="#0F2A4A" floodOpacity="0.20" />
+                            </filter>
+                            <linearGradient id="deptGradGreenH" x1="0" y1="0" x2="1" y2="0">
+                              <stop offset="0%" stopColor="#34D399" />
+                              <stop offset="100%" stopColor="#059669" />
+                            </linearGradient>
+                          </defs>
                           <CartesianGrid strokeDasharray="3 3" stroke="#EAEFF5" />
                           <XAxis type="number" tickFormatter={formatAxisINR} tickLine={{ stroke: '#000000' }} axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} tick={{ fontSize: 9.5, fill: '#0F2A4A' }} />
                           <YAxis dataKey="name" type="category" tickLine={{ stroke: '#000000' }} axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} tick={{ fontSize: 9.5, fill: '#0F2A4A' }} width={90} />
@@ -514,7 +549,7 @@ export default function DeptDashboard({ deptId = 'pm', departments = [], filters
                             formatter={(val) => [formatINR(val), 'Amount']}
                             contentStyle={{ fontSize: '11px', borderRadius: '4px' }} 
                           />
-                          <Bar dataKey="value" fill="#2E9E6B" radius={[0, 2, 2, 0]} />
+                          <Bar dataKey="value" fill="url(#deptGradGreenH)" stroke="#047857" strokeWidth={1} filter="url(#deptSecBar3d)" radius={[0, 3, 3, 0]} />
                         </BarChart>
                       </ResponsiveContainer>
                     </div>
@@ -580,6 +615,27 @@ export default function DeptDashboard({ deptId = 'pm', departments = [], filters
                     <div style={{ width: '100%', minWidth: '780px', height: `${Math.max(640, locationSpendingData.length * 40)}px` }}>
                       <ResponsiveContainer width="100%" height="100%">
                         <BarChart data={locationSpendingData} layout="vertical" barCategoryGap="20%" barGap={2} margin={{ top: 10, right: 30, left: 10, bottom: 15 }}>
+                          <defs>
+                            <filter id="deptLocBar3d" x="-10%" y="-10%" width="130%" height="130%">
+                              <feDropShadow dx="2" dy="3" stdDeviation="2" floodColor="#0F2A4A" floodOpacity="0.20" />
+                            </filter>
+                            <linearGradient id="deptLocGradPurple" x1="0" y1="0" x2="1" y2="0">
+                              <stop offset="0%" stopColor="#A78BFA" />
+                              <stop offset="100%" stopColor="#7C3AED" />
+                            </linearGradient>
+                            <linearGradient id="deptLocGradBlue" x1="0" y1="0" x2="1" y2="0">
+                              <stop offset="0%" stopColor="#38BDF8" />
+                              <stop offset="100%" stopColor="#0284C7" />
+                            </linearGradient>
+                            <linearGradient id="deptLocGradGreen" x1="0" y1="0" x2="1" y2="0">
+                              <stop offset="0%" stopColor="#34D399" />
+                              <stop offset="100%" stopColor="#059669" />
+                            </linearGradient>
+                            <linearGradient id="deptLocGradRose" x1="0" y1="0" x2="1" y2="0">
+                              <stop offset="0%" stopColor="#FB7185" />
+                              <stop offset="100%" stopColor="#BE123C" />
+                            </linearGradient>
+                          </defs>
                           <CartesianGrid strokeDasharray="3 3" stroke="#EAEFF5" />
                           <XAxis type="number" domain={[0, 'auto']} tickFormatter={formatAxisINR} tickLine={{ stroke: '#000000' }} axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} tick={{ fontSize: 9.5, fill: '#0F2A4A' }} />
                           <YAxis dataKey="location" type="category" interval={0} tickLine={{ stroke: '#000000' }} axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} tick={{ fontSize: 10, fill: '#0F2A4A' }} width={150} />
@@ -604,34 +660,34 @@ export default function DeptDashboard({ deptId = 'pm', departments = [], filters
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                         <span style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#475569' }}>
-                                          <span style={{ width: '8px', height: '8px', backgroundColor: '#6366F1', borderRadius: '2px', display: 'inline-block' }} />
+                                          <span style={{ width: '9px', height: '9px', backgroundColor: '#7C3AED', border: '1px solid #5B21B6', borderRadius: '2px', display: 'inline-block' }} />
                                           Opening Balance:
                                         </span>
-                                        <strong style={{ color: '#0F2A4A' }}>{formatINR(d.openingBalance || 0)}</strong>
+                                        <strong style={{ color: '#7C3AED' }}>{formatINR(d.openingBalance || 0)}</strong>
                                       </div>
                                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                         <span style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#475569' }}>
-                                          <span style={{ width: '8px', height: '8px', backgroundColor: '#0284C7', borderRadius: '2px', display: 'inline-block' }} />
+                                          <span style={{ width: '9px', height: '9px', backgroundColor: '#0284C7', border: '1px solid #0369A1', borderRadius: '2px', display: 'inline-block' }} />
                                           Total Cost:
                                         </span>
                                         <strong style={{ color: '#0F2A4A' }}>{formatINR(d.totalCost || 0)}</strong>
                                       </div>
                                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                         <span style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#475569' }}>
-                                          <span style={{ width: '8px', height: '8px', backgroundColor: '#1F6FEB', borderRadius: '2px', display: 'inline-block' }} />
+                                          <span style={{ width: '9px', height: '9px', backgroundColor: '#059669', border: '1px solid #047857', borderRadius: '2px', display: 'inline-block' }} />
                                           Paid Amount:
                                         </span>
-                                        <strong style={{ color: '#1F6FEB' }}>{formatINR(d.paidAmount || d.amount || 0)}</strong>
+                                        <strong style={{ color: '#059669' }}>{formatINR(d.paidAmount || d.amount || 0)}</strong>
                                       </div>
                                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid #E2E8F0', paddingTop: '4px', marginTop: '2px' }}>
-                                        <span style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#C8423A', fontWeight: '700' }}>
-                                          <span style={{ width: '8px', height: '8px', backgroundColor: '#C8423A', borderRadius: '2px', display: 'inline-block' }} />
+                                        <span style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#BE123C', fontWeight: '700' }}>
+                                          <span style={{ width: '9px', height: '9px', backgroundColor: '#BE123C', border: '1px solid #9F1239', borderRadius: '2px', display: 'inline-block' }} />
                                           Closing Balance:
                                         </span>
-                                        <strong style={{ color: '#C8423A' }}>{formatINR(d.closingBalance || 0)}</strong>
+                                        <strong style={{ color: '#BE123C' }}>{formatINR(d.closingBalance || 0)}</strong>
                                       </div>
                                       {d.quantity > 0 && (
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '2px', fontSize: '10.5px', color: '#10B981' }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '2px', fontSize: '10.5px', color: '#059669' }}>
                                           <span>Total Quantity:</span>
                                           <strong>{formatNumber(d.quantity, 2)} Ltrs</strong>
                                         </div>
@@ -643,10 +699,10 @@ export default function DeptDashboard({ deptId = 'pm', departments = [], filters
                               return null;
                             }}
                           />
-                          <Bar dataKey="openingBalance" fill="#6366F1" name="Opening Balance" barSize={7} radius={[0, 2, 2, 0]} />
-                          <Bar dataKey="totalCost" fill="#0284C7" name="Total Cost" barSize={7} radius={[0, 2, 2, 0]} />
-                          <Bar dataKey="paidAmount" fill="#1F6FEB" name="Paid Amount" barSize={7} radius={[0, 2, 2, 0]} />
-                          <Bar dataKey="closingBalance" fill="#C8423A" name="Closing Balance" barSize={7} radius={[0, 2, 2, 0]} />
+                          <Bar dataKey="openingBalance" fill="url(#deptLocGradPurple)" stroke="#5B21B6" strokeWidth={1} filter="url(#deptLocBar3d)" name="Opening Balance" barSize={7} radius={[0, 2, 2, 0]} />
+                          <Bar dataKey="totalCost" fill="url(#deptLocGradBlue)" stroke="#0369A1" strokeWidth={1} filter="url(#deptLocBar3d)" name="Total Cost" barSize={7} radius={[0, 2, 2, 0]} />
+                          <Bar dataKey="paidAmount" fill="url(#deptLocGradGreen)" stroke="#047857" strokeWidth={1} filter="url(#deptLocBar3d)" name="Paid Amount" barSize={7} radius={[0, 2, 2, 0]} />
+                          <Bar dataKey="closingBalance" fill="url(#deptLocGradRose)" stroke="#9F1239" strokeWidth={1} filter="url(#deptLocBar3d)" name="Closing Balance" barSize={7} radius={[0, 2, 2, 0]} />
                         </BarChart>
                       </ResponsiveContainer>
                     </div>
@@ -760,6 +816,19 @@ export default function DeptDashboard({ deptId = 'pm', departments = [], filters
                     <div style={{ width: '100%', height: '220px' }}>
                       <ResponsiveContainer width="100%" height="100%">
                         <BarChart data={primaryData} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+                          <defs>
+                            <filter id="deptOtherBar3d" x="-10%" y="-10%" width="130%" height="130%">
+                              <feDropShadow dx="2" dy="3" stdDeviation="2" floodColor="#0F2A4A" floodOpacity="0.20" />
+                            </filter>
+                            <linearGradient id="deptOtherGradBlue" x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="0%" stopColor="#38BDF8" />
+                              <stop offset="100%" stopColor="#0284C7" />
+                            </linearGradient>
+                            <linearGradient id="deptOtherGradOrange" x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="0%" stopColor="#FB923C" />
+                              <stop offset="100%" stopColor="#EA580C" />
+                            </linearGradient>
+                          </defs>
                           <CartesianGrid strokeDasharray="3 3" stroke="#EAEFF5" />
                           <XAxis dataKey="label" tickLine={{ stroke: '#000000' }} axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} tick={{ fontSize: 9.5, fill: '#0F2A4A' }} />
                           <YAxis tickFormatter={formatAxisINR} tickLine={{ stroke: '#000000' }} axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} tick={{ fontSize: 9.5, fill: '#0F2A4A' }} />
@@ -767,9 +836,9 @@ export default function DeptDashboard({ deptId = 'pm', departments = [], filters
                             formatter={(val) => [`Rs. ${Number(val).toLocaleString('en-IN')}`, 'Value']}
                             contentStyle={{ fontSize: '11px', borderRadius: '4px' }} 
                           />
-                          <Bar dataKey="val1" fill="#1F6FEB" name="Primary" radius={[2, 2, 0, 0]} />
+                          <Bar dataKey="val1" fill="url(#deptOtherGradBlue)" stroke="#0369A1" strokeWidth={1} filter="url(#deptOtherBar3d)" name="Primary" radius={[2, 2, 0, 0]} />
                           {primaryData.some(p => p.val2 !== undefined) && (
-                            <Bar dataKey="val2" fill="#D99A1E" name="Secondary" radius={[2, 2, 0, 0]} />
+                            <Bar dataKey="val2" fill="url(#deptOtherGradOrange)" stroke="#C2410C" strokeWidth={1} filter="url(#deptOtherBar3d)" name="Secondary" radius={[2, 2, 0, 0]} />
                           )}
                         </BarChart>
                       </ResponsiveContainer>
@@ -832,6 +901,15 @@ export default function DeptDashboard({ deptId = 'pm', departments = [], filters
                     <div style={{ width: '100%', height: '200px' }}>
                       <ResponsiveContainer width="100%" height="100%">
                         <BarChart data={secondaryData} layout="vertical" margin={{ top: 10, right: 10, left: 30, bottom: 0 }}>
+                          <defs>
+                            <filter id="deptOtherSec3d" x="-10%" y="-10%" width="130%" height="130%">
+                              <feDropShadow dx="2" dy="3" stdDeviation="2" floodColor="#0F2A4A" floodOpacity="0.20" />
+                            </filter>
+                            <linearGradient id="deptOtherGradGreenH" x1="0" y1="0" x2="1" y2="0">
+                              <stop offset="0%" stopColor="#34D399" />
+                              <stop offset="100%" stopColor="#059669" />
+                            </linearGradient>
+                          </defs>
                           <CartesianGrid strokeDasharray="3 3" stroke="#EAEFF5" />
                           <XAxis type="number" tickFormatter={formatAxisINR} tickLine={{ stroke: '#000000' }} axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} tick={{ fontSize: 9.5, fill: '#0F2A4A' }} />
                           <YAxis dataKey="name" type="category" tickLine={{ stroke: '#000000' }} axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} tick={{ fontSize: 9.5, fill: '#0F2A4A' }} width={90} />
@@ -839,7 +917,7 @@ export default function DeptDashboard({ deptId = 'pm', departments = [], filters
                             formatter={(val) => [formatINR(val), 'Amount']}
                             contentStyle={{ fontSize: '11px', borderRadius: '4px' }} 
                           />
-                          <Bar dataKey="value" fill="#2E9E6B" radius={[0, 2, 2, 0]} />
+                          <Bar dataKey="value" fill="url(#deptOtherGradGreenH)" stroke="#047857" strokeWidth={1} filter="url(#deptOtherSec3d)" radius={[0, 3, 3, 0]} />
                         </BarChart>
                       </ResponsiveContainer>
                     </div>
