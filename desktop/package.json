@@ -1,0 +1,76 @@
+{
+  "name": "civet-dashboards-mis",
+  "productName": "Civet MIS",
+  "version": "1.0.8",
+  "description": "Civet Projects Private Limited - Management Information System",
+  "main": "main.js",
+  "author": "Civet Projects Private Limited",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder --win --x64"
+  },
+  "build": {
+    "appId": "com.civetprojects.mis",
+    "productName": "Civet MIS",
+    "asar": true,
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "package.json",
+      "icon.png",
+      "icon.ico",
+      {
+        "from": "../backend",
+        "to": "backend",
+        "filter": [
+          "**/*",
+          "!data/uploads/**/*"
+        ]
+      },
+      {
+        "from": "../frontend/dist",
+        "to": "frontend/dist",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ],
+    "win": {
+      "icon": "build/icon.ico",
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Civet MIS",
+      "warningsAsErrors": false
+    }
+  },
+  "devDependencies": {
+    "electron": "^44.7.0",
+    "electron-builder": "^26.15.3"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.6",
+    "dotenv": "^18.0.7",
+    "exceljs": "^4.4.0",
+    "express": "^5.3.0",
+    "mongodb": "^7.7.0",
+    "multer": "^2.4.0",
+    "pdfkit": "^0.20.2"
+  }
+}
