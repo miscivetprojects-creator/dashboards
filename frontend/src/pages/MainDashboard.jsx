@@ -139,26 +139,26 @@ export default function MainDashboard({ filters, onNavigate }) {
         <KPICard 
           label="Total Amount (Fuel Cost)" 
           value={formatINR(totalCostAmount)} 
-          bg="#E8F4FD"
-          borderLeftColor="#1F6FEB"
+          bg="#BAE6FD"
+          borderLeftColor="#0284C7"
         />
         <KPICard 
           label="Opening Balance" 
           value={formatINR(totalOpeningAmount)} 
-          bg="#EAF8F1"
-          borderLeftColor="#2E9E6B"
+          bg="#BBF7D0"
+          borderLeftColor="#16A34A"
         />
         <KPICard 
           label="Closing Balance" 
           value={formatINR(totalClosingAmount)} 
-          bg="#FDF2E9"
+          bg="#FED7AA"
           borderLeftColor="#EA580C"
         />
         <KPICard 
           label="Active Cost Centers" 
           value={kpis.activeSites?.formatted || `${activeLocSpending.length || 39} Cost Centers`} 
-          bg="#F3E8FF"
-          borderLeftColor="#8B5CF6"
+          bg="#DDD6FE"
+          borderLeftColor="#7C3AED"
         />
       </div>
 
@@ -184,7 +184,7 @@ export default function MainDashboard({ filters, onNavigate }) {
               alignItems: 'stretch'
             }}>
               <div style={{
-                backgroundColor: '#F0F7FF',
+                backgroundColor: '#E0F2FE',
                 border: '1px solid #000000',
                 borderRadius: '6px',
                 padding: '14px 12px 8px 6px'
@@ -374,7 +374,7 @@ export default function MainDashboard({ filters, onNavigate }) {
               alignItems: 'center'
             }}>
               <div style={{
-                backgroundColor: '#FAF5FF',
+                backgroundColor: '#F3E8FF',
                 border: '1px solid #000000',
                 borderRadius: '6px',
                 padding: '12px 14px',
@@ -551,7 +551,7 @@ export default function MainDashboard({ filters, onNavigate }) {
             ) : (
               <div>
                 <div style={{
-                  backgroundColor: '#F0F7FF',
+                  backgroundColor: '#FEF3C7',
                   border: '1px solid #000000',
                   borderRadius: '6px',
                   padding: '10px 8px 4px 0',
@@ -620,7 +620,7 @@ export default function MainDashboard({ filters, onNavigate }) {
             ) : (
               <div>
                 <div style={{
-                  backgroundColor: '#F0FDF4',
+                  backgroundColor: '#DCFCE7',
                   border: '1px solid #000000',
                   borderRadius: '6px',
                   padding: '10px 14px 4px 10px',
