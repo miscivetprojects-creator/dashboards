@@ -99,7 +99,7 @@ export default function CashAndCarryChart({ data = [], analytics = {} }) {
                   yAxisId="left"
                   tickLine={{ stroke: '#000000' }}
                   axisLine={{ stroke: '#000000', strokeWidth: 1.5 }}
-                  tick={{ fontSize: 9.5, fill: '#1F6FEB' }}
+                  tick={{ fontSize: 9.5, fill: '#0284C7' }}
                   tickFormatter={formatShortAxisINR}
                 />
                 <YAxis
@@ -107,9 +107,21 @@ export default function CashAndCarryChart({ data = [], analytics = {} }) {
                   orientation="right"
                   tickLine={{ stroke: '#000000' }}
                   axisLine={{ stroke: '#000000', strokeWidth: 1.5 }}
-                  tick={{ fontSize: 9.5, fill: '#D97706' }}
+                  tick={{ fontSize: 9.5, fill: '#EA580C' }}
                   tickFormatter={formatShortAxisLtr}
                 />
+                <defs>
+                  <filter id="ccBar3d" x="-10%" y="-10%" width="130%" height="130%">
+                    <feDropShadow dx="2" dy="3" stdDeviation="2" floodColor="#0F2A4A" floodOpacity="0.20" />
+                  </filter>
+                  <filter id="ccLine3d" x="-10%" y="-10%" width="120%" height="130%">
+                    <feDropShadow dx="1" dy="3" stdDeviation="2" floodColor="#C2410C" floodOpacity="0.30" />
+                  </filter>
+                  <linearGradient id="ccGradBlue" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#38BDF8" />
+                    <stop offset="100%" stopColor="#0284C7" />
+                  </linearGradient>
+                </defs>
                 <Tooltip
                   content={({ active, payload }) => {
                     if (!active || !payload || !payload.length) return null;
@@ -153,7 +165,10 @@ export default function CashAndCarryChart({ data = [], analytics = {} }) {
                 <Bar
                   yAxisId="left"
                   dataKey="amount"
-                  fill="#1F6FEB"
+                  fill="url(#ccGradBlue)"
+                  stroke="#0369A1"
+                  strokeWidth={1.5}
+                  filter="url(#ccBar3d)"
                   radius={[4, 4, 0, 0]}
                   name="Payments Made (Rs.)"
                   barSize={32}
@@ -162,11 +177,12 @@ export default function CashAndCarryChart({ data = [], analytics = {} }) {
                   yAxisId="right"
                   type="monotone"
                   dataKey="quantity"
-                  stroke="#D97706"
-                  strokeWidth={2.5}
+                  stroke="#EA580C"
+                  strokeWidth={3.5}
+                  filter="url(#ccLine3d)"
                   name="Fuel Quantity (Ltrs)"
-                  dot={{ r: 4, fill: '#FFFFFF', stroke: '#D97706', strokeWidth: 2 }}
-                  activeDot={{ r: 6, fill: '#D97706', stroke: '#FFFFFF', strokeWidth: 2 }}
+                  dot={{ r: 4.5, fill: '#FFFFFF', stroke: '#EA580C', strokeWidth: 2.5 }}
+                  activeDot={{ r: 6.5, fill: '#EA580C', stroke: '#FFFFFF', strokeWidth: 2.5 }}
                 />
               </ComposedChart>
             </ResponsiveContainer>
