@@ -1,0 +1,16 @@
+{
+  "name": "dashboards",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start:server": "node backend/server.js",
+    "build:frontend": "cd frontend && npm run build",
+    "desktop": "cd desktop && npm start",
+    "desktop:build": "cd desktop && npm run build"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs"
+}

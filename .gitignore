@@ -1,0 +1,47 @@
+# Dependencies
+node_modules/
+*/node_modules/
+
+# Production builds
+dist/
+build/
+*/dist/
+*/build/
+
+# Environment and secrets
+.env
+.env.local
+.env.*.local
+*.env
+!.env.example
+!*/.env.example
+
+# Excluded assets & developer handoffs
+pdf_text/
+scratch/
+*.pdf
+CIVET_Management_MIS_Developer_Handoff.pdf
+
+# Temporary backups & logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*backup*.json
+
+# OS and Editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Runtime uploads
+backend/data/uploads/*
+!backend/data/uploads/.gitkeep
