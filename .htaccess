@@ -8,16 +8,21 @@
   # Avoid 403 Forbidden by explicitly setting default index files
   DirectoryIndex frontend/dist/index.html index.html index.js server.js
 
-  # Allow direct access to real files and directories
+  # 1. CRITICAL: Never rewrite /api requests to frontend/dist/index.html!
+  RewriteCond %{REQUEST_URI} ^/api [NC]
+  RewriteRule ^ - [L]
+
+  # 2. Allow direct access to real files and directories
   RewriteCond %{REQUEST_FILENAME} -f [OR]
   RewriteCond %{REQUEST_FILENAME} -d
   RewriteRule ^ - [L]
 
-  # Serve assets from frontend/dist
+  # 3. Serve assets from frontend/dist
   RewriteCond %{DOCUMENT_ROOT}/frontend/dist/$1 -f
   RewriteRule ^(.*)$ frontend/dist/$1 [L]
 
-  # SPA fallback to frontend/dist/index.html
+  # 4. SPA fallback: ONLY rewrite non-API requests to frontend/dist/index.html
+  RewriteCond %{REQUEST_URI} !^/api [NC]
   RewriteCond %{DOCUMENT_ROOT}/frontend/dist/index.html -f
   RewriteRule ^.*$ frontend/dist/index.html [L]
 </IfModule>

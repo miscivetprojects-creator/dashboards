@@ -59,6 +59,10 @@ async function executeApiRequest(endpoint, options = {}) {
     return await res.blob();
   }
 
+  if (contentType.includes('text/html')) {
+    throw new Error('API server returned HTML instead of JSON. Ensure the backend Node.js server is started in Hostinger.');
+  }
+
   const data = await res.json().catch(() => ({}));
   if (!res.ok) {
     throw new Error(data.error || `Request failed with status ${res.status}`);
@@ -73,6 +77,9 @@ export const api = {
       method: 'POST',
       body: JSON.stringify({ email, password })
     });
+    if (!data || !data.token) {
+      throw new Error(data?.error || 'Login failed: Invalid server response.');
+    }
     setAuthToken(data.token, data.user);
     return data;
   },
