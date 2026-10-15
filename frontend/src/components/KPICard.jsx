@@ -1,14 +1,18 @@
 import React from 'react';
 
-export default function KPICard({ label, value, badge, icon: Icon, alert = false }) {
+export default function KPICard({ label, value, badge, icon: Icon, alert = false, bg, borderLeftColor }) {
+  const cardBg = alert ? '#FBEFEB' : (bg || '#FFEDB9');
+  const borderLeft = alert ? '4px solid #D9383A' : `4px solid ${borderLeftColor || '#D99A1E'}`;
+  const borderStyle = alert ? '1px solid #F3C3C0' : '1px solid rgba(15, 42, 74, 0.12)';
+
   return (
     <div style={{ 
       display: 'flex', 
       flexDirection: 'column', 
       justifyContent: 'center',
-      backgroundColor: '#FFFFFF',
-      border: alert ? '1px solid #F3C3C0' : '1px solid #000000',
-      borderLeft: alert ? '4px solid #D9383A' : '4px solid #1F6FEB',
+      backgroundColor: cardBg,
+      border: borderStyle,
+      borderLeft: borderLeft,
       borderRadius: '6px',
       height: '76px',
       padding: '12px 14px',
