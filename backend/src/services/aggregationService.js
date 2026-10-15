@@ -717,12 +717,6 @@ class AggregationService {
           label: 'Operating Departments',
           subtext: null
         },
-        totalRecords: {
-          value: monthlyRecordsCount,
-          formatted: `${formatIndianNumber(monthlyRecordsCount, 0)} Records`,
-          label: 'Operational Submissions',
-          subtext: null
-        },
         activeSites: {
           value: locationsReportingCount > 0 ? locationsReportingCount : activeLocations.length,
           formatted: `${locationsReportingCount > 0 ? locationsReportingCount : activeLocations.length} Cost Centers`,
@@ -1502,12 +1496,6 @@ class AggregationService {
           label: 'Total Amount (Fuel Cost)',
           subtext: null
         },
-        totalAmount: {
-          value: totalFuelExp,
-          formatted: formatIndianCurrency(totalFuelExp),
-          label: 'Total Paid Amount',
-          subtext: null
-        },
         totalPayments: {
           value: totalFuelExp,
           formatted: formatIndianCurrency(totalFuelExp),
@@ -2065,12 +2053,6 @@ class AggregationService {
             label: 'Closing Balance',
             subtext: null
           },
-          totalAmount: {
-            value: 0,
-            formatted: 'Rs. 0',
-            label: 'Total Amount',
-            subtext: null
-          },
           totalPayments: {
             value: 0,
             formatted: 'Rs. 0',
@@ -2320,12 +2302,6 @@ class AggregationService {
           value: runningLocBal,
           formatted: formatIndianCurrency(runningLocBal),
           label: 'Closing Balance',
-          subtext: null
-        },
-        totalAmount: {
-          value: totalPaid,
-          formatted: formatIndianCurrency(totalPaid),
-          label: 'Total Amount',
           subtext: null
         },
         totalPayments: {
