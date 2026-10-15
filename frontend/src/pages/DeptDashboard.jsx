@@ -17,7 +17,7 @@ const DEPARTMENT_METADATA = {
     badge: 'P&M'
   },
   fuel: {
-    title: '',
+    title: 'Fuel Management',
     subtitle: 'Site diesel intake, litres, fuel rates, suppliers, and machinery tracking',
     icon: Fuel,
     apiMethod: 'getFuelDashboard',
@@ -239,13 +239,13 @@ export default function DeptDashboard({ deptId = 'pm', departments = [], filters
         {(() => {
           const KPI_LIGHT_COLORS = [
             { bg: '#FFEDB9', border: '#D99A1E' },
-            { bg: '#E8F4FD', border: '#1F6FEB' },
-            { bg: '#EAF8F1', border: '#2E9E6B' },
-            { bg: '#FDF2E9', border: '#EA580C' },
-            { bg: '#F3E8FF', border: '#8B5CF6' },
-            { bg: '#E0F2FE', border: '#0284C7' },
-            { bg: '#FEF3C7', border: '#D97706' },
-            { bg: '#F1F5F9', border: '#64748B' }
+            { bg: '#BAE6FD', border: '#0284C7' },
+            { bg: '#BBF7D0', border: '#16A34A' },
+            { bg: '#FED7AA', border: '#EA580C' },
+            { bg: '#DDD6FE', border: '#7C3AED' },
+            { bg: '#A5F3FC', border: '#0891B2' },
+            { bg: '#FECDD3', border: '#E11D48' },
+            { bg: '#D9F99D', border: '#65A30D' }
           ];
           const seenLabels = new Set();
           let colorIdx = 0;
@@ -301,7 +301,7 @@ export default function DeptDashboard({ deptId = 'pm', departments = [], filters
               ) : (
                 <div>
                   <div style={{
-                    backgroundColor: '#FFFFFF',
+                    backgroundColor: '#F0F7FF',
                     border: '1px solid #000000',
                     borderRadius: '6px',
                     padding: '10px 8px 4px 0',
@@ -332,7 +332,23 @@ export default function DeptDashboard({ deptId = 'pm', departments = [], filters
                             </linearGradient>
                           </defs>
                           <CartesianGrid strokeDasharray="3 3" stroke="#EAEFF5" />
-                          <XAxis dataKey="label" tickLine={{ stroke: '#000000' }} axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} tick={{ fontSize: 9.5, fill: '#0F2A4A' }} />
+                          <XAxis 
+                            dataKey="month" 
+                            interval={0} 
+                            tickFormatter={(val, idx) => {
+                              if (val && typeof val === 'string' && val.length <= 4) return val;
+                              const p = primaryData[idx];
+                              if (p?.month) return p.month;
+                              if (p?.monthNum) {
+                                const mNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                                return mNames[p.monthNum - 1] || val;
+                              }
+                              return val;
+                            }}
+                            tickLine={{ stroke: '#000000' }} 
+                            axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} 
+                            tick={{ fontSize: 9.5, fill: '#0F2A4A' }} 
+                          />
                           <YAxis tickFormatter={formatAxisINR} tickLine={{ stroke: '#000000' }} axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} tick={{ fontSize: 9.5, fill: '#0F2A4A' }} />
                           <Tooltip 
                             content={({ active, payload, label }) => {
@@ -458,7 +474,7 @@ export default function DeptDashboard({ deptId = 'pm', departments = [], filters
               ) : (
                 <div>
                   <div style={{
-                    backgroundColor: '#FFFFFF',
+                    backgroundColor: '#F0FDF4',
                     border: '1px solid #000000',
                     borderRadius: '6px',
                     padding: '10px 8px 4px 0',
@@ -473,7 +489,23 @@ export default function DeptDashboard({ deptId = 'pm', departments = [], filters
                             </filter>
                           </defs>
                           <CartesianGrid strokeDasharray="3 3" stroke="#EAEFF5" />
-                          <XAxis dataKey="label" tickLine={{ stroke: '#000000' }} axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} tick={{ fontSize: 9.5, fill: '#0F2A4A' }} />
+                          <XAxis 
+                            dataKey="month" 
+                            interval={0} 
+                            tickFormatter={(val, idx) => {
+                              if (val && typeof val === 'string' && val.length <= 4) return val;
+                              const p = primaryData[idx];
+                              if (p?.month) return p.month;
+                              if (p?.monthNum) {
+                                const mNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                                return mNames[p.monthNum - 1] || val;
+                              }
+                              return val;
+                            }}
+                            tickLine={{ stroke: '#000000' }} 
+                            axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} 
+                            tick={{ fontSize: 9.5, fill: '#0F2A4A' }} 
+                          />
                           <YAxis tickFormatter={(v) => v >= 1000 ? `${(v / 1000).toFixed(0)}k L` : `${v} L`} tickLine={{ stroke: '#000000' }} axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} tick={{ fontSize: 9.5, fill: '#059669' }} />
                           <Tooltip 
                             formatter={(val) => [`${formatNumber(val, 2)} Ltrs`, 'Fuel Quantity']}
@@ -524,7 +556,7 @@ export default function DeptDashboard({ deptId = 'pm', departments = [], filters
               ) : (
                 <div>
                   <div style={{
-                    backgroundColor: '#FFFFFF',
+                    backgroundColor: '#F0FDF4',
                     border: '1px solid #000000',
                     borderRadius: '6px',
                     padding: '10px 12px 4px 8px',
@@ -605,7 +637,7 @@ export default function DeptDashboard({ deptId = 'pm', departments = [], filters
 
                 <div>
                   <div style={{
-                    backgroundColor: '#FFFFFF',
+                    backgroundColor: '#F0F7FF',
                     border: '1px solid #000000',
                     borderRadius: '6px',
                     padding: '12px 14px 10px 8px',
@@ -807,7 +839,7 @@ export default function DeptDashboard({ deptId = 'pm', departments = [], filters
               ) : (
                 <div>
                   <div style={{
-                    backgroundColor: '#FFFFFF',
+                    backgroundColor: '#F0F7FF',
                     border: '1px solid #000000',
                     borderRadius: '6px',
                     padding: '10px 8px 4px 0',
@@ -830,7 +862,23 @@ export default function DeptDashboard({ deptId = 'pm', departments = [], filters
                             </linearGradient>
                           </defs>
                           <CartesianGrid strokeDasharray="3 3" stroke="#EAEFF5" />
-                          <XAxis dataKey="label" tickLine={{ stroke: '#000000' }} axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} tick={{ fontSize: 9.5, fill: '#0F2A4A' }} />
+                          <XAxis 
+                            dataKey="month" 
+                            interval={0} 
+                            tickFormatter={(val, idx) => {
+                              if (val && typeof val === 'string' && val.length <= 4) return val;
+                              const p = primaryData[idx];
+                              if (p?.month) return p.month;
+                              if (p?.monthNum) {
+                                const mNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                                return mNames[p.monthNum - 1] || val;
+                              }
+                              return val;
+                            }}
+                            tickLine={{ stroke: '#000000' }} 
+                            axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} 
+                            tick={{ fontSize: 9.5, fill: '#0F2A4A' }} 
+                          />
                           <YAxis tickFormatter={formatAxisINR} tickLine={{ stroke: '#000000' }} axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} tick={{ fontSize: 9.5, fill: '#0F2A4A' }} />
                           <Tooltip 
                             formatter={(val) => [`Rs. ${Number(val).toLocaleString('en-IN')}`, 'Value']}
