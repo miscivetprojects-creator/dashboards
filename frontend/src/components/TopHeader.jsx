@@ -35,7 +35,14 @@ export default function TopHeader({
             value={filters.year || '2025'}
             onChange={e => {
               const val = e.target.value;
-              if (val === '2026') {
+              if (val === 'ALL' || val === 'All') {
+                onFilterChange({
+                  ...filters,
+                  year: 'ALL',
+                  from_date: '',
+                  to_date: ''
+                });
+              } else if (val === '2026') {
                 onFilterChange({
                   ...filters,
                   year: '2026',
@@ -65,6 +72,7 @@ export default function TopHeader({
             }}
             title="Select Year"
           >
+            <option value="ALL">All</option>
             <option value="2025">2025</option>
             <option value="2026">2026</option>
           </select>
