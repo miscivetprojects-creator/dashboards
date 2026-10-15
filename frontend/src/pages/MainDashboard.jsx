@@ -11,7 +11,8 @@ import RecordPreviewModal from '../components/RecordPreviewModal';
 import { api } from '../services/api';
 import { formatINR, formatNumber } from '../utils/formatUtils';
 
-const PALETTE = ['#1F6FEB', '#2E9E6B', '#D99A1E', '#9B51E0', '#0F2A4A', '#E67E22', '#16A085'];
+const PALETTE = ['#0284C7', '#059669', '#EA580C', '#7C3AED', '#EAB308', '#BE123C'];
+const PALETTE_STROKES = ['#0369A1', '#047857', '#C2410C', '#5B21B6', '#A16207', '#9F1239'];
 
 function formatAxisINR(val) {
   if (val >= 10000000) return `${(val / 10000000).toFixed(1)} Cr`;
@@ -191,6 +192,19 @@ export default function MainDashboard({ filters, onNavigate }) {
                 <div style={{ width: '100%', height: '240px' }}>
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={spendingTrend} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+                      <defs>
+                        <filter id="mainBar3d" x="-10%" y="-10%" width="130%" height="130%">
+                          <feDropShadow dx="2" dy="3" stdDeviation="2" floodColor="#0F2A4A" floodOpacity="0.20" />
+                        </filter>
+                        <linearGradient id="mainPaidGrad" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="#38BDF8" />
+                          <stop offset="100%" stopColor="#0284C7" />
+                        </linearGradient>
+                        <linearGradient id="mainClosingGrad" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="#FB7185" />
+                          <stop offset="100%" stopColor="#BE123C" />
+                        </linearGradient>
+                      </defs>
                       <CartesianGrid strokeDasharray="3 3" stroke="#EAEFF5" />
                       <XAxis dataKey="month" tickLine={{ stroke: '#000000' }} axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} tick={{ fontSize: 10, fill: '#0F2A4A' }} />
                       <YAxis tickFormatter={formatAxisINR} tickLine={{ stroke: '#000000' }} axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} tick={{ fontSize: 10, fill: '#0F2A4A' }} />
@@ -222,34 +236,34 @@ export default function MainDashboard({ filters, onNavigate }) {
                                 </div>
                                 {(pData.openingBalance > 0 || bal > 0) && (
                                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '11px', marginBottom: '4px' }}>
-                                    <span style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#6366F1' }}>
-                                      <span style={{ width: '8px', height: '8px', borderRadius: '2px', backgroundColor: '#6366F1' }}></span>
+                                    <span style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#7C3AED' }}>
+                                      <span style={{ width: '9px', height: '9px', borderRadius: '2px', backgroundColor: '#7C3AED', border: '1px solid #5B21B6' }}></span>
                                       Opening Balance
                                     </span>
-                                    <strong style={{ color: '#6366F1', fontWeight: '700' }}>{formatINR(pData.openingBalance || 0)}</strong>
+                                    <strong style={{ color: '#7C3AED', fontWeight: '700' }}>{formatINR(pData.openingBalance || 0)}</strong>
                                   </div>
                                 )}
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '11px', marginBottom: '4px' }}>
-                                  <span style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#0284C7' }}>
-                                    <span style={{ width: '8px', height: '8px', borderRadius: '2px', backgroundColor: '#0284C7' }}></span>
+                                  <span style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#059669' }}>
+                                    <span style={{ width: '9px', height: '9px', borderRadius: '2px', backgroundColor: '#059669', border: '1px solid #047857' }}></span>
                                     Total Cost
                                   </span>
                                   <strong style={{ color: '#0F2A4A', fontWeight: '700' }}>{formatINR(cost)}</strong>
                                 </div>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '11px', marginBottom: '4px' }}>
-                                  <span style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#1F6FEB' }}>
-                                    <span style={{ width: '8px', height: '8px', borderRadius: '2px', backgroundColor: '#1F6FEB' }}></span>
+                                  <span style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#0284C7' }}>
+                                    <span style={{ width: '9px', height: '9px', borderRadius: '2px', backgroundColor: '#0284C7', border: '1px solid #0369A1' }}></span>
                                     Paid Amount
                                   </span>
                                   <strong style={{ color: '#0F2A4A', fontWeight: '700' }}>{formatINR(tot)}</strong>
                                 </div>
                                 {(bal > 0 || pData.openingBalance > 0) && (
                                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '11px', borderTop: '1px solid #F1F5F9', paddingTop: '4px' }}>
-                                    <span style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#C8423A' }}>
-                                      <span style={{ width: '8px', height: '8px', borderRadius: '2px', backgroundColor: '#C8423A' }}></span>
+                                    <span style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#BE123C' }}>
+                                      <span style={{ width: '9px', height: '9px', borderRadius: '2px', backgroundColor: '#BE123C', border: '1px solid #9F1239' }}></span>
                                       Closing Balance
                                     </span>
-                                    <strong style={{ color: '#C8423A', fontWeight: '700' }}>{formatINR(bal)}</strong>
+                                    <strong style={{ color: '#BE123C', fontWeight: '700' }}>{formatINR(bal)}</strong>
                                   </div>
                                 )}
                               </div>
@@ -258,8 +272,8 @@ export default function MainDashboard({ filters, onNavigate }) {
                           return null;
                         }}
                       />
-                      <Bar dataKey="amount" fill="#1F6FEB" stackId="main" radius={[0, 0, 0, 0]} name="Paid Amount (Rs.)" />
-                      <Bar dataKey="balance" fill="#C8423A" stackId="main" radius={[3, 3, 0, 0]} name="Closing Balance (Rs.)" />
+                      <Bar dataKey="amount" fill="url(#mainPaidGrad)" stroke="#0369A1" strokeWidth={1} filter="url(#mainBar3d)" stackId="main" radius={[0, 0, 0, 0]} name="Paid Amount (Rs.)" />
+                      <Bar dataKey="balance" fill="url(#mainClosingGrad)" stroke="#9F1239" strokeWidth={1} filter="url(#mainBar3d)" stackId="main" radius={[3, 3, 0, 0]} name="Closing Balance (Rs.)" />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
@@ -388,6 +402,11 @@ export default function MainDashboard({ filters, onNavigate }) {
                 <div style={{ width: '100%', height: '220px', position: 'relative' }}>
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
+                      <defs>
+                        <filter id="mainPie3d" x="-20%" y="-20%" width="140%" height="140%">
+                          <feDropShadow dx="2" dy="3" stdDeviation="2.5" floodColor="#0F2A4A" floodOpacity="0.22" />
+                        </filter>
+                      </defs>
                       <Pie
                         data={activeDeptSpending}
                         cx="50%"
@@ -399,9 +418,15 @@ export default function MainDashboard({ filters, onNavigate }) {
                         nameKey="name"
                         label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
                         labelLine={true}
+                        filter="url(#mainPie3d)"
                       >
                         {activeDeptSpending.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={PALETTE[index % PALETTE.length]} />
+                          <Cell 
+                            key={`cell-${index}`} 
+                            fill={PALETTE[index % PALETTE.length]} 
+                            stroke={PALETTE_STROKES[index % PALETTE_STROKES.length]}
+                            strokeWidth={2}
+                          />
                         ))}
                       </Pie>
                       <Tooltip 
@@ -442,7 +467,7 @@ export default function MainDashboard({ filters, onNavigate }) {
                     const pct = total > 0 ? (entry.amount / total) * 100 : 0;
                     return (
                       <div key={entry.name || index} style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '10.5px' }}>
-                        <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: PALETTE[index % PALETTE.length], display: 'inline-block' }} />
+                        <span style={{ width: '9px', height: '9px', borderRadius: '50%', backgroundColor: PALETTE[index % PALETTE.length], border: `1.5px solid ${PALETTE_STROKES[index % PALETTE_STROKES.length]}`, boxShadow: '0 1px 3px rgba(0,0,0,0.18)', display: 'inline-block' }} />
                         <span style={{ color: '#0F2A4A', fontWeight: '600' }}>{entry.name || entry.id}:</span>
                         <span style={{ color: '#1F6FEB', fontWeight: '700' }}>
                           {formatINR(entry.amount)}
@@ -490,7 +515,7 @@ export default function MainDashboard({ filters, onNavigate }) {
                       }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                            <span style={{ width: '9px', height: '9px', borderRadius: '50%', backgroundColor: PALETTE[index % PALETTE.length] }} />
+                            <span style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: PALETTE[index % PALETTE.length], border: `1.5px solid ${PALETTE_STROKES[index % PALETTE_STROKES.length]}`, boxShadow: '0 1px 3px rgba(0,0,0,0.18)' }} />
                             <strong style={{ color: '#0F2A4A' }}>{entry.name || entry.id}</strong>
                           </div>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -498,8 +523,8 @@ export default function MainDashboard({ filters, onNavigate }) {
                             <span style={{ fontSize: '10.5px', color: '#64748B', fontWeight: '600' }}>{pctStr}</span>
                           </div>
                         </div>
-                        <div style={{ width: '100%', height: '5px', backgroundColor: '#E2E8F0', borderRadius: '3px', overflow: 'hidden' }}>
-                          <div style={{ width: `${Math.min(pct, 100)}%`, height: '100%', backgroundColor: PALETTE[index % PALETTE.length], borderRadius: '3px' }} />
+                        <div style={{ width: '100%', height: '6px', backgroundColor: '#E2E8F0', borderRadius: '3px', overflow: 'hidden' }}>
+                          <div style={{ width: `${Math.min(pct, 100)}%`, height: '100%', backgroundColor: PALETTE[index % PALETTE.length], border: `1px solid ${PALETTE_STROKES[index % PALETTE_STROKES.length]}`, borderRadius: '3px', boxShadow: '0 1px 2px rgba(0,0,0,0.15)' }} />
                         </div>
                       </div>
                     );
@@ -535,11 +560,20 @@ export default function MainDashboard({ filters, onNavigate }) {
                   <div style={{ width: '100%', height: '190px' }}>
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart data={activeLocSpending} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+                        <defs>
+                          <filter id="mainLocBar3d" x="-10%" y="-10%" width="130%" height="130%">
+                            <feDropShadow dx="2" dy="3" stdDeviation="2" floodColor="#0F2A4A" floodOpacity="0.20" />
+                          </filter>
+                          <linearGradient id="mainLocBlueGrad" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stopColor="#38BDF8" />
+                            <stop offset="100%" stopColor="#0284C7" />
+                          </linearGradient>
+                        </defs>
                         <CartesianGrid strokeDasharray="3 3" stroke="#EAEFF5" />
                         <XAxis dataKey="location" tickLine={{ stroke: '#000000' }} axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} tick={{ fontSize: 9.5, fill: '#0F2A4A' }} />
                         <YAxis tickFormatter={formatAxisINR} tickLine={{ stroke: '#000000' }} axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} tick={{ fontSize: 9.5, fill: '#0F2A4A' }} />
                         <Tooltip formatter={(val) => [formatINR(val), 'Spending']} />
-                        <Bar dataKey="amount" fill="#0F2A4A" radius={[3, 3, 0, 0]} />
+                        <Bar dataKey="amount" fill="url(#mainLocBlueGrad)" stroke="#0369A1" strokeWidth={1} filter="url(#mainLocBar3d)" radius={[3, 3, 0, 0]} />
                       </BarChart>
                     </ResponsiveContainer>
                   </div>
@@ -563,8 +597,8 @@ export default function MainDashboard({ filters, onNavigate }) {
                             <span style={{ color: '#1C2733' }}>{loc.location}</span>
                             <strong style={{ color: '#0F2A4A' }}>{formatINR(loc.amount)}</strong>
                           </div>
-                          <div style={{ width: '100%', height: '4px', backgroundColor: '#E2E8F0', borderRadius: '2px', overflow: 'hidden' }}>
-                            <div style={{ width: `${pct}%`, height: '100%', backgroundColor: '#0F2A4A', borderRadius: '2px' }} />
+                          <div style={{ width: '100%', height: '5px', backgroundColor: '#E2E8F0', borderRadius: '3px', overflow: 'hidden' }}>
+                            <div style={{ width: `${pct}%`, height: '100%', backgroundColor: '#0284C7', border: '1px solid #0369A1', borderRadius: '3px', boxShadow: '0 1px 2px rgba(0,0,0,0.12)' }} />
                           </div>
                         </div>
                       );
@@ -595,11 +629,20 @@ export default function MainDashboard({ filters, onNavigate }) {
                   <div style={{ width: '100%', height: '190px' }}>
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart data={activeServiceSpending} layout="vertical" margin={{ top: 10, right: 10, left: 30, bottom: 0 }}>
+                        <defs>
+                          <filter id="mainSrvBar3d" x="-10%" y="-10%" width="130%" height="130%">
+                            <feDropShadow dx="2" dy="3" stdDeviation="2" floodColor="#0F2A4A" floodOpacity="0.20" />
+                          </filter>
+                          <linearGradient id="mainSrvGreenGrad" x1="0" y1="0" x2="1" y2="0">
+                            <stop offset="0%" stopColor="#34D399" />
+                            <stop offset="100%" stopColor="#059669" />
+                          </linearGradient>
+                        </defs>
                         <CartesianGrid strokeDasharray="3 3" stroke="#EAEFF5" />
                         <XAxis type="number" tickFormatter={formatAxisINR} tickLine={{ stroke: '#000000' }} axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} tick={{ fontSize: 9.5, fill: '#0F2A4A' }} />
                         <YAxis dataKey="service" type="category" tickLine={{ stroke: '#000000' }} axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} tick={{ fontSize: 9.5, fill: '#0F2A4A' }} width={80} />
                         <Tooltip formatter={(val) => [formatINR(val), 'Amount']} />
-                        <Bar dataKey="amount" fill="#2E9E6B" radius={[0, 3, 3, 0]} />
+                        <Bar dataKey="amount" fill="url(#mainSrvGreenGrad)" stroke="#047857" strokeWidth={1} filter="url(#mainSrvBar3d)" radius={[0, 3, 3, 0]} />
                       </BarChart>
                     </ResponsiveContainer>
                   </div>
@@ -623,8 +666,8 @@ export default function MainDashboard({ filters, onNavigate }) {
                             <span style={{ color: '#1C2733' }}>{srv.service}</span>
                             <strong style={{ color: '#0F2A4A' }}>{formatINR(srv.amount)}</strong>
                           </div>
-                          <div style={{ width: '100%', height: '4px', backgroundColor: '#E2E8F0', borderRadius: '2px', overflow: 'hidden' }}>
-                            <div style={{ width: `${pct}%`, height: '100%', backgroundColor: '#2E9E6B', borderRadius: '2px' }} />
+                          <div style={{ width: '100%', height: '5px', backgroundColor: '#E2E8F0', borderRadius: '3px', overflow: 'hidden' }}>
+                            <div style={{ width: `${pct}%`, height: '100%', backgroundColor: '#059669', border: '1px solid #047857', borderRadius: '3px', boxShadow: '0 1px 2px rgba(0,0,0,0.12)' }} />
                           </div>
                         </div>
                       );
