@@ -34,13 +34,13 @@ class AggregationService {
         ]
       });
     } else {
-      if (params.year && params.year !== 'All') {
+      if (params.year && String(params.year).toUpperCase() !== 'ALL') {
         filter.reporting_year = Number(params.year);
       }
-      if (params.quarter && params.quarter !== 'All') {
+      if (params.quarter && String(params.quarter).toUpperCase() !== 'ALL') {
         filter.reporting_quarter = params.quarter;
       }
-      if (params.month && params.month !== 'All') {
+      if (params.month && String(params.month).toUpperCase() !== 'ALL') {
         filter.reporting_month = Number(params.month);
       }
     }
@@ -293,6 +293,7 @@ class AggregationService {
         if (m) return Number(m[1]);
       }
       if (params.year) {
+        if (String(params.year).toUpperCase() === 'ALL') return 'All';
         const y = Number(params.year);
         if (!isNaN(y) && y > 2000) return y;
       }
@@ -350,7 +351,7 @@ class AggregationService {
         monthNum: m,
         month: getMonthName(m),
         year: effectiveYear,
-        label: `${getMonthName(m)} ${effectiveYear}`,
+        label: effectiveYear === 'All' ? getMonthName(m) : `${getMonthName(m)} ${effectiveYear}`,
         amount: Number(sumPaid.toFixed(2)),
         paidAmount: Number(sumPaid.toFixed(2)),
         totalCost: Number(sumTotalCost.toFixed(2)),
@@ -980,6 +981,7 @@ class AggregationService {
         if (m) return Number(m[1]);
       }
       if (params.year) {
+        if (String(params.year).toUpperCase() === 'ALL') return 'All';
         const y = Number(params.year);
         if (!isNaN(y) && y > 2000) return y;
       }
@@ -1130,6 +1132,7 @@ class AggregationService {
         if (m) return Number(m[1]);
       }
       if (params.year) {
+        if (String(params.year).toUpperCase() === 'ALL') return 'All';
         const y = Number(params.year);
         if (!isNaN(y) && y > 2000) return y;
       }
@@ -1251,7 +1254,7 @@ class AggregationService {
         monthNum: m,
         month: getMonthName(m),
         year: effectiveYear,
-        label: `${getMonthName(m)} ${effectiveYear}`,
+        label: effectiveYear === 'All' ? getMonthName(m) : `${getMonthName(m)} ${effectiveYear}`,
         amount: amt,
         paidAmount: amt,
         totalCost: totalCostAmt,
@@ -1578,6 +1581,7 @@ class AggregationService {
         if (m) return Number(m[1]);
       }
       if (params.year) {
+        if (String(params.year).toUpperCase() === 'ALL') return 'All';
         const y = Number(params.year);
         if (!isNaN(y) && y > 2000) return y;
       }
@@ -1724,6 +1728,7 @@ class AggregationService {
         if (m) return Number(m[1]);
       }
       if (params.year) {
+        if (String(params.year).toUpperCase() === 'ALL') return 'All';
         const y = Number(params.year);
         if (!isNaN(y) && y > 2000) return y;
       }
@@ -2021,6 +2026,7 @@ class AggregationService {
         if (m) return Number(m[1]);
       }
       if (params.year) {
+        if (String(params.year).toUpperCase() === 'ALL') return 'All';
         const y = Number(params.year);
         if (!isNaN(y) && y > 2000) return y;
       }
