@@ -8,7 +8,8 @@ import RecordPreviewModal from '../components/RecordPreviewModal';
 import { api } from '../services/api';
 import { formatINR, formatNumber } from '../utils/formatUtils';
 
-const DONUT_COLORS = ['#1F6FEB', '#2563EB', '#1D4ED8', '#3B82F6', '#60A5FA'];
+const DONUT_COLORS = ['#0284C7', '#059669', '#EA580C', '#7C3AED', '#EAB308', '#BE123C'];
+const DONUT_STROKES = ['#0369A1', '#047857', '#C2410C', '#5B21B6', '#A16207', '#9F1239'];
 
 export default function LocationDashboard({
   locationName = '',
@@ -285,11 +286,20 @@ export default function LocationDashboard({
             ) : (
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={monthlySpending} margin={{ top: 8, right: 8, left: -10, bottom: 0 }}>
+                  <defs>
+                    <filter id="locMonthBar3d" x="-10%" y="-10%" width="130%" height="130%">
+                      <feDropShadow dx="2" dy="3" stdDeviation="2" floodColor="#0F2A4A" floodOpacity="0.20" />
+                    </filter>
+                    <linearGradient id="locMonthGradBlue" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#38BDF8" />
+                      <stop offset="100%" stopColor="#0284C7" />
+                    </linearGradient>
+                  </defs>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#EAEFF5" />
                   <XAxis dataKey="month" tickLine={{ stroke: '#000000' }} axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} tick={{ fontSize: 9.5, fill: '#0F2A4A' }} />
                   <YAxis tickLine={{ stroke: '#000000' }} axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} tick={{ fontSize: 9.5, fill: '#0F2A4A' }} />
                   <Tooltip formatter={(val, name, item) => [formatINR(item?.payload?.amountRaw ?? (Number(val) * 100000)), 'Spending']} />
-                  <Bar dataKey="amount" fill="#1F6FEB" radius={[2, 2, 0, 0]} />
+                  <Bar dataKey="amount" fill="url(#locMonthGradBlue)" stroke="#0369A1" strokeWidth={1} filter="url(#locMonthBar3d)" radius={[2, 2, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             )}
@@ -308,11 +318,24 @@ export default function LocationDashboard({
             ) : (
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart layout="vertical" data={departmentSpending} margin={{ top: 8, right: 48, left: 10, bottom: 0 }}>
+                  <defs>
+                    <filter id="locDeptBar3d" x="-10%" y="-10%" width="130%" height="130%">
+                      <feDropShadow dx="2" dy="3" stdDeviation="2" floodColor="#0F2A4A" floodOpacity="0.20" />
+                    </filter>
+                  </defs>
                   <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#EAEFF5" />
                   <XAxis type="number" tickLine={{ stroke: '#000000' }} axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} tick={{ fontSize: 9.5, fill: '#0F2A4A' }} />
                   <YAxis dataKey="department" type="category" interval={0} tickLine={{ stroke: '#000000' }} axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} tick={{ fontSize: 10, fill: '#0F2A4A' }} width={110} />
                   <Tooltip formatter={(val, name, item) => [formatINR(item?.payload?.amountRaw ?? (Number(val) * 100000)), 'Amount']} />
-                  <Bar dataKey="spending" fill="#1F6FEB" radius={[0, 2, 2, 0]} barSize={16}>
+                  <Bar dataKey="spending" radius={[0, 2, 2, 0]} barSize={16} filter="url(#locDeptBar3d)">
+                    {departmentSpending.map((entry, index) => (
+                      <Cell 
+                        key={`dept-cell-${index}`} 
+                        fill={DONUT_COLORS[index % DONUT_COLORS.length]} 
+                        stroke={DONUT_STROKES[index % DONUT_STROKES.length]}
+                        strokeWidth={1}
+                      />
+                    ))}
                     <LabelList dataKey="spending" position="right" formatter={(val) => `${val}L`} style={{ fontSize: 10, fill: '#0F2A4A', fontWeight: 600 }} />
                   </Bar>
                 </BarChart>
@@ -335,6 +358,11 @@ export default function LocationDashboard({
                 <div style={{ flex: 1, height: '100%' }}>
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
+                      <defs>
+                        <filter id="locPie3d" x="-20%" y="-20%" width="140%" height="140%">
+                          <feDropShadow dx="2" dy="3" stdDeviation="2.5" floodColor="#0F2A4A" floodOpacity="0.22" />
+                        </filter>
+                      </defs>
                       <Pie
                         data={serviceSpending}
                         cx="50%"
@@ -345,9 +373,15 @@ export default function LocationDashboard({
                         dataKey="percentage"
                         label={({ percent }) => `${(percent * 100).toFixed(0)}%`}
                         labelLine={false}
+                        filter="url(#locPie3d)"
                       >
                         {serviceSpending.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={DONUT_COLORS[index % DONUT_COLORS.length]} />
+                          <Cell 
+                            key={`cell-${index}`} 
+                            fill={DONUT_COLORS[index % DONUT_COLORS.length]} 
+                            stroke={DONUT_STROKES[index % DONUT_STROKES.length]}
+                            strokeWidth={2}
+                          />
                         ))}
                       </Pie>
                       <Tooltip formatter={(val, name, props) => [`${val}%`, props.payload.service]} />
@@ -357,7 +391,7 @@ export default function LocationDashboard({
                 <div style={{ width: '90px', display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '10.5px', color: '#334155' }}>
                   {serviceSpending.map((entry, index) => (
                     <div key={entry.service} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <span style={{ width: '9px', height: '9px', backgroundColor: DONUT_COLORS[index % DONUT_COLORS.length], display: 'inline-block' }} />
+                      <span style={{ width: '9px', height: '9px', backgroundColor: DONUT_COLORS[index % DONUT_COLORS.length], border: `1.5px solid ${DONUT_STROKES[index % DONUT_STROKES.length]}`, borderRadius: '2px', display: 'inline-block' }} />
                       <span>{entry.service}</span>
                     </div>
                   ))}
@@ -438,11 +472,20 @@ export default function LocationDashboard({
             ) : (
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart layout="vertical" data={vendorSpending.slice(0, 5)} margin={{ top: 8, right: 48, left: 10, bottom: 0 }}>
+                  <defs>
+                    <filter id="locVendorBar3d" x="-10%" y="-10%" width="130%" height="130%">
+                      <feDropShadow dx="2" dy="3" stdDeviation="2" floodColor="#0F2A4A" floodOpacity="0.20" />
+                    </filter>
+                    <linearGradient id="locVendorGradOrange" x1="0" y1="0" x2="1" y2="0">
+                      <stop offset="0%" stopColor="#FB923C" />
+                      <stop offset="100%" stopColor="#EA580C" />
+                    </linearGradient>
+                  </defs>
                   <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#EAEFF5" />
                   <XAxis type="number" tickLine={{ stroke: '#000000' }} axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} tick={{ fontSize: 9.5, fill: '#0F2A4A' }} />
                   <YAxis dataKey="vendor" type="category" interval={0} tickLine={{ stroke: '#000000' }} axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} tick={{ fontSize: 10, fill: '#0F2A4A' }} width={140} />
                   <Tooltip formatter={(val, name, item) => [formatINR(item?.payload?.amountRaw ?? (Number(val) * 100000)), 'Spending']} />
-                  <Bar dataKey="amount" fill="#1F6FEB" radius={[0, 2, 2, 0]} barSize={16}>
+                  <Bar dataKey="amount" fill="url(#locVendorGradOrange)" stroke="#C2410C" strokeWidth={1} filter="url(#locVendorBar3d)" radius={[0, 2, 2, 0]} barSize={16}>
                     <LabelList dataKey="amount" position="right" formatter={(val) => `${val}L`} style={{ fontSize: 10, fill: '#0F2A4A', fontWeight: 600 }} />
                   </Bar>
                 </BarChart>
