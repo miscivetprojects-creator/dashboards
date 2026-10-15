@@ -301,7 +301,7 @@ export default function DeptDashboard({ deptId = 'pm', departments = [], filters
               ) : (
                 <div>
                   <div style={{
-                    backgroundColor: '#F0F7FF',
+                    backgroundColor: '#E0F2FE',
                     border: '1px solid #000000',
                     borderRadius: '6px',
                     padding: '10px 8px 4px 0',
@@ -474,7 +474,7 @@ export default function DeptDashboard({ deptId = 'pm', departments = [], filters
               ) : (
                 <div>
                   <div style={{
-                    backgroundColor: '#F0FDF4',
+                    backgroundColor: '#DCFCE7',
                     border: '1px solid #000000',
                     borderRadius: '6px',
                     padding: '10px 8px 4px 0',
@@ -556,7 +556,7 @@ export default function DeptDashboard({ deptId = 'pm', departments = [], filters
               ) : (
                 <div>
                   <div style={{
-                    backgroundColor: '#F0FDF4',
+                    backgroundColor: '#FEF3C7',
                     border: '1px solid #000000',
                     borderRadius: '6px',
                     padding: '10px 12px 4px 8px',
@@ -637,7 +637,7 @@ export default function DeptDashboard({ deptId = 'pm', departments = [], filters
 
                 <div>
                   <div style={{
-                    backgroundColor: '#F0F7FF',
+                    backgroundColor: '#F3E8FF',
                     border: '1px solid #000000',
                     borderRadius: '6px',
                     padding: '12px 14px 10px 8px',
@@ -839,7 +839,7 @@ export default function DeptDashboard({ deptId = 'pm', departments = [], filters
               ) : (
                 <div>
                   <div style={{
-                    backgroundColor: '#F0F7FF',
+                    backgroundColor: '#E0F2FE',
                     border: '1px solid #000000',
                     borderRadius: '6px',
                     padding: '10px 8px 4px 0',
@@ -940,7 +940,7 @@ export default function DeptDashboard({ deptId = 'pm', departments = [], filters
               ) : (
                 <div>
                   <div style={{
-                    backgroundColor: '#FFFFFF',
+                    backgroundColor: '#DCFCE7',
                     border: '1px solid #000000',
                     borderRadius: '6px',
                     padding: '10px 12px 4px 8px',
