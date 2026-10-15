@@ -2,7 +2,18 @@ const path = require('path');
 const os = require('os');
 const fs = require('fs');
 
-require('dotenv').config({ path: path.resolve(__dirname, '../../.env') });
+const envPaths = [
+  path.resolve(__dirname, '../../.env'),
+  path.resolve(__dirname, '../../../.env'),
+  path.resolve(process.cwd(), '.env'),
+  path.resolve(process.cwd(), 'backend/.env')
+];
+for (const p of envPaths) {
+  if (fs.existsSync(p)) {
+    require('dotenv').config({ path: p });
+  }
+}
+require('dotenv').config();
 
 function resolveDataDirectory() {
   const isPackaged = __dirname.includes('app.asar');

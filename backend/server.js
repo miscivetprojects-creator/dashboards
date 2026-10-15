@@ -37,19 +37,36 @@ app.use('/api/workspace', workspaceRoutes);
 app.use('/api/register', registerRoutes);
 app.use('/api/master', masterRoutes);
 app.use('/api/updates', updateRoutes);
-const frontendDist = process.env.FRONTEND_DIST || (require('fs').existsSync(path.join(__dirname, '../frontend/dist')) 
-  ? path.join(__dirname, '../frontend/dist') 
-  : path.join(__dirname, 'frontend/dist'));
+function resolveFrontendDist() {
+  if (process.env.FRONTEND_DIST && require('fs').existsSync(process.env.FRONTEND_DIST)) {
+    return process.env.FRONTEND_DIST;
+  }
+  const candidates = [
+    path.join(__dirname, '../frontend/dist'),
+    path.join(__dirname, 'frontend/dist'),
+    path.join(__dirname, '../dist'),
+    path.join(__dirname, 'dist'),
+    path.join(process.cwd(), 'frontend/dist'),
+    path.join(process.cwd(), 'dist')
+  ];
+  for (const c of candidates) {
+    if (require('fs').existsSync(c)) {
+      return c;
+    }
+  }
+  return path.join(__dirname, '../frontend/dist');
+}
+const frontendDist = resolveFrontendDist();
 app.use(express.static(frontendDist));
 app.use((req, res, next) => {
   if (req.path.startsWith('/api')) {
     return res.status(404).json({ error: 'Endpoint not found' });
   }
-  res.sendFile(path.join(frontendDist, 'index.html'), (err) => {
-    if (err) {
-      res.status(200).send('CIVET DASHBOARDS API Server is running. Frontend Vite dev server running on port 5173.');
-    }
-  });
+  const indexFile = path.join(frontendDist, 'index.html');
+  if (require('fs').existsSync(indexFile)) {
+    return res.sendFile(indexFile);
+  }
+  res.status(200).send('CIVET DASHBOARDS API Server is running. Frontend build not found at: ' + frontendDist);
 });
 app.use((err, req, res, next) => {
   console.error('[API ERROR]', err);

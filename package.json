@@ -1,16 +1,39 @@
 {
-  "name": "dashboards",
+  "name": "civet-dashboards-mis",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "CIVET DASHBOARDS - Management MIS",
+  "main": "server.js",
   "scripts": {
+    "start": "node server.js",
+    "server": "node server.js",
+    "build": "npm --prefix backend install && npm --prefix frontend install && npm --prefix frontend run build",
+    "postinstall": "npm --prefix backend install && npm --prefix frontend install && npm --prefix frontend run build",
     "start:server": "node backend/server.js",
     "build:frontend": "cd frontend && npm run build",
     "desktop": "cd desktop && npm start",
     "desktop:build": "cd desktop && npm run build"
   },
-  "keywords": [],
-  "author": "",
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.6",
+    "dotenv": "^18.0.6",
+    "exceljs": "^4.4.0",
+    "express": "^5.2.1",
+    "mongodb": "^7.7.0",
+    "multer": "^2.4.0",
+    "pdfkit": "^0.20.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "civet",
+    "mis",
+    "dashboards",
+    "management"
+  ],
+  "author": "Civet Projects Private Limited",
   "license": "ISC",
   "type": "commonjs"
 }

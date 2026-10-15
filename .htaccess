@@ -1,0 +1,23 @@
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+
+  # Prevent directory browsing
+  Options -Indexes
+
+  # Avoid 403 Forbidden by explicitly setting default index files
+  DirectoryIndex frontend/dist/index.html index.html index.js server.js
+
+  # Allow direct access to real files and directories
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^ - [L]
+
+  # Serve assets from frontend/dist
+  RewriteCond %{DOCUMENT_ROOT}/frontend/dist/$1 -f
+  RewriteRule ^(.*)$ frontend/dist/$1 [L]
+
+  # SPA fallback to frontend/dist/index.html
+  RewriteCond %{DOCUMENT_ROOT}/frontend/dist/index.html -f
+  RewriteRule ^.*$ frontend/dist/index.html [L]
+</IfModule>
