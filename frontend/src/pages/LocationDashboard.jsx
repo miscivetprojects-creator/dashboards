@@ -242,21 +242,21 @@ export default function LocationDashboard({
       </div>
 
       <div className="grid-charts-3">
-        <div style={{ backgroundColor: '#FFFFFF', border: '1px solid #000000', borderLeft: '4px solid #1F6FEB', borderRadius: '6px', padding: '10px 14px' }}>
+        <div style={{ backgroundColor: '#FFEDB9', border: '1px solid rgba(15, 42, 74, 0.12)', borderLeft: '4px solid #D99A1E', borderRadius: '6px', padding: '10px 14px' }}>
           <div style={{ fontSize: '10.5px', color: '#576574' }}>Total Amount</div>
           <div style={{ fontSize: '18px', fontWeight: '700', color: '#0F2A4A', marginTop: '2px' }}>
             {kpis.totalPayments?.formatted || formatINR(kpis.totalPayments?.value || 0)}
           </div>
         </div>
 
-        <div style={{ backgroundColor: '#FFFFFF', border: '1px solid #000000', borderLeft: '4px solid #1F6FEB', borderRadius: '6px', padding: '10px 14px' }}>
+        <div style={{ backgroundColor: '#E8F4FD', border: '1px solid rgba(15, 42, 74, 0.12)', borderLeft: '4px solid #1F6FEB', borderRadius: '6px', padding: '10px 14px' }}>
           <div style={{ fontSize: '10.5px', color: '#576574' }}>P&M Working Hours</div>
           <div style={{ fontSize: '18px', fontWeight: '700', color: '#0F2A4A', marginTop: '2px' }}>
             {kpis.operationalKPI?.formatted || kpis.pmHours?.formatted || '0 h'}
           </div>
         </div>
 
-        <div style={{ backgroundColor: '#FFFFFF', border: '1px solid #000000', borderLeft: '4px solid #1F6FEB', borderRadius: '6px', padding: '10px 14px' }}>
+        <div style={{ backgroundColor: '#EAF8F1', border: '1px solid rgba(15, 42, 74, 0.12)', borderLeft: '4px solid #2E9E6B', borderRadius: '6px', padding: '10px 14px' }}>
           <div style={{ fontSize: '10.5px', color: '#576574' }}>
             {localFilters.department === 'STORES' ? 'Stores Amount' : localFilters.department === 'PM' ? 'P&M Fuel Amount' : 'Stores & Fuel Amount'}
           </div>
