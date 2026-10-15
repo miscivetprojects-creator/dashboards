@@ -128,7 +128,7 @@ function createWindow() {
             dialog.showMessageBox(mainWindow, {
               type: 'info',
               title: 'About Civet MIS',
-              message: 'CIVET DASHBOARDS — Management MIS\nVersion: 1.0.1\nCivet Projects Private Limited'
+              message: 'CIVET DASHBOARDS — Management MIS\nVersion: 1.0.9\nCivet Projects Private Limited'
             });
           }
         }
