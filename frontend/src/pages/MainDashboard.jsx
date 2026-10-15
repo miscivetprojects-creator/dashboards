@@ -132,26 +132,32 @@ export default function MainDashboard({ filters, onNavigate }) {
         <KPICard 
           label="Total Paid Amount" 
           value={formatINR(totalPaymentsAmount)} 
+          bg="#FFEDB9"
+          borderLeftColor="#D99A1E"
         />
         <KPICard 
           label="Total Amount (Fuel Cost)" 
           value={formatINR(totalCostAmount)} 
+          bg="#E8F4FD"
+          borderLeftColor="#1F6FEB"
         />
         <KPICard 
           label="Opening Balance" 
           value={formatINR(totalOpeningAmount)} 
+          bg="#EAF8F1"
+          borderLeftColor="#2E9E6B"
         />
         <KPICard 
           label="Closing Balance" 
           value={formatINR(totalClosingAmount)} 
+          bg="#FDF2E9"
+          borderLeftColor="#EA580C"
         />
         <KPICard 
           label="Active Cost Centers" 
           value={kpis.activeSites?.formatted || `${activeLocSpending.length || 39} Cost Centers`} 
-        />
-        <KPICard 
-          label={kpis.totalRecords?.label || 'Cost Center Daily Logs'} 
-          value={kpis.totalRecords?.formatted || `${dashboardData?.recordCount || 6753} Records`} 
+          bg="#F3E8FF"
+          borderLeftColor="#8B5CF6"
         />
       </div>
 
