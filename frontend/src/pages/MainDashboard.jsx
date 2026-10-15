@@ -184,7 +184,7 @@ export default function MainDashboard({ filters, onNavigate }) {
               alignItems: 'stretch'
             }}>
               <div style={{
-                backgroundColor: '#FFFFFF',
+                backgroundColor: '#F0F7FF',
                 border: '1px solid #000000',
                 borderRadius: '6px',
                 padding: '14px 12px 8px 6px'
@@ -206,7 +206,7 @@ export default function MainDashboard({ filters, onNavigate }) {
                         </linearGradient>
                       </defs>
                       <CartesianGrid strokeDasharray="3 3" stroke="#EAEFF5" />
-                      <XAxis dataKey="month" tickLine={{ stroke: '#000000' }} axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} tick={{ fontSize: 10, fill: '#0F2A4A' }} />
+                      <XAxis dataKey="month" interval={0} tickLine={{ stroke: '#000000' }} axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} tick={{ fontSize: 10, fill: '#0F2A4A' }} />
                       <YAxis tickFormatter={formatAxisINR} tickLine={{ stroke: '#000000' }} axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} tick={{ fontSize: 10, fill: '#0F2A4A' }} />
                       <Tooltip 
                         content={({ active, payload, label }) => {
@@ -374,7 +374,7 @@ export default function MainDashboard({ filters, onNavigate }) {
               alignItems: 'center'
             }}>
               <div style={{
-                backgroundColor: '#FFFFFF',
+                backgroundColor: '#FAF5FF',
                 border: '1px solid #000000',
                 borderRadius: '6px',
                 padding: '12px 14px',
@@ -551,7 +551,7 @@ export default function MainDashboard({ filters, onNavigate }) {
             ) : (
               <div>
                 <div style={{
-                  backgroundColor: '#FFFFFF',
+                  backgroundColor: '#F0F7FF',
                   border: '1px solid #000000',
                   borderRadius: '6px',
                   padding: '10px 8px 4px 0',
@@ -620,7 +620,7 @@ export default function MainDashboard({ filters, onNavigate }) {
             ) : (
               <div>
                 <div style={{
-                  backgroundColor: '#FFFFFF',
+                  backgroundColor: '#F0FDF4',
                   border: '1px solid #000000',
                   borderRadius: '6px',
                   padding: '10px 14px 4px 10px',
