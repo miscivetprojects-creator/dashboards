@@ -242,39 +242,17 @@ export default function LocationDashboard({
         )}
       </div>
 
-      <div className="grid-charts-3">
-        <div style={{ backgroundColor: '#FFEDB9', border: '1px solid rgba(15, 42, 74, 0.12)', borderLeft: '4px solid #D99A1E', borderRadius: '6px', padding: '10px 14px' }}>
-          <div style={{ fontSize: '10.5px', color: '#576574' }}>Total Amount</div>
+      <div style={{ display: 'flex', gap: '12px', marginBottom: '16px' }}>
+        <div style={{ backgroundColor: '#FFEDB9', border: '1px solid rgba(15, 42, 74, 0.12)', borderLeft: '4px solid #D99A1E', borderRadius: '6px', padding: '10px 18px', minWidth: '240px' }}>
+          <div style={{ fontSize: '10.5px', color: '#576574', fontWeight: '600' }}>Total Amount</div>
           <div style={{ fontSize: '18px', fontWeight: '700', color: '#0F2A4A', marginTop: '2px' }}>
             {kpis.totalPayments?.formatted || formatINR(kpis.totalPayments?.value || 0)}
-          </div>
-        </div>
-
-        <div style={{ backgroundColor: '#E8F4FD', border: '1px solid rgba(15, 42, 74, 0.12)', borderLeft: '4px solid #1F6FEB', borderRadius: '6px', padding: '10px 14px' }}>
-          <div style={{ fontSize: '10.5px', color: '#576574' }}>P&M Working Hours</div>
-          <div style={{ fontSize: '18px', fontWeight: '700', color: '#0F2A4A', marginTop: '2px' }}>
-            {kpis.operationalKPI?.formatted || kpis.pmHours?.formatted || '0 h'}
-          </div>
-        </div>
-
-        <div style={{ backgroundColor: '#EAF8F1', border: '1px solid rgba(15, 42, 74, 0.12)', borderLeft: '4px solid #2E9E6B', borderRadius: '6px', padding: '10px 14px' }}>
-          <div style={{ fontSize: '10.5px', color: '#576574' }}>
-            {localFilters.department === 'STORES' ? 'Stores Amount' : localFilters.department === 'PM' ? 'P&M Fuel Amount' : 'Stores & Fuel Amount'}
-          </div>
-          <div style={{ fontSize: '18px', fontWeight: '700', color: '#0F2A4A', marginTop: '2px' }}>
-            {localFilters.department === 'STORES' 
-              ? (kpis.storesExp?.formatted || formatINR(kpis.storesExp?.value || 0)) 
-              : localFilters.department === 'PM' 
-              ? (kpis.fuelExp?.formatted || formatINR(kpis.fuelExp?.value || 0)) 
-              : ((kpis.fuelExp?.value || 0) + (kpis.storesExp?.value || 0) > 0 
-                  ? formatINR((kpis.fuelExp?.value || 0) + (kpis.storesExp?.value || 0)) 
-                  : (kpis.fuelExp?.formatted || kpis.storesExp?.formatted || 'Rs. 0.00'))}
           </div>
         </div>
       </div>
 
       <div className="grid-charts-3">
-        <div style={{ backgroundColor: '#FFFFFF', border: '1px solid #000000', borderRadius: '4px', padding: '10px 12px' }}>
+        <div style={{ backgroundColor: '#F0F7FF', border: '1px solid #000000', borderRadius: '4px', padding: '10px 12px' }}>
           <div style={{ fontSize: '11.5px', fontWeight: '600', color: '#0F2A4A', textAlign: 'center', marginBottom: '6px' }}>
             A. Monthly Cost Center Payments (INR)
           </div>
@@ -296,7 +274,7 @@ export default function LocationDashboard({
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#EAEFF5" />
-                  <XAxis dataKey="month" tickLine={{ stroke: '#000000' }} axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} tick={{ fontSize: 9.5, fill: '#0F2A4A' }} />
+                  <XAxis dataKey="month" interval={0} tickLine={{ stroke: '#000000' }} axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} tick={{ fontSize: 9.5, fill: '#0F2A4A' }} />
                   <YAxis tickLine={{ stroke: '#000000' }} axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} tick={{ fontSize: 9.5, fill: '#0F2A4A' }} />
                   <Tooltip formatter={(val, name, item) => [formatINR(item?.payload?.amountRaw ?? (Number(val) * 100000)), 'Spending']} />
                   <Bar dataKey="amount" fill="url(#locMonthGradBlue)" stroke="#0369A1" strokeWidth={1} filter="url(#locMonthBar3d)" radius={[2, 2, 0, 0]} />
@@ -306,7 +284,7 @@ export default function LocationDashboard({
           </div>
         </div>
 
-        <div style={{ backgroundColor: '#FFFFFF', border: '1px solid #000000', borderRadius: '4px', padding: '10px 12px' }}>
+        <div style={{ backgroundColor: '#F0FDF4', border: '1px solid #000000', borderRadius: '4px', padding: '10px 12px' }}>
           <div style={{ fontSize: '11.5px', fontWeight: '600', color: '#0F2A4A', textAlign: 'center', marginBottom: '6px' }}>
             B. Department-wise Amount (INR)
           </div>
@@ -344,7 +322,7 @@ export default function LocationDashboard({
           </div>
         </div>
 
-        <div style={{ backgroundColor: '#FFFFFF', border: '1px solid #000000', borderRadius: '4px', padding: '10px 12px' }}>
+        <div style={{ backgroundColor: '#FAF5FF', border: '1px solid #000000', borderRadius: '4px', padding: '10px 12px' }}>
           <div style={{ fontSize: '11.5px', fontWeight: '600', color: '#0F2A4A', textAlign: 'center', marginBottom: '6px' }}>
             C. Fuel & Materials Distribution
           </div>
@@ -460,7 +438,7 @@ export default function LocationDashboard({
           />
         </div>
 
-        <div style={{ backgroundColor: '#FFFFFF', border: '1px solid #000000', borderRadius: '4px', padding: '10px 12px' }}>
+        <div style={{ backgroundColor: '#FFFBEB', border: '1px solid #000000', borderRadius: '4px', padding: '10px 12px' }}>
           <div style={{ fontSize: '11.5px', fontWeight: '600', color: '#0F2A4A', textAlign: 'center', marginBottom: '6px' }}>
             E. Top Supplier & Vendor Payments (INR)
           </div>
