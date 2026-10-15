@@ -252,7 +252,7 @@ export default function LocationDashboard({
       </div>
 
       <div className="grid-charts-3">
-        <div style={{ backgroundColor: '#F0F7FF', border: '1px solid #000000', borderRadius: '4px', padding: '10px 12px' }}>
+        <div style={{ backgroundColor: '#E0F2FE', border: '1px solid #000000', borderRadius: '4px', padding: '10px 12px' }}>
           <div style={{ fontSize: '11.5px', fontWeight: '600', color: '#0F2A4A', textAlign: 'center', marginBottom: '6px' }}>
             A. Monthly Cost Center Payments (INR)
           </div>
@@ -284,7 +284,7 @@ export default function LocationDashboard({
           </div>
         </div>
 
-        <div style={{ backgroundColor: '#F0FDF4', border: '1px solid #000000', borderRadius: '4px', padding: '10px 12px' }}>
+        <div style={{ backgroundColor: '#DCFCE7', border: '1px solid #000000', borderRadius: '4px', padding: '10px 12px' }}>
           <div style={{ fontSize: '11.5px', fontWeight: '600', color: '#0F2A4A', textAlign: 'center', marginBottom: '6px' }}>
             B. Department-wise Amount (INR)
           </div>
@@ -322,14 +322,14 @@ export default function LocationDashboard({
           </div>
         </div>
 
-        <div style={{ backgroundColor: '#FAF5FF', border: '1px solid #000000', borderRadius: '4px', padding: '10px 12px' }}>
+        <div style={{ backgroundColor: '#F3E8FF', border: '1px solid #000000', borderRadius: '4px', padding: '10px 12px' }}>
           <div style={{ fontSize: '11.5px', fontWeight: '600', color: '#0F2A4A', textAlign: 'center', marginBottom: '6px' }}>
-            C. Fuel & Materials Distribution
+            C. Fuel Distribution
           </div>
           <div style={{ display: 'flex', alignItems: 'center', height: '180px' }}>
             {serviceSpending.length === 0 ? (
               <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94A3B8', fontSize: '11px' }}>
-                No fuel or materials recorded.
+                No fuel recorded.
               </div>
             ) : (
               <>
@@ -438,7 +438,7 @@ export default function LocationDashboard({
           />
         </div>
 
-        <div style={{ backgroundColor: '#FFFBEB', border: '1px solid #000000', borderRadius: '4px', padding: '10px 12px' }}>
+        <div style={{ backgroundColor: '#FEF3C7', border: '1px solid #000000', borderRadius: '4px', padding: '10px 12px' }}>
           <div style={{ fontSize: '11.5px', fontWeight: '600', color: '#0F2A4A', textAlign: 'center', marginBottom: '6px' }}>
             E. Top Supplier & Vendor Payments (INR)
           </div>
