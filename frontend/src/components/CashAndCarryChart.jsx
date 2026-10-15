@@ -78,7 +78,7 @@ export default function CashAndCarryChart({ data = [], analytics = {} }) {
         alignItems: 'stretch'
       }}>
         <div style={{
-          backgroundColor: '#FFFFFF',
+          backgroundColor: '#FEF3C7',
           border: '1px solid #000000',
           borderRadius: '6px',
           padding: '14px 12px 6px 4px',
@@ -91,6 +91,7 @@ export default function CashAndCarryChart({ data = [], analytics = {} }) {
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#EAEFF5" />
                 <XAxis
                   dataKey="month"
+                  interval={0}
                   tickLine={{ stroke: '#000000' }}
                   axisLine={{ stroke: '#000000', strokeWidth: 1.5 }}
                   tick={{ fontSize: 10, fill: '#0F2A4A', fontWeight: '600' }}
