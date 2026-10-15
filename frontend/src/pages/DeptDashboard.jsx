@@ -236,18 +236,41 @@ export default function DeptDashboard({ deptId = 'pm', departments = [], filters
       </div>
 
       <div className="grid-kpis" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))' }}>
-        {Object.keys(kpis).map((cardKey) => {
-          const item = kpis[cardKey];
-          return (
-            <KPICard
-              key={cardKey}
-              label={item.label || cardKey}
-              value={item.formatted || item.value || '0'}
-              subtext={item.subtext}
-              alert={item.isAlert}
-            />
-          );
-        })}
+        {(() => {
+          const KPI_LIGHT_COLORS = [
+            { bg: '#FFEDB9', border: '#D99A1E' },
+            { bg: '#E8F4FD', border: '#1F6FEB' },
+            { bg: '#EAF8F1', border: '#2E9E6B' },
+            { bg: '#FDF2E9', border: '#EA580C' },
+            { bg: '#F3E8FF', border: '#8B5CF6' },
+            { bg: '#E0F2FE', border: '#0284C7' },
+            { bg: '#FEF3C7', border: '#D97706' },
+            { bg: '#F1F5F9', border: '#64748B' }
+          ];
+          const seenLabels = new Set();
+          let colorIdx = 0;
+          return Object.keys(kpis).map((cardKey) => {
+            const item = kpis[cardKey];
+            if (!item) return null;
+            const normLabel = String(item.label || cardKey).trim().toLowerCase();
+            if (normLabel.includes('operational submissions') || cardKey === 'totalRecords' || cardKey === 'recordsCount') return null;
+            if (seenLabels.has(normLabel)) return null;
+            seenLabels.add(normLabel);
+            const colorScheme = KPI_LIGHT_COLORS[colorIdx % KPI_LIGHT_COLORS.length];
+            colorIdx++;
+            return (
+              <KPICard
+                key={cardKey}
+                label={item.label || cardKey}
+                value={item.formatted || item.value || '0'}
+                subtext={item.subtext}
+                alert={item.isAlert}
+                bg={colorScheme.bg}
+                borderLeftColor={colorScheme.border}
+              />
+            );
+          });
+        })()}
       </div>
 
       <div style={{
