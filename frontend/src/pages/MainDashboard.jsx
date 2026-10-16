@@ -163,7 +163,6 @@ export default function MainDashboard({ filters, onNavigate }) {
             value={formatINR(displayTotalPaid)} 
             bg="#FFEDB9"
             borderLeftColor="#D99A1E"
-            badge={selectedDepartment === null ? { text: 'Active View', type: 'badge-primary' } : null}
           />
         </div>
 
@@ -180,7 +179,6 @@ export default function MainDashboard({ filters, onNavigate }) {
             value={formatINR(displayPM)} 
             bg="#BAE6FD"
             borderLeftColor="#0284C7"
-            badge={selectedDepartment === 'Plant & Machinery' ? { text: 'Filtered', type: 'badge-info' } : null}
           />
         </div>
 
@@ -197,7 +195,6 @@ export default function MainDashboard({ filters, onNavigate }) {
             value={formatINR(displayIT)} 
             bg="#DDD6FE"
             borderLeftColor="#7C3AED"
-            badge={selectedDepartment === 'IT & MIS' ? { text: 'Filtered', type: 'badge-purple' } : null}
           />
         </div>
 
@@ -214,7 +211,6 @@ export default function MainDashboard({ filters, onNavigate }) {
             value={formatINR(displayAdmin)} 
             bg="#BBF7D0"
             borderLeftColor="#16A34A"
-            badge={selectedDepartment === 'Admin' ? { text: 'Filtered', type: 'badge-success' } : null}
           />
         </div>
       </div>
