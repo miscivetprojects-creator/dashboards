@@ -50,6 +50,10 @@ export default function SearchableSelect({
     return opt.label.toLowerCase().includes(term) || opt.value.toLowerCase().includes(term);
   });
 
+  if (searchTerm.trim() && !normalizedOptions.some(o => o.value.toLowerCase() === searchTerm.trim().toLowerCase())) {
+    filteredOptions.push({ value: searchTerm.trim(), label: `Use "${searchTerm.trim()}"` });
+  }
+
   useEffect(() => {
     setHighlightedIndex(0);
   }, [searchTerm, isOpen]);
