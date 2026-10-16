@@ -141,7 +141,7 @@ export default function LocationDashboard({
             </button>
           )}
           <div>
-            <h1 style={{ fontSize: '18px', fontWeight: '700', color: '#0F2A4A', margin: 0 }}>Cost Centers Dashboard</h1>
+            <h1 style={{ fontSize: '18px', fontWeight: '700', color: '#0F2A4A', margin: 0 }}>Project Divisions Dashboard</h1>
           </div>
         </div>
       </div>
@@ -157,7 +157,7 @@ export default function LocationDashboard({
         borderRadius: '4px'
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-          <span style={{ fontSize: '11px', color: '#576574' }}>Cost Center:</span>
+          <span style={{ fontSize: '11px', color: '#576574' }}>Project Division:</span>
           <select
             value={localFilters.location}
             onChange={e => handleFilterChange('location', e.target.value)}
@@ -173,7 +173,7 @@ export default function LocationDashboard({
               cursor: 'pointer'
             }}
           >
-            <option value="All">All Cost Centers</option>
+            <option value="All">All Project Divisions</option>
             {locations.map(loc => (
               <option key={loc.code || loc.name} value={loc.name || loc.code}>
                 {loc.name || loc.code}
@@ -254,12 +254,12 @@ export default function LocationDashboard({
       <div className="grid-charts-3">
         <div style={{ backgroundColor: '#E0F2FE', border: '1px solid #000000', borderRadius: '4px', padding: '10px 12px' }}>
           <div style={{ fontSize: '11.5px', fontWeight: '600', color: '#0F2A4A', textAlign: 'center', marginBottom: '6px' }}>
-            A. Monthly Cost Center Payments (INR)
+            A. Monthly Project Division Payments (INR)
           </div>
           <div style={{ width: '100%', height: '180px' }}>
             {monthlySpending.length === 0 ? (
               <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94A3B8', fontSize: '11px' }}>
-                No payments recorded for this cost center.
+                No payments recorded for this project division.
               </div>
             ) : (
               <ResponsiveContainer width="100%" height="100%">
@@ -475,7 +475,7 @@ export default function LocationDashboard({
         <div style={{ backgroundColor: '#A5F3FC', border: '1px solid #000000', borderRadius: '4px', padding: '10px 12px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
           <div>
             <div style={{ fontSize: '11.5px', fontWeight: '600', color: '#0F2A4A', marginBottom: '8px' }}>
-              F. Cost Center Report Register
+              F. Project Division Report Register
             </div>
             <div style={{ overflowX: 'auto' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '10.5px' }}>
@@ -492,7 +492,7 @@ export default function LocationDashboard({
                   {registerRecords.length === 0 ? (
                     <tr>
                       <td colSpan="5" style={{ textAlign: 'center', padding: '14px', color: '#94A3B8', border: '1px solid #000000', backgroundColor: '#FFFFFF' }}>
-                        No records logged for this cost center.
+                        No records logged for this project division.
                       </td>
                     </tr>
                   ) : (
@@ -543,7 +543,7 @@ export default function LocationDashboard({
               borderTop: '1px solid #F1F5F9'
             }}
           >
-            Drill: Overview &gt; Cost Center &gt; Department &gt; Daily Cost Center Logs
+            Drill: Overview &gt; Project Division &gt; Department &gt; Daily Project Division Logs
           </div>
         </div>
       </div>
