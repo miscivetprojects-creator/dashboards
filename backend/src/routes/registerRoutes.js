@@ -128,6 +128,26 @@ function buildRegisterQuery(params = {}, user = {}) {
   return query;
 }
 
+async function getMasterProjectNameMap() {
+  const locsColl = getCollection('project_locations');
+  const masterLocs = await locsColl.find({}).toArray();
+  const locProjectMap = new Map();
+  for (const ml of masterLocs) {
+    const pName = (ml.project_name && ml.project_name !== 'Project Site' && ml.project_name !== '-')
+      ? ml.project_name
+      : ((ml.category && ml.category !== 'Project Site' && ml.category !== '-') ? ml.category : '-');
+    if (ml.code) locProjectMap.set(String(ml.code).trim().toLowerCase(), pName);
+    if (ml.name) locProjectMap.set(String(ml.name).trim().toLowerCase(), pName);
+    if (ml.id) locProjectMap.set(String(ml.id).trim().toLowerCase(), pName);
+  }
+  return locProjectMap;
+}
+
+function resolveRecordProjectName(rec, locProjectMap) {
+  const divKey = String(rec.location_code || rec.location_id || rec.project_division || rec.location_name || rec.data?.location || '').trim().toLowerCase();
+  return locProjectMap.get(divKey) || '-';
+}
+
 router.get('/records', async (req, res) => {
   try {
     const recordsColl = getCollection('monthly_report_records');
@@ -135,12 +155,17 @@ router.get('/records', async (req, res) => {
     const query = buildRegisterQuery(req.query, req.user);
     const skip = (parseInt(page) - 1) * parseInt(limit);
     const totalCount = await recordsColl.countDocuments(query);
-    const records = await recordsColl
+    const locProjectMap = await getMasterProjectNameMap();
+    const rawRecords = await recordsColl
       .find(query)
       .sort({ report_date: -1, created_at: -1 })
       .skip(skip)
       .limit(parseInt(limit))
       .toArray();
+    const records = rawRecords.map(r => ({
+      ...r,
+      project_name: resolveRecordProjectName(r, locProjectMap)
+    }));
     res.json({
       records,
       pagination: {
@@ -172,6 +197,8 @@ router.get('/record/:id', async (req, res) => {
     if (!record) {
       return res.status(404).json({ error: 'Record not found.' });
     }
+    const locProjectMap = await getMasterProjectNameMap();
+    record.project_name = resolveRecordProjectName(record, locProjectMap);
     const schemasColl = getCollection('report_schemas');
     const schemaDoc = await schemasColl.findOne({
       $or: [{ report_type_id: record.report_type_id }, { reportType: record.report_type_id }]
@@ -379,6 +406,8 @@ router.get('/export/excel', async (req, res) => {
       .limit(3000)
       .toArray();
 
+    const locProjectMap = await getMasterProjectNameMap();
+
     const reportTypeRaw = String(req.query.reportType || req.query.report_type || records[0]?.report_type_id || 'FUEL_PURCHASE').trim();
     const reportTypeLabels = {
       'FUEL_PURCHASE': 'Fuel Purchase Log',
@@ -478,7 +507,7 @@ router.get('/export/excel', async (req, res) => {
         formatDateDDMMYYYY(rec.report_date),
         cleanStr(rec.department_name || rec.department_id || 'Plant & Machinery'),
         cleanStr(rec.project_division || rec.location_name || rec.location_id),
-        cleanStr(rec.project_name || rec.site_name || (rec.data && (rec.data.project_name || rec.data.site_name)) || '-'),
+        cleanStr(resolveRecordProjectName(rec, locProjectMap)),
         ledger,
         opBal,
         dQty,
@@ -579,6 +608,8 @@ router.get('/export/pdf', async (req, res) => {
       .limit(1000)
       .toArray();
 
+    const locProjectMap = await getMasterProjectNameMap();
+
     const reportTypeRaw = String(req.query.reportType || req.query.report_type || records[0]?.report_type_id || 'FUEL_PURCHASE').trim();
     const reportTypeLabels = {
       'FUEL_PURCHASE': 'Fuel Purchase Log',
@@ -634,7 +665,7 @@ router.get('/export/pdf', async (req, res) => {
       return [
         formatDateDDMMYYYY(rec.report_date),
         cleanStr(rec.project_division || rec.location_name || rec.location_id),
-        cleanStr(rec.project_name || rec.site_name || (rec.data && (rec.data.project_name || rec.data.site_name)) || '-'),
+        cleanStr(resolveRecordProjectName(rec, locProjectMap)),
         ledger,
         opBal > 0 ? ('Rs. ' + Math.round(opBal).toLocaleString('en-IN')) : '-',
         dQty > 0 ? Math.round(dQty).toLocaleString('en-IN') : '-',

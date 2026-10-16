@@ -244,6 +244,24 @@ class AggregationService {
     if (activeLocations.length === 0) {
       activeLocations = await locsColl.find({}).toArray();
     }
+    const getRecProjectName = r => {
+      const lid = r.location_code || r.location_id || r.project_division || r.location_name || r.data?.location;
+      const lIdLower = String(lid || '').trim().toLowerCase();
+      const matched = activeLocations.find(l => 
+        String(l.id || '').trim().toLowerCase() === lIdLower ||
+        String(l.name || '').trim().toLowerCase() === lIdLower ||
+        String(l.code || '').trim().toLowerCase() === lIdLower
+      );
+      if (matched) {
+        const p = (matched.project_name && matched.project_name !== 'Project Site' && matched.project_name !== '-')
+          ? matched.project_name
+          : ((matched.category && matched.category !== 'Project Site' && matched.category !== '-') ? matched.category : '-');
+        if (p && p !== '-') return p;
+      }
+      if (r.project_name && r.project_name !== '-' && r.project_name !== 'Project Site') return r.project_name;
+      if (r.data?.project_name && r.data.project_name !== '-' && r.data.project_name !== 'Project Site') return r.data.project_name;
+      return '-';
+    };
     const reportingLocSet = new Set();
     records.forEach(r => {
       const lid = r.location_id || (r.data && (r.data.location_id || r.data.location));
@@ -387,19 +405,14 @@ class AggregationService {
       const projBreakdown = {};
       mRecs.forEach(r => {
         const rDiv = r.project_division || r.location_name || (r.data && (r.data.project_division || r.data.location_name || r.data.location)) || r.location_id;
-        const rawPName = (r.project_name && r.project_name !== '-' && r.project_name !== 'Project Site') ? r.project_name :
-          (r.site_name && r.site_name !== '-' && r.site_name !== 'Project Site') ? r.site_name :
-          (r.data && (
-            (r.data.project_name && r.data.project_name !== '-' && r.data.project_name !== 'Project Site') ? r.data.project_name :
-            (r.data.site_name && r.data.site_name !== '-' && r.data.site_name !== 'Project Site') ? r.data.site_name : null
-          ));
+        const resolvedPName = getRecProjectName(r);
         const rPaid = getRecPaid(r);
         if (rDiv) {
           const k = String(rDiv).trim();
           divBreakdown[k] = Number(((divBreakdown[k] || 0) + rPaid).toFixed(2));
         }
-        if (rawPName) {
-          const pk = String(rawPName).trim();
+        if (resolvedPName && resolvedPName !== '-') {
+          const pk = String(resolvedPName).trim();
           projBreakdown[pk] = Number(((projBreakdown[pk] || 0) + rPaid).toFixed(2));
         }
       });
@@ -516,14 +529,8 @@ class AggregationService {
     const projNameSpendMap = {};
     records.forEach(r => {
       const recPaid = getRecPaid(r);
-      const rawPName = (r.project_name && r.project_name !== '-' && r.project_name !== 'Project Site') ? r.project_name :
-        (r.site_name && r.site_name !== '-' && r.site_name !== 'Project Site') ? r.site_name :
-        (r.data && (
-          (r.data.project_name && r.data.project_name !== '-' && r.data.project_name !== 'Project Site') ? r.data.project_name :
-          (r.data.site_name && r.data.site_name !== '-' && r.data.site_name !== 'Project Site') ? r.data.site_name : null
-        ));
-      const pName = rawPName || r.project_division || r.location_name || 'General';
-      if (pName && recPaid > 0) {
+      const pName = getRecProjectName(r);
+      if (pName && pName !== '-' && recPaid > 0) {
         if (!projNameSpendMap[pName]) {
           projNameSpendMap[pName] = { name: pName, projectName: pName, amount: 0, count: 0 };
         }
