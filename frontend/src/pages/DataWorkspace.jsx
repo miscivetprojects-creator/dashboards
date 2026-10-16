@@ -394,8 +394,8 @@ export default function DataWorkspace({ currentUser, preselectDept, onNavigate }
         formData.department = 'Plant & Machinery';
         formData.department_beneficiary = 'Plant & Machinery';
       }
-      if (!formData.ledger_type) {
-        formData.ledger_type = '-';
+      if (!formData.ledger_type || formData.ledger_type === '-') {
+        errors.ledger_type = 'Ledger Type / Vendor is required';
       }
       if (!formData.fuel_type) {
         formData.fuel_type = 'Diesel';
@@ -766,10 +766,12 @@ export default function DataWorkspace({ currentUser, preselectDept, onNavigate }
                       handleInputChange('project_division', val);
                       handleInputChange('location', val);
                       const matchedLoc = (locations || []).find(l => (l.name || l.code) === val);
-                      if (matchedLoc && (matchedLoc.project_name || matchedLoc.category)) {
-                        const pVal = matchedLoc.project_name || matchedLoc.category;
-                        handleInputChange('project_name', pVal);
-                        handleInputChange('site_name', pVal);
+                      if (matchedLoc) {
+                        const pVal = (matchedLoc.project_name && matchedLoc.project_name !== 'Project Site') ? matchedLoc.project_name : ((matchedLoc.category && matchedLoc.category !== 'Project Site') ? matchedLoc.category : '');
+                        if (pVal) {
+                          handleInputChange('project_name', pVal);
+                          handleInputChange('site_name', pVal);
+                        }
                       }
                     }}
                     options={locations.map(l => ({ value: l.name || l.code, label: l.name || l.code }))}
@@ -801,13 +803,13 @@ export default function DataWorkspace({ currentUser, preselectDept, onNavigate }
 
                 <div>
                   <label style={{ display: 'block', fontSize: '11px', fontWeight: '600', color: '#576574', marginBottom: '4px' }}>
-                    Ledger Type <span style={{ fontSize: '10px', color: '#8395A7', fontWeight: '400' }}>(Optional)</span>
+                    Ledger Type / Vendor <span style={{ color: '#C8423A' }}>*</span>
                   </label>
                   <SearchableSelect
                     value={formData.ledger_type || ''}
                     onChange={val => handleInputChange('ledger_type', val)}
                     options={fuelBunkOptions}
-                    placeholder="Search Ledger Type..."
+                    placeholder="Search Ledger Type / Vendor..."
                     style={{ width: '100%', height: '32px', borderColor: formErrors.ledger_type ? '#C8423A' : '#000000' }}
                   />
                   {formErrors.ledger_type && (
