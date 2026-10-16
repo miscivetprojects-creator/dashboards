@@ -78,7 +78,7 @@ export default function CashAndCarryChart({ data = [], analytics = {} }) {
         alignItems: 'stretch'
       }}>
         <div style={{
-          backgroundColor: '#FFFFFF',
+          backgroundColor: '#FFEDD5',
           border: '1px solid #000000',
           borderRadius: '6px',
           padding: '14px 12px 6px 4px',
@@ -88,7 +88,7 @@ export default function CashAndCarryChart({ data = [], analytics = {} }) {
           <div style={{ width: '100%', height: '240px' }}>
             <ResponsiveContainer width="100%" height="100%">
               <ComposedChart data={chartPoints} margin={{ top: 20, right: 10, left: 10, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#EAEFF5" />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#CBD5E1" />
                 <XAxis
                   dataKey="month"
                   interval={0}
@@ -195,8 +195,8 @@ export default function CashAndCarryChart({ data = [], analytics = {} }) {
             alignItems: 'center',
             padding: '8px 12px',
             marginTop: '8px',
-            backgroundColor: '#F8FAFC',
-            borderTop: '1px solid #E2E8F0',
+            backgroundColor: '#FED7AA',
+            borderTop: '1px solid #000000',
             fontSize: '11px',
             color: '#64748B'
           }}>
@@ -206,7 +206,7 @@ export default function CashAndCarryChart({ data = [], analytics = {} }) {
         </div>
 
         <div style={{
-          backgroundColor: '#FFFFFF',
+          backgroundColor: '#FFF7ED',
           border: '1px solid #000000',
           borderRadius: '6px',
           padding: '12px 14px',
@@ -243,8 +243,8 @@ export default function CashAndCarryChart({ data = [], analytics = {} }) {
             gap: '8px'
           }}>
             <div style={{
-              backgroundColor: '#FFFFFF',
-              border: '1px solid #CBD5E1',
+              backgroundColor: '#FEF3C7',
+              border: '1px solid #000000',
               borderRadius: '4px',
               padding: '8px'
             }}>
@@ -255,8 +255,8 @@ export default function CashAndCarryChart({ data = [], analytics = {} }) {
             </div>
 
             <div style={{
-              backgroundColor: '#FFFFFF',
-              border: '1px solid #CBD5E1',
+              backgroundColor: '#E0F2FE',
+              border: '1px solid #000000',
               borderRadius: '4px',
               padding: '8px'
             }}>
@@ -267,8 +267,8 @@ export default function CashAndCarryChart({ data = [], analytics = {} }) {
             </div>
 
             <div style={{
-              backgroundColor: '#FFFFFF',
-              border: '1px solid #CBD5E1',
+              backgroundColor: '#DCFCE7',
+              border: '1px solid #000000',
               borderRadius: '4px',
               padding: '8px'
             }}>
@@ -279,8 +279,8 @@ export default function CashAndCarryChart({ data = [], analytics = {} }) {
             </div>
 
             <div style={{
-              backgroundColor: '#FFFFFF',
-              border: '1px solid #CBD5E1',
+              backgroundColor: '#F3E8FF',
+              border: '1px solid #000000',
               borderRadius: '4px',
               padding: '8px'
             }}>
