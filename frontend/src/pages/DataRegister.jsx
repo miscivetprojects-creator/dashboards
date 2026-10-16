@@ -328,13 +328,16 @@ export default function DataRegister({ prefilterDept, prefilterLocation, onNavig
                     (rec.data.vendor && rec.data.vendor !== '-') ? rec.data.vendor : null
                   ));
                   const vendor = rawVendor || '-';
-                  const rawProject = (rec.project_name && rec.project_name !== '-' && rec.project_name !== 'Project Site') ? rec.project_name :
-                    (rec.site_name && rec.site_name !== '-' && rec.site_name !== 'Project Site') ? rec.site_name :
-                    (rec.data && (
-                      (rec.data.project_name && rec.data.project_name !== '-' && rec.data.project_name !== 'Project Site') ? rec.data.project_name :
-                      (rec.data.site_name && rec.data.site_name !== '-' && rec.data.site_name !== 'Project Site') ? rec.data.site_name : null
-                    ));
-                  const projectDisplay = rawProject || '-';
+                  const divKey = String(rec.location_code || rec.location_id || rec.project_division || rec.location_name || rec.data?.location || '').trim().toLowerCase();
+                  const matchedLoc = locations.find(l => 
+                    String(l.code || '').trim().toLowerCase() === divKey ||
+                    String(l.name || '').trim().toLowerCase() === divKey ||
+                    String(l.id || '').trim().toLowerCase() === divKey
+                  );
+                  const pFromMaster = matchedLoc 
+                    ? ((matchedLoc.project_name && matchedLoc.project_name !== 'Project Site' && matchedLoc.project_name !== '-') ? matchedLoc.project_name : ((matchedLoc.category && matchedLoc.category !== 'Project Site' && matchedLoc.category !== '-') ? matchedLoc.category : '-'))
+                    : '-';
+                  const projectDisplay = (pFromMaster && pFromMaster !== '-') ? pFromMaster : ((rec.project_name && rec.project_name !== '-' && rec.project_name !== 'Project Site') ? rec.project_name : '-');
                   const isMerchant = String(vendor).toLowerCase().includes('merchant');
                   const rawPType = rec.payment_type || (rec.data && rec.data.payment_type) || '';
                   const ccField = rec.cash_and_carry || (rec.data && rec.data.cash_and_carry) || '';
@@ -545,7 +548,18 @@ export default function DataRegister({ prefilterDept, prefilterLocation, onNavig
               </div>
               <div>
                 <span style={{ color: '#8395A7', display: 'block' }}>Project Name</span>
-                <strong>{((selectedRecord.project_name && selectedRecord.project_name !== 'Project Site') ? selectedRecord.project_name : (selectedRecord.site_name && selectedRecord.site_name !== 'Project Site') ? selectedRecord.site_name : (selectedRecord.data && ((selectedRecord.data.project_name && selectedRecord.data.project_name !== 'Project Site') ? selectedRecord.data.project_name : (selectedRecord.data.site_name && selectedRecord.data.site_name !== 'Project Site') ? selectedRecord.data.site_name : null))) || '-'}</strong>
+                <strong>{(() => {
+                  const sDivKey = String(selectedRecord.location_code || selectedRecord.location_id || selectedRecord.project_division || selectedRecord.location_name || selectedRecord.data?.location || '').trim().toLowerCase();
+                  const sMatch = locations.find(l => 
+                    String(l.code || '').trim().toLowerCase() === sDivKey ||
+                    String(l.name || '').trim().toLowerCase() === sDivKey ||
+                    String(l.id || '').trim().toLowerCase() === sDivKey
+                  );
+                  const sPFromMaster = sMatch 
+                    ? ((sMatch.project_name && sMatch.project_name !== 'Project Site' && sMatch.project_name !== '-') ? sMatch.project_name : ((sMatch.category && sMatch.category !== 'Project Site' && sMatch.category !== '-') ? sMatch.category : '-'))
+                    : '-';
+                  return (sPFromMaster && sPFromMaster !== '-') ? sPFromMaster : ((selectedRecord.project_name && selectedRecord.project_name !== '-' && selectedRecord.project_name !== 'Project Site') ? selectedRecord.project_name : '-');
+                })()}</strong>
               </div>
               <div>
                 <span style={{ color: '#8395A7', display: 'block' }}>Created By</span>
