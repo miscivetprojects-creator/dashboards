@@ -122,7 +122,10 @@ function createMasterCrudRoutes(collectionName) {
         worksheet.getRow(1).getCell(col).border = blackBorder;
       }
 
-      const headers = ['Code', 'Name / Description', 'Category / Details', 'Unit / Type', 'Created Date'];
+      const isLoc = collectionName === 'project_locations';
+      const headers = isLoc 
+        ? ['Code', 'Project Division', 'Project Name', 'Unit / Type', 'Created Date']
+        : ['Code', 'Name / Description', 'Category / Details', 'Unit / Type', 'Created Date'];
       const headerRow = worksheet.getRow(2);
       headerRow.values = headers;
       headerRow.height = 22;
@@ -142,7 +145,7 @@ function createMasterCrudRoutes(collectionName) {
         row.values = [
           code,
           item.name || item.full_name || item.report_name || item.item_name || '',
-          item.category || item.department_id || item.state || '',
+          isLoc ? (item.project_name || item.category || '') : (item.category || item.department_id || item.state || ''),
           item.unit || item.type || '',
           formatDateDDMMYYYY(item.created_at || new Date())
         ];
@@ -182,7 +185,10 @@ function createMasterCrudRoutes(collectionName) {
       const prefix = getCollectionCodePrefix(collectionName);
       const label = getCollectionDisplayName(collectionName);
 
-      const headers = ['Code', 'Name / Description', 'Category / Details', 'Unit / Type', 'Created Date'];
+      const isLoc = collectionName === 'project_locations';
+      const headers = isLoc 
+        ? ['Code', 'Project Division', 'Project Name', 'Unit / Type', 'Created Date']
+        : ['Code', 'Name / Description', 'Category / Details', 'Unit / Type', 'Created Date'];
       const rows = items.map((item, idx) => {
         let code = item.code || item.asset_code || item.item_code || item.id;
         if (!code || /^[0-9a-fA-F]{24}$/.test(String(code))) {
@@ -191,7 +197,7 @@ function createMasterCrudRoutes(collectionName) {
         return [
           code,
           item.name || item.full_name || item.report_name || item.item_name || '',
-          item.category || item.department_id || item.state || '-',
+          isLoc ? (item.project_name || item.category || '-') : (item.category || item.department_id || item.state || '-'),
           item.unit || item.type || '-',
           formatDateDDMMYYYY(item.created_at || new Date())
         ];
@@ -231,8 +237,11 @@ function createMasterCrudRoutes(collectionName) {
       titleCell.alignment = { vertical: 'middle', horizontal: 'center' };
       worksheet.getRow(1).height = 28;
 
+      const isLoc = collectionName === 'project_locations';
       const headerRow = worksheet.getRow(2);
-      headerRow.values = ['Code (Optional)', 'Name * (Required)', 'Category (Optional)', 'Unit / Type (Optional)'];
+      headerRow.values = isLoc
+        ? ['Code (Optional)', 'Project Division * (Required)', 'Project Name (Optional)', 'Opening Balance (Optional)']
+        : ['Code (Optional)', 'Name * (Required)', 'Category (Optional)', 'Unit / Type (Optional)'];
       headerRow.height = 22;
       headerRow.eachCell(c => {
         c.font = { name: 'Calibri', size: 10, bold: true, color: { argb: 'FFFFFFFF' } };
@@ -241,7 +250,10 @@ function createMasterCrudRoutes(collectionName) {
         c.border = blackBorder;
       });
 
-      const sampleRows = [
+      const sampleRows = isLoc ? [
+        [`${prefix}-0001`, 'Khammam', 'Khammam Water Supply Project', '0'],
+        [`${prefix}-0002`, 'Jadcherla', 'Jadcherla Highway Project', '0']
+      ] : [
         [`${prefix}-0001`, `Sample ${label} 1`, 'General', 'Nos'],
         [`${prefix}-0002`, `Sample ${label} 2`, 'Primary', 'MT']
       ];
@@ -377,6 +389,7 @@ function createMasterCrudRoutes(collectionName) {
           code,
           id: code,
           category: category || '',
+          project_name: collectionName === 'project_locations' ? (category || '') : undefined,
           unit: unit || '',
           status: 'active',
           created_at: new Date(),
@@ -498,6 +511,13 @@ function createMasterCrudRoutes(collectionName) {
         updated_at: new Date(),
         created_by: req.user ? req.user.email : 'system'
       };
+      if (collectionName === 'project_locations') {
+        const pVal = req.body.project_name !== undefined ? req.body.project_name : req.body.category;
+        if (pVal !== undefined) {
+          doc.category = pVal;
+          doc.project_name = pVal;
+        }
+      }
       delete doc._id;
 
       const result = await coll.insertOne(doc);
@@ -568,6 +588,13 @@ function createMasterCrudRoutes(collectionName) {
       }
 
       const updateData = { ...req.body, updated_at: new Date(), updated_by: req.user ? req.user.email : 'system' };
+      if (collectionName === 'project_locations') {
+        const pVal = req.body.project_name !== undefined ? req.body.project_name : req.body.category;
+        if (pVal !== undefined) {
+          updateData.category = pVal;
+          updateData.project_name = pVal;
+        }
+      }
       delete updateData._id;
       await coll.updateOne({ _id: current._id }, { $set: updateData });
       res.json({ success: true });
