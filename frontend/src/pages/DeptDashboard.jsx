@@ -280,7 +280,7 @@ export default function DeptDashboard({ deptId = 'pm', departments = [], filters
       }}>
         {deptId === 'fuel' ? (
           <>
-            <div className="civet-card" style={{ border: '1px solid #000000', padding: '16px 20px' }}>
+            <div className="civet-card" style={{ border: '1px solid #000000', padding: '16px 20px', backgroundColor: '#E0F2FE' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
                 <div>
                   <h2 className="text-h2">Monthly Fuel Payments Trend</h2>
@@ -301,7 +301,7 @@ export default function DeptDashboard({ deptId = 'pm', departments = [], filters
               ) : (
                 <div>
                   <div style={{
-                    backgroundColor: '#E0F2FE',
+                    backgroundColor: '#FFFFFF',
                     border: '1px solid #000000',
                     borderRadius: '6px',
                     padding: '10px 8px 4px 0',
@@ -403,7 +403,7 @@ export default function DeptDashboard({ deptId = 'pm', departments = [], filters
                   </div>
 
                   <div style={{
-                    backgroundColor: '#FAFCFE',
+                    backgroundColor: '#FFFFFF',
                     border: '1px solid #000000',
                     borderRadius: '4px',
                     padding: '10px 14px',
@@ -458,7 +458,7 @@ export default function DeptDashboard({ deptId = 'pm', departments = [], filters
               )}
             </div>
 
-            <div className="civet-card" style={{ border: '1px solid #000000', padding: '16px 20px' }}>
+            <div className="civet-card" style={{ border: '1px solid #000000', padding: '16px 20px', backgroundColor: '#DCFCE7' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
                 <div>
                   <h2 className="text-h2">Monthly Fuel Quantity Intake</h2>
@@ -474,7 +474,7 @@ export default function DeptDashboard({ deptId = 'pm', departments = [], filters
               ) : (
                 <div>
                   <div style={{
-                    backgroundColor: '#DCFCE7',
+                    backgroundColor: '#FFFFFF',
                     border: '1px solid #000000',
                     borderRadius: '6px',
                     padding: '10px 8px 4px 0',
@@ -518,7 +518,7 @@ export default function DeptDashboard({ deptId = 'pm', departments = [], filters
                   </div>
 
                   <div style={{
-                    backgroundColor: '#FAFCFE',
+                    backgroundColor: '#FFFFFF',
                     border: '1px solid #000000',
                     borderRadius: '4px',
                     padding: '10px 14px',
@@ -544,7 +544,7 @@ export default function DeptDashboard({ deptId = 'pm', departments = [], filters
               )}
             </div>
 
-            <div className="civet-card" style={{ border: '1px solid #000000', padding: '16px 20px' }}>
+            <div className="civet-card" style={{ border: '1px solid #000000', padding: '16px 20px', backgroundColor: '#FEF3C7' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
                 <div>
                   <h2 className="text-h2">Expenses by Fuel Type</h2>
@@ -556,7 +556,7 @@ export default function DeptDashboard({ deptId = 'pm', departments = [], filters
               ) : (
                 <div>
                   <div style={{
-                    backgroundColor: '#FEF3C7',
+                    backgroundColor: '#FFFFFF',
                     border: '1px solid #000000',
                     borderRadius: '6px',
                     padding: '10px 12px 4px 8px',
@@ -578,8 +578,8 @@ export default function DeptDashboard({ deptId = 'pm', departments = [], filters
                           <XAxis type="number" tickFormatter={formatAxisINR} tickLine={{ stroke: '#000000' }} axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} tick={{ fontSize: 9.5, fill: '#0F2A4A' }} />
                           <YAxis dataKey="name" type="category" tickLine={{ stroke: '#000000' }} axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} tick={{ fontSize: 9.5, fill: '#0F2A4A' }} width={90} />
                           <Tooltip 
-                            formatter={(val) => [formatINR(val), 'Amount']}
-                            contentStyle={{ fontSize: '11px', borderRadius: '4px' }} 
+                            formatter={(val) => [formatINR(val), 'Amount']} 
+                            contentStyle={{ fontSize: '11px', borderRadius: '4px' }}
                           />
                           <Bar dataKey="value" fill="url(#deptGradGreenH)" stroke="#047857" strokeWidth={1} filter="url(#deptSecBar3d)" radius={[0, 3, 3, 0]} />
                         </BarChart>
@@ -588,7 +588,7 @@ export default function DeptDashboard({ deptId = 'pm', departments = [], filters
                   </div>
 
                   <div style={{
-                    backgroundColor: '#FAFCFE',
+                    backgroundColor: '#FFFFFF',
                     border: '1px solid #000000',
                     borderRadius: '4px',
                     padding: '10px 12px'
@@ -610,7 +610,7 @@ export default function DeptDashboard({ deptId = 'pm', departments = [], filters
             </div>
 
             {locationSpendingData.length > 0 && (
-              <div className="civet-card" style={{ gridColumn: '1 / -1', border: '1px solid #000000', padding: '16px 20px' }}>
+              <div className="civet-card" style={{ gridColumn: '1 / -1', border: '1px solid #000000', padding: '16px 20px', backgroundColor: '#F3E8FF' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
                   <div>
                     <h2 className="text-h2">Cost Center Fuel Payments & All Cost Centers Ledger Breakdown</h2>
@@ -637,7 +637,7 @@ export default function DeptDashboard({ deptId = 'pm', departments = [], filters
 
                 <div>
                   <div style={{
-                    backgroundColor: '#F3E8FF',
+                    backgroundColor: '#FFFFFF',
                     border: '1px solid #000000',
                     borderRadius: '6px',
                     padding: '12px 14px 10px 8px',
@@ -766,11 +766,11 @@ export default function DeptDashboard({ deptId = 'pm', departments = [], filters
                           <tr style={{ backgroundColor: '#0F2A4A', color: '#FFFFFF' }}>
                             <th style={{ padding: '7px 10px', textAlign: 'center', width: '40px', border: '1px solid #000000' }}>#</th>
                             <th style={{ padding: '7px 10px', textAlign: 'left', border: '1px solid #000000' }}>Cost Center</th>
-                            <th style={{ padding: '7px 10px', textAlign: 'right', border: '1px solid #000000' }}>Opening Balance</th>
-                            <th style={{ padding: '7px 10px', textAlign: 'right', border: '1px solid #000000' }}>Total Cost (Without Op/Cl)</th>
-                            <th style={{ padding: '7px 10px', textAlign: 'right', border: '1px solid #000000' }}>Paid Amount</th>
-                            <th style={{ padding: '7px 10px', textAlign: 'right', border: '1px solid #000000' }}>Closing Balance</th>
-                            <th style={{ padding: '7px 10px', textAlign: 'right', border: '1px solid #000000' }}>Quantity (Ltrs)</th>
+                            <th style={{ padding: '7px 10px', textAlign: 'right', border: '1px solid #000000', backgroundColor: '#B45309' }}>Opening Balance</th>
+                            <th style={{ padding: '7px 10px', textAlign: 'right', border: '1px solid #000000', backgroundColor: '#0369A1' }}>Total Cost (Without Op/Cl)</th>
+                            <th style={{ padding: '7px 10px', textAlign: 'right', border: '1px solid #000000', backgroundColor: '#047857' }}>Paid Amount</th>
+                            <th style={{ padding: '7px 10px', textAlign: 'right', border: '1px solid #000000', backgroundColor: '#B91C1C' }}>Closing Balance</th>
+                            <th style={{ padding: '7px 10px', textAlign: 'right', border: '1px solid #000000', backgroundColor: '#6D28D9' }}>Quantity (Ltrs)</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -780,15 +780,16 @@ export default function DeptDashboard({ deptId = 'pm', departments = [], filters
                             const paid = Number(loc.paidAmount || loc.amount || 0);
                             const cl = Number(loc.closingBalance || 0);
                             const qty = Number(loc.quantity || 0);
+                            const isEven = idx % 2 === 0;
                             return (
-                              <tr key={loc.location || idx} style={{ borderBottom: '1px solid #E2E8F0', backgroundColor: idx % 2 === 0 ? '#FFFFFF' : '#F8FAFD' }}>
-                                <td style={{ padding: '6px 10px', textAlign: 'center', color: '#64748B', border: '1px solid #000000' }}>{idx + 1}</td>
-                                <td style={{ padding: '6px 10px', fontWeight: '600', color: '#0F2A4A', border: '1px solid #000000' }}>{loc.location}</td>
-                                <td style={{ padding: '6px 10px', textAlign: 'right', color: '#6366F1', fontWeight: '500', border: '1px solid #000000' }}>{formatINR(op)}</td>
-                                <td style={{ padding: '6px 10px', textAlign: 'right', color: '#0284C7', fontWeight: '600', border: '1px solid #000000' }}>{formatINR(cost)}</td>
-                                <td style={{ padding: '6px 10px', textAlign: 'right', color: '#1F6FEB', fontWeight: '600', border: '1px solid #000000' }}>{formatINR(paid)}</td>
-                                <td style={{ padding: '6px 10px', textAlign: 'right', color: '#C8423A', fontWeight: '700', border: '1px solid #000000' }}>{formatINR(cl)}</td>
-                                <td style={{ padding: '6px 10px', textAlign: 'right', color: '#10B981', fontWeight: '500', border: '1px solid #000000' }}>{formatNumber(qty, 2)}</td>
+                              <tr key={loc.location || idx} style={{ borderBottom: '1px solid #000000' }}>
+                                <td style={{ padding: '6px 10px', textAlign: 'center', color: '#64748B', border: '1px solid #000000', backgroundColor: isEven ? '#FFFFFF' : '#F8FAFD' }}>{idx + 1}</td>
+                                <td style={{ padding: '6px 10px', fontWeight: '600', color: '#0F2A4A', border: '1px solid #000000', backgroundColor: isEven ? '#FFFFFF' : '#F8FAFD' }}>{loc.location}</td>
+                                <td style={{ padding: '6px 10px', textAlign: 'right', color: '#92400E', fontWeight: '600', border: '1px solid #000000', backgroundColor: isEven ? '#FEF9C3' : '#FEF08A' }}>{formatINR(op)}</td>
+                                <td style={{ padding: '6px 10px', textAlign: 'right', color: '#0369A1', fontWeight: '600', border: '1px solid #000000', backgroundColor: isEven ? '#E0F2FE' : '#BAE6FD' }}>{formatINR(cost)}</td>
+                                <td style={{ padding: '6px 10px', textAlign: 'right', color: '#047857', fontWeight: '700', border: '1px solid #000000', backgroundColor: isEven ? '#DCFCE7' : '#BBF7D0' }}>{formatINR(paid)}</td>
+                                <td style={{ padding: '6px 10px', textAlign: 'right', color: '#B91C1C', fontWeight: '700', border: '1px solid #000000', backgroundColor: isEven ? '#FEE2E2' : '#FECDD3' }}>{formatINR(cl)}</td>
+                                <td style={{ padding: '6px 10px', textAlign: 'right', color: '#6D28D9', fontWeight: '600', border: '1px solid #000000', backgroundColor: isEven ? '#F3E8FF' : '#DDD6FE' }}>{formatNumber(qty, 2)}</td>
                               </tr>
                             );
                           })}
@@ -801,15 +802,15 @@ export default function DeptDashboard({ deptId = 'pm', departments = [], filters
                             const totCl = locationSpendingData.reduce((s, l) => s + Number(l.closingBalance || 0), 0);
                             const totQty = locationSpendingData.reduce((s, l) => s + Number(l.quantity || 0), 0);
                             return (
-                              <tr style={{ backgroundColor: '#F1F5F9', fontWeight: '700', borderTop: '2px solid #000000' }}>
-                                <td colSpan={2} style={{ padding: '8px 10px', textAlign: 'left', color: '#0F2A4A', border: '1px solid #000000' }}>
+                              <tr style={{ fontWeight: '700', borderTop: '2px solid #000000' }}>
+                                <td colSpan={2} style={{ padding: '8px 10px', textAlign: 'left', color: '#FFFFFF', backgroundColor: '#0F2A4A', border: '1px solid #000000' }}>
                                   Total ({locationSpendingData.length} Cost Centers)
                                 </td>
-                                <td style={{ padding: '8px 10px', textAlign: 'right', color: '#6366F1', border: '1px solid #000000' }}>{formatINR(totOp)}</td>
-                                <td style={{ padding: '8px 10px', textAlign: 'right', color: '#0284C7', border: '1px solid #000000' }}>{formatINR(totCost)}</td>
-                                <td style={{ padding: '8px 10px', textAlign: 'right', color: '#1F6FEB', border: '1px solid #000000' }}>{formatINR(totPaid)}</td>
-                                <td style={{ padding: '8px 10px', textAlign: 'right', color: '#C8423A', border: '1px solid #000000' }}>{formatINR(totCl)}</td>
-                                <td style={{ padding: '8px 10px', textAlign: 'right', color: '#10B981', border: '1px solid #000000' }}>{formatNumber(totQty, 2)}</td>
+                                <td style={{ padding: '8px 10px', textAlign: 'right', color: '#78350F', backgroundColor: '#FDE047', border: '1px solid #000000' }}>{formatINR(totOp)}</td>
+                                <td style={{ padding: '8px 10px', textAlign: 'right', color: '#0369A1', backgroundColor: '#7DD3FC', border: '1px solid #000000' }}>{formatINR(totCost)}</td>
+                                <td style={{ padding: '8px 10px', textAlign: 'right', color: '#047857', backgroundColor: '#86EFAC', border: '1px solid #000000' }}>{formatINR(totPaid)}</td>
+                                <td style={{ padding: '8px 10px', textAlign: 'right', color: '#9F1239', backgroundColor: '#FDA4AF', border: '1px solid #000000' }}>{formatINR(totCl)}</td>
+                                <td style={{ padding: '8px 10px', textAlign: 'right', color: '#5B21B6', backgroundColor: '#C4B5FD', border: '1px solid #000000' }}>{formatNumber(totQty, 2)}</td>
                               </tr>
                             );
                           })()}
@@ -823,7 +824,7 @@ export default function DeptDashboard({ deptId = 'pm', departments = [], filters
           </>
         ) : (
           <>
-            <div className="civet-card" style={{ border: '1px solid #000000', padding: '16px 20px' }}>
+            <div className="civet-card" style={{ border: '1px solid #000000', padding: '16px 20px', backgroundColor: '#E0F2FE' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
                 <div>
                   <h2 className="text-h2">
@@ -839,7 +840,7 @@ export default function DeptDashboard({ deptId = 'pm', departments = [], filters
               ) : (
                 <div>
                   <div style={{
-                    backgroundColor: '#E0F2FE',
+                    backgroundColor: '#FFFFFF',
                     border: '1px solid #000000',
                     borderRadius: '6px',
                     padding: '10px 8px 4px 0',
@@ -894,7 +895,7 @@ export default function DeptDashboard({ deptId = 'pm', departments = [], filters
                   </div>
 
                   <div style={{
-                    backgroundColor: '#FAFCFE',
+                    backgroundColor: '#FFFFFF',
                     border: '1px solid #000000',
                     borderRadius: '4px',
                     padding: '10px 14px',
@@ -924,7 +925,7 @@ export default function DeptDashboard({ deptId = 'pm', departments = [], filters
               )}
             </div>
 
-            <div className="civet-card" style={{ border: '1px solid #000000', padding: '16px 20px' }}>
+            <div className="civet-card" style={{ border: '1px solid #000000', padding: '16px 20px', backgroundColor: '#DCFCE7' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
                 <div>
                   <h2 className="text-h2">
@@ -940,7 +941,7 @@ export default function DeptDashboard({ deptId = 'pm', departments = [], filters
               ) : (
                 <div>
                   <div style={{
-                    backgroundColor: '#DCFCE7',
+                    backgroundColor: '#FFFFFF',
                     border: '1px solid #000000',
                     borderRadius: '6px',
                     padding: '10px 12px 4px 8px',
@@ -962,8 +963,8 @@ export default function DeptDashboard({ deptId = 'pm', departments = [], filters
                           <XAxis type="number" tickFormatter={formatAxisINR} tickLine={{ stroke: '#000000' }} axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} tick={{ fontSize: 9.5, fill: '#0F2A4A' }} />
                           <YAxis dataKey="name" type="category" tickLine={{ stroke: '#000000' }} axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} tick={{ fontSize: 9.5, fill: '#0F2A4A' }} width={90} />
                           <Tooltip 
-                            formatter={(val) => [formatINR(val), 'Amount']}
-                            contentStyle={{ fontSize: '11px', borderRadius: '4px' }} 
+                            formatter={(val) => [formatINR(val), 'Amount']} 
+                            contentStyle={{ fontSize: '11px', borderRadius: '4px' }}
                           />
                           <Bar dataKey="value" fill="url(#deptOtherGradGreenH)" stroke="#047857" strokeWidth={1} filter="url(#deptOtherSec3d)" radius={[0, 3, 3, 0]} />
                         </BarChart>
@@ -972,7 +973,7 @@ export default function DeptDashboard({ deptId = 'pm', departments = [], filters
                   </div>
 
                   <div style={{
-                    backgroundColor: '#FAFCFE',
+                    backgroundColor: '#FFFFFF',
                     border: '1px solid #000000',
                     borderRadius: '4px',
                     padding: '10px 12px'
