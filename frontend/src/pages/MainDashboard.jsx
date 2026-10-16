@@ -399,7 +399,7 @@ export default function MainDashboard({ filters, onNavigate }) {
                   </span>
                 </div>
 
-                <div style={{ width: '100%', height: '220px', position: 'relative' }}>
+                <div style={{ width: '100%', height: '230px', position: 'relative' }}>
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                       <defs>
@@ -411,8 +411,8 @@ export default function MainDashboard({ filters, onNavigate }) {
                         data={activeDeptSpending}
                         cx="50%"
                         cy="50%"
-                        innerRadius={56}
-                        outerRadius={86}
+                        innerRadius={68}
+                        outerRadius={94}
                         paddingAngle={2}
                         dataKey="amount"
                         nameKey="name"
@@ -442,12 +442,25 @@ export default function MainDashboard({ filters, onNavigate }) {
                     left: '50%',
                     transform: 'translate(-50%, -50%)',
                     textAlign: 'center',
-                    pointerEvents: 'none'
+                    pointerEvents: 'none',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: '130px',
+                    maxWidth: '130px'
                   }}>
-                    <span style={{ fontSize: '9.5px', color: '#64748B', display: 'block', fontWeight: '600', textTransform: 'uppercase' }}>
+                    <span style={{ fontSize: '9px', color: '#64748B', display: 'block', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '2px' }}>
                       Total Spend
                     </span>
-                    <strong style={{ fontSize: '13px', fontWeight: '800', color: '#0F2A4A', display: 'block' }}>
+                    <strong style={{
+                      fontSize: String(formatINR(totalPaymentsAmount)).length > 17 ? '11px' : (String(formatINR(totalPaymentsAmount)).length > 13 ? '12px' : '13px'),
+                      fontWeight: '800',
+                      color: '#0F2A4A',
+                      display: 'block',
+                      whiteSpace: 'nowrap',
+                      lineHeight: '1.2'
+                    }}>
                       {formatINR(totalPaymentsAmount)}
                     </strong>
                   </div>
