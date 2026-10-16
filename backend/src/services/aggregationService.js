@@ -2289,7 +2289,11 @@ class AggregationService {
           serviceSpending: [],
           vendorSpending: []
         },
-        departmentOverview: allDepts.map(d => ({
+        departmentOverview: allDepts.filter(d => {
+          const dCode = String(d.code || d.id || '').trim().toUpperCase();
+          const dName = String(d.name || '').trim().toUpperCase();
+          return !(dCode === 'STORES' || dCode === 'MMS' || dCode === 'DPT-0003' || dName.includes('STORE'));
+        }).map(d => ({
           department: d.name,
           measure: 'Total Amount',
           value: '0'
@@ -2391,7 +2395,11 @@ class AggregationService {
       amountRaw: amount,
       amountFormatted: formatIndianCurrency(amount)
     })).sort((a, b) => b.amount - a.amount);
-    const departmentOverview = allDepts.map(d => {
+    const departmentOverview = allDepts.filter(d => {
+      const dCode = String(d.code || d.id || '').trim().toUpperCase();
+      const dName = String(d.name || '').trim().toUpperCase();
+      return !(dCode === 'STORES' || dCode === 'MMS' || dCode === 'DPT-0003' || dName.includes('STORE'));
+    }).map(d => {
       const dCode = String(d.code || d.id || '').trim().toUpperCase();
       const dName = String(d.name || '').trim().toUpperCase();
 
