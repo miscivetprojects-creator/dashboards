@@ -268,8 +268,8 @@ export default function Sidebar({
           onClick={() => onNavigate({ view: 'dashboard-main' })}
         />
         <NavItem
-          label="Cost Centers"
-          tooltipText="Cost Centers"
+          label="Project Divisions"
+          tooltipText="Project Divisions"
           icon={MapPin}
           active={currentRoute.view === 'dashboard-location'}
           onClick={() => onNavigate({ view: 'dashboard-location', location: 'All' })}
