@@ -270,30 +270,30 @@ export default function DataRegister({ prefilterDept, prefilterLocation, onNavig
         <div className="civet-table-container" style={{ border: 'none', borderRadius: 0 }}>
           <table className="civet-table">
             <thead>
-              <tr>
-                <th>Date</th>
-                <th>Department</th>
-                <th>Cost Center</th>
-                <th>Ledger / Vendor</th>
-                <th style={{ textAlign: 'right' }}>Opening Bal (Rs.)</th>
-                <th style={{ textAlign: 'right' }}>Fuel Qty (Ltrs)</th>
-                <th style={{ textAlign: 'right' }}>Total Cost (Rs.)</th>
-                <th style={{ textAlign: 'right' }}>Amount Paid (Rs.)</th>
-                <th style={{ textAlign: 'right' }}>Closing Bal (Rs.)</th>
-                <th style={{ textAlign: 'center' }}>Payment Type</th>
-                <th style={{ textAlign: 'center' }}>Actions</th>
+              <tr style={{ backgroundColor: '#0F2A4A', color: '#FFFFFF' }}>
+                <th style={{ padding: '8px 10px', border: '1px solid #000000' }}>Date</th>
+                <th style={{ padding: '8px 10px', border: '1px solid #000000' }}>Department</th>
+                <th style={{ padding: '8px 10px', border: '1px solid #000000' }}>Cost Center</th>
+                <th style={{ padding: '8px 10px', border: '1px solid #000000' }}>Ledger / Vendor</th>
+                <th style={{ textAlign: 'right', padding: '8px 10px', border: '1px solid #000000', backgroundColor: '#B45309' }}>Opening Bal (Rs.)</th>
+                <th style={{ textAlign: 'right', padding: '8px 10px', border: '1px solid #000000', backgroundColor: '#6D28D9' }}>Fuel Qty (Ltrs)</th>
+                <th style={{ textAlign: 'right', padding: '8px 10px', border: '1px solid #000000', backgroundColor: '#0369A1' }}>Total Cost (Rs.)</th>
+                <th style={{ textAlign: 'right', padding: '8px 10px', border: '1px solid #000000', backgroundColor: '#047857' }}>Amount Paid (Rs.)</th>
+                <th style={{ textAlign: 'right', padding: '8px 10px', border: '1px solid #000000', backgroundColor: '#B91C1C' }}>Closing Bal (Rs.)</th>
+                <th style={{ textAlign: 'center', padding: '8px 10px', border: '1px solid #000000' }}>Payment Type</th>
+                <th style={{ textAlign: 'center', padding: '8px 10px', border: '1px solid #000000' }}>Actions</th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan="11" style={{ textAlign: 'center', padding: '24px', color: '#576574' }}>
+                  <td colSpan="11" style={{ textAlign: 'center', padding: '24px', color: '#576574', border: '1px solid #000000' }}>
                     Loading register records...
                   </td>
                 </tr>
               ) : records.length === 0 ? (
                 <tr>
-                  <td colSpan="11" style={{ textAlign: 'center', padding: '30px', color: '#8395A7' }}>
+                  <td colSpan="11" style={{ textAlign: 'center', padding: '30px', color: '#8395A7', border: '1px solid #000000' }}>
                     No records found in Data Register matching active criteria.
                   </td>
                 </tr>
@@ -329,40 +329,41 @@ export default function DataRegister({ prefilterDept, prefilterLocation, onNavig
                   const isCC = isMerchant || String(rawPType).toLowerCase().includes('cash') || (ccField && !['no', 'false', '0', 'none', 'n/a', '-'].includes(String(ccField).trim().toLowerCase())) || isZeroQtyOrRate;
                   const paymentTypeVal = isCC ? 'Cash & Carry' : (rawPType ? (String(rawPType).toLowerCase().includes('card') ? 'Card Payment' : rawPType) : (paidAmt > 0 ? 'Regular / Ledger' : ''));
                   const isCashAndCarry = isCC;
+                  const isEven = index % 2 === 0;
 
                   return (
-                    <tr key={rec._id}>
-                      <td style={{ fontWeight: '600', whiteSpace: 'nowrap' }}>{formatDateDisplay(rec.report_date)}</td>
-                      <td style={{ fontWeight: '600', color: '#0F2A4A' }}>{rec.department_name || rec.department_id || 'Plant & Machinery'}</td>
-                      <td style={{ fontWeight: '600' }}>{rec.location_name || rec.location_id}</td>
-                      <td style={{ color: '#0F2A4A' }}>{vendor}</td>
-                      <td style={{ textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>
+                    <tr key={rec._id} style={{ borderBottom: '1px solid #000000' }}>
+                      <td style={{ fontWeight: '600', whiteSpace: 'nowrap', backgroundColor: isEven ? '#FFFFFF' : '#F8FAFC', border: '1px solid #000000' }}>{formatDateDisplay(rec.report_date)}</td>
+                      <td style={{ fontWeight: '600', color: '#0F2A4A', backgroundColor: isEven ? '#FFFFFF' : '#F8FAFC', border: '1px solid #000000' }}>{rec.department_name || rec.department_id || 'Plant & Machinery'}</td>
+                      <td style={{ fontWeight: '600', backgroundColor: isEven ? '#FFFFFF' : '#EFF6FF', border: '1px solid #000000' }}>{rec.location_name || rec.location_id}</td>
+                      <td style={{ color: '#0F2A4A', backgroundColor: isEven ? '#FFFFFF' : '#F8FAFC', border: '1px solid #000000' }}>{vendor}</td>
+                      <td style={{ textAlign: 'right', fontVariantNumeric: 'tabular-nums', fontWeight: '600', color: '#92400E', backgroundColor: isEven ? '#FEF9C3' : '#FEF08A', border: '1px solid #000000' }}>
                         {opBal > 0 ? ('Rs. ' + Math.round(opBal).toLocaleString('en-IN')) : '-'}
                       </td>
-                      <td style={{ textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>
+                      <td style={{ textAlign: 'right', fontVariantNumeric: 'tabular-nums', fontWeight: '600', color: '#6D28D9', backgroundColor: isEven ? '#F3E8FF' : '#DDD6FE', border: '1px solid #000000' }}>
                         {isBoth ? (
                           <span>P: {pQ.toLocaleString('en-IN')}L | D: {dQ.toLocaleString('en-IN')}L</span>
                         ) : totalQty > 0 ? (
                           `${totalQty.toLocaleString('en-IN')} L`
                         ) : '-'}
                       </td>
-                      <td style={{ textAlign: 'right', fontWeight: '600', color: '#0F2A4A', fontVariantNumeric: 'tabular-nums' }}>
+                      <td style={{ textAlign: 'right', fontWeight: '600', color: '#0369A1', fontVariantNumeric: 'tabular-nums', backgroundColor: isEven ? '#E0F2FE' : '#BAE6FD', border: '1px solid #000000' }}>
                         {totalCost > 0 ? ('Rs. ' + totalCost.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })) : '-'}
                       </td>
-                      <td style={{ textAlign: 'right', fontWeight: '700', color: paidAmt > 0 ? '#1F6FEB' : '#0F2A4A', fontVariantNumeric: 'tabular-nums' }}>
+                      <td style={{ textAlign: 'right', fontWeight: '700', color: '#047857', fontVariantNumeric: 'tabular-nums', backgroundColor: isEven ? '#DCFCE7' : '#BBF7D0', border: '1px solid #000000' }}>
                         {paidAmt > 0 ? ('Rs. ' + paidAmt.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })) : '-'}
                       </td>
-                      <td style={{ textAlign: 'right', fontWeight: '600', color: '#0F2A4A', fontVariantNumeric: 'tabular-nums' }}>
+                      <td style={{ textAlign: 'right', fontWeight: '700', color: '#B91C1C', fontVariantNumeric: 'tabular-nums', backgroundColor: isEven ? '#FEE2E2' : '#FECDD3', border: '1px solid #000000' }}>
                         {balanceAmt > 0 ? ('Rs. ' + balanceAmt.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })) : '-'}
                       </td>
-                      <td style={{ textAlign: 'center' }}>
+                      <td style={{ textAlign: 'center', backgroundColor: isEven ? '#FFF7ED' : '#FED7AA', border: '1px solid #000000' }}>
                         {paymentTypeVal ? (
-                          <span style={{ color: isCashAndCarry ? '#B45309' : '#0F2A4A', fontWeight: isCashAndCarry ? '600' : '500' }}>
+                          <span style={{ color: isCashAndCarry ? '#B45309' : '#0F2A4A', fontWeight: isCashAndCarry ? '700' : '600' }}>
                             {paymentTypeVal}
                           </span>
                         ) : '-'}
                       </td>
-                      <td style={{ textAlign: 'center' }}>
+                      <td style={{ textAlign: 'center', backgroundColor: isEven ? '#FFFFFF' : '#F8FAFC', border: '1px solid #000000' }}>
                         <div style={{ display: 'inline-flex', gap: '4px' }}>
                           <button
                             className="btn btn-secondary btn-sm"
