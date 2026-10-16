@@ -163,7 +163,7 @@ export default function MainDashboard({ filters, onNavigate }) {
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-        <div className="civet-card" style={{ border: '1px solid #000000', padding: '16px 20px' }}>
+        <div className="civet-card" style={{ border: '1px solid #000000', padding: '16px 20px', backgroundColor: '#E0F2FE' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px', flexWrap: 'wrap', gap: '8px' }}>
             <div>
               <h2 style={{ fontSize: '15px', fontWeight: '700', color: '#0F2A4A', margin: 0 }}>Monthly Payments</h2>
@@ -184,7 +184,7 @@ export default function MainDashboard({ filters, onNavigate }) {
               alignItems: 'stretch'
             }}>
               <div style={{
-                backgroundColor: '#E0F2FE',
+                backgroundColor: '#FFFFFF',
                 border: '1px solid #000000',
                 borderRadius: '6px',
                 padding: '14px 12px 8px 6px'
@@ -280,7 +280,7 @@ export default function MainDashboard({ filters, onNavigate }) {
               </div>
 
               <div style={{
-                backgroundColor: '#FAFCFE',
+                backgroundColor: '#FFFFFF',
                 border: '1px solid #000000',
                 borderRadius: '6px',
                 padding: '12px 14px',
@@ -358,7 +358,7 @@ export default function MainDashboard({ filters, onNavigate }) {
           )}
         </div>
 
-        <div className="civet-card" style={{ border: '1px solid #000000', padding: '16px 20px' }}>
+        <div className="civet-card" style={{ border: '1px solid #000000', padding: '16px 20px', backgroundColor: '#F3E8FF' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
             <h2 style={{ fontSize: '15px', fontWeight: '700', color: '#0F2A4A', margin: 0 }}>Department Spending Share</h2>
             <span style={{ fontSize: '10.5px', color: '#8395A7', fontWeight: '600' }}>Distribution %</span>
@@ -374,7 +374,7 @@ export default function MainDashboard({ filters, onNavigate }) {
               alignItems: 'center'
             }}>
               <div style={{
-                backgroundColor: '#F3E8FF',
+                backgroundColor: '#FFFFFF',
                 border: '1px solid #000000',
                 borderRadius: '6px',
                 padding: '12px 14px',
@@ -480,7 +480,7 @@ export default function MainDashboard({ filters, onNavigate }) {
               </div>
 
               <div style={{
-                backgroundColor: '#FAFCFE',
+                backgroundColor: '#FFFFFF',
                 border: '1px solid #000000',
                 borderRadius: '6px',
                 padding: '12px 14px',
@@ -540,7 +540,7 @@ export default function MainDashboard({ filters, onNavigate }) {
           gridTemplateColumns: 'repeat(auto-fit, minmax(460px, 1fr))',
           gap: '16px'
         }}>
-          <div className="civet-card" style={{ border: '1px solid #000000', padding: '16px 20px' }}>
+          <div className="civet-card" style={{ border: '1px solid #000000', padding: '16px 20px', backgroundColor: '#FEF3C7' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
               <div>
                 <h2 className="text-h2">Cost Center Payments</h2>
@@ -551,7 +551,7 @@ export default function MainDashboard({ filters, onNavigate }) {
             ) : (
               <div>
                 <div style={{
-                  backgroundColor: '#FEF3C7',
+                  backgroundColor: '#FFFFFF',
                   border: '1px solid #000000',
                   borderRadius: '6px',
                   padding: '10px 8px 4px 0',
@@ -580,7 +580,7 @@ export default function MainDashboard({ filters, onNavigate }) {
                 </div>
 
                 <div style={{
-                  backgroundColor: '#FAFCFE',
+                  backgroundColor: '#FFFFFF',
                   border: '1px solid #000000',
                   borderRadius: '4px',
                   padding: '10px 12px'
@@ -609,7 +609,7 @@ export default function MainDashboard({ filters, onNavigate }) {
             )}
           </div>
 
-          <div className="civet-card" style={{ border: '1px solid #000000', padding: '16px 20px' }}>
+          <div className="civet-card" style={{ border: '1px solid #000000', padding: '16px 20px', backgroundColor: '#DCFCE7' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
               <div>
                 <h2 className="text-h2">Fuel & Operational Breakdown</h2>
@@ -620,7 +620,7 @@ export default function MainDashboard({ filters, onNavigate }) {
             ) : (
               <div>
                 <div style={{
-                  backgroundColor: '#DCFCE7',
+                  backgroundColor: '#FFFFFF',
                   border: '1px solid #000000',
                   borderRadius: '6px',
                   padding: '10px 14px 4px 10px',
