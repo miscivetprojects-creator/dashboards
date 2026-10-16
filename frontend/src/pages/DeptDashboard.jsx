@@ -301,7 +301,7 @@ export default function DeptDashboard({ deptId = 'pm', departments = [], filters
               ) : (
                 <div>
                   <div style={{
-                    backgroundColor: '#FFFFFF',
+                    backgroundColor: '#BAE6FD',
                     border: '1px solid #000000',
                     borderRadius: '6px',
                     padding: '10px 8px 4px 0',
@@ -403,7 +403,7 @@ export default function DeptDashboard({ deptId = 'pm', departments = [], filters
                   </div>
 
                   <div style={{
-                    backgroundColor: '#FFFFFF',
+                    backgroundColor: '#F0F9FF',
                     border: '1px solid #000000',
                     borderRadius: '4px',
                     padding: '10px 14px',
@@ -474,7 +474,7 @@ export default function DeptDashboard({ deptId = 'pm', departments = [], filters
               ) : (
                 <div>
                   <div style={{
-                    backgroundColor: '#FFFFFF',
+                    backgroundColor: '#BBF7D0',
                     border: '1px solid #000000',
                     borderRadius: '6px',
                     padding: '10px 8px 4px 0',
@@ -488,7 +488,7 @@ export default function DeptDashboard({ deptId = 'pm', departments = [], filters
                               <feDropShadow dx="1" dy="3" stdDeviation="2" floodColor="#047857" floodOpacity="0.30" />
                             </filter>
                           </defs>
-                          <CartesianGrid strokeDasharray="3 3" stroke="#EAEFF5" />
+                          <CartesianGrid strokeDasharray="3 3" stroke="#A7F3D0" />
                           <XAxis 
                             dataKey="month" 
                             interval={0} 
@@ -518,7 +518,7 @@ export default function DeptDashboard({ deptId = 'pm', departments = [], filters
                   </div>
 
                   <div style={{
-                    backgroundColor: '#FFFFFF',
+                    backgroundColor: '#F0FDF4',
                     border: '1px solid #000000',
                     borderRadius: '4px',
                     padding: '10px 14px',
@@ -556,7 +556,7 @@ export default function DeptDashboard({ deptId = 'pm', departments = [], filters
               ) : (
                 <div>
                   <div style={{
-                    backgroundColor: '#FFFFFF',
+                    backgroundColor: '#FEF08A',
                     border: '1px solid #000000',
                     borderRadius: '6px',
                     padding: '10px 12px 4px 8px',
@@ -574,7 +574,7 @@ export default function DeptDashboard({ deptId = 'pm', departments = [], filters
                               <stop offset="100%" stopColor="#059669" />
                             </linearGradient>
                           </defs>
-                          <CartesianGrid strokeDasharray="3 3" stroke="#EAEFF5" />
+                          <CartesianGrid strokeDasharray="3 3" stroke="#CBD5E1" />
                           <XAxis type="number" tickFormatter={formatAxisINR} tickLine={{ stroke: '#000000' }} axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} tick={{ fontSize: 9.5, fill: '#0F2A4A' }} />
                           <YAxis dataKey="name" type="category" tickLine={{ stroke: '#000000' }} axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} tick={{ fontSize: 9.5, fill: '#0F2A4A' }} width={90} />
                           <Tooltip 
@@ -588,7 +588,7 @@ export default function DeptDashboard({ deptId = 'pm', departments = [], filters
                   </div>
 
                   <div style={{
-                    backgroundColor: '#FFFFFF',
+                    backgroundColor: '#FFFBEB',
                     border: '1px solid #000000',
                     borderRadius: '4px',
                     padding: '10px 12px'
@@ -637,7 +637,7 @@ export default function DeptDashboard({ deptId = 'pm', departments = [], filters
 
                 <div>
                   <div style={{
-                    backgroundColor: '#FFFFFF',
+                    backgroundColor: '#DDD6FE',
                     border: '1px solid #000000',
                     borderRadius: '6px',
                     padding: '12px 14px 10px 8px',
@@ -840,7 +840,7 @@ export default function DeptDashboard({ deptId = 'pm', departments = [], filters
               ) : (
                 <div>
                   <div style={{
-                    backgroundColor: '#FFFFFF',
+                    backgroundColor: '#BAE6FD',
                     border: '1px solid #000000',
                     borderRadius: '6px',
                     padding: '10px 8px 4px 0',
@@ -862,7 +862,7 @@ export default function DeptDashboard({ deptId = 'pm', departments = [], filters
                               <stop offset="100%" stopColor="#EA580C" />
                             </linearGradient>
                           </defs>
-                          <CartesianGrid strokeDasharray="3 3" stroke="#EAEFF5" />
+                          <CartesianGrid strokeDasharray="3 3" stroke="#94A3B8" strokeOpacity={0.4} />
                           <XAxis 
                             dataKey="month" 
                             interval={0} 
@@ -895,7 +895,7 @@ export default function DeptDashboard({ deptId = 'pm', departments = [], filters
                   </div>
 
                   <div style={{
-                    backgroundColor: '#FFFFFF',
+                    backgroundColor: '#F0F9FF',
                     border: '1px solid #000000',
                     borderRadius: '4px',
                     padding: '10px 14px',
@@ -941,7 +941,7 @@ export default function DeptDashboard({ deptId = 'pm', departments = [], filters
               ) : (
                 <div>
                   <div style={{
-                    backgroundColor: '#FFFFFF',
+                    backgroundColor: '#BBF7D0',
                     border: '1px solid #000000',
                     borderRadius: '6px',
                     padding: '10px 12px 4px 8px',
@@ -959,7 +959,7 @@ export default function DeptDashboard({ deptId = 'pm', departments = [], filters
                               <stop offset="100%" stopColor="#059669" />
                             </linearGradient>
                           </defs>
-                          <CartesianGrid strokeDasharray="3 3" stroke="#EAEFF5" />
+                          <CartesianGrid strokeDasharray="3 3" stroke="#A7F3D0" />
                           <XAxis type="number" tickFormatter={formatAxisINR} tickLine={{ stroke: '#000000' }} axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} tick={{ fontSize: 9.5, fill: '#0F2A4A' }} />
                           <YAxis dataKey="name" type="category" tickLine={{ stroke: '#000000' }} axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} tick={{ fontSize: 9.5, fill: '#0F2A4A' }} width={90} />
                           <Tooltip 
@@ -973,7 +973,7 @@ export default function DeptDashboard({ deptId = 'pm', departments = [], filters
                   </div>
 
                   <div style={{
-                    backgroundColor: '#FFFFFF',
+                    backgroundColor: '#F0FDF4',
                     border: '1px solid #000000',
                     borderRadius: '4px',
                     padding: '10px 12px'
