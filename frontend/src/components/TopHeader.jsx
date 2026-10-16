@@ -134,9 +134,9 @@ export default function TopHeader({
           value={filters.location || 'All'}
           onChange={e => onFilterChange({ ...filters, location: (e?.target ? e.target.value : e) })}
           style={{ height: '28px', minWidth: '140px', maxWidth: '180px', fontSize: '11px' }}
-          title="Filter Cost Center"
+          title="Filter Project Division"
           options={[
-            { value: 'All', label: 'All Cost Centers' },
+            { value: 'All', label: 'All Project Divisions' },
             ...locations.map(l => ({ value: l.name || l.code, label: l.name || l.code }))
           ]}
         />
