@@ -205,7 +205,7 @@ export default function DataRegister({ prefilterDept, prefilterLocation, onNavig
         </div>
       </div>
 
-      <div className="civet-card" style={{ padding: '12px 14px' }}>
+      <div className="civet-card" style={{ padding: '12px 14px', border: '1px solid #000000', backgroundColor: '#F8FAFC' }}>
         <form onSubmit={handleSearchSubmit} style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', alignItems: 'center' }}>
           <div style={{ position: 'relative', flex: '1 1 200px' }}>
             <input
@@ -254,8 +254,8 @@ export default function DataRegister({ prefilterDept, prefilterLocation, onNavig
         </form>
       </div>
 
-      <div className="civet-card" style={{ padding: 0, overflow: 'hidden' }}>
-        <div style={{ padding: '12px 18px', backgroundColor: '#F8FAFC', borderBottom: '1px solid #CBD5E1', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '12px' }}>
+      <div className="civet-card" style={{ padding: 0, overflow: 'hidden', border: '1px solid #000000' }}>
+        <div style={{ padding: '12px 18px', backgroundColor: '#F8FAFC', borderBottom: '1px solid #000000', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '12px' }}>
           <div>
             <strong style={{ color: '#0F2A4A' }}>Report Type:</strong> <span style={{ color: '#1F6FEB', fontWeight: '700' }}>{REPORT_TYPE_LABELS[reportTypeFilter] || (reportTypeFilter !== 'All' ? reportTypeFilter : 'Fuel Purchase Log')}</span>
             <span style={{ margin: '0 10px', color: '#CBD5E1' }}>|</span>
