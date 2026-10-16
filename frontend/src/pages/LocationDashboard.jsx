@@ -381,7 +381,7 @@ export default function LocationDashboard({
       </div>
 
       <div className="grid-charts-3">
-        <div style={{ backgroundColor: '#FFFFFF', border: '1px solid #000000', borderRadius: '4px', padding: '10px 12px' }}>
+        <div style={{ backgroundColor: '#FED7AA', border: '1px solid #000000', borderRadius: '4px', padding: '10px 12px' }}>
           <div style={{ fontSize: '11.5px', fontWeight: '600', color: '#0F2A4A', marginBottom: '8px' }}>
             D. Department operational overview
           </div>
@@ -389,26 +389,26 @@ export default function LocationDashboard({
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '10.5px' }}>
               <thead>
                 <tr style={{ backgroundColor: '#0F2A4A', color: '#FFFFFF', textAlign: 'left' }}>
-                  <th style={{ padding: '6px 8px', fontWeight: 600 }}>Dept</th>
-                  <th style={{ padding: '6px 8px', fontWeight: 600 }}>Measure</th>
-                  <th style={{ padding: '6px 8px', fontWeight: 600 }}>Value</th>
-                  <th style={{ padding: '6px 8px', fontWeight: 600, textAlign: 'center' }}>Action</th>
+                  <th style={{ padding: '6px 8px', fontWeight: 600, border: '1px solid #000000' }}>Dept</th>
+                  <th style={{ padding: '6px 8px', fontWeight: 600, border: '1px solid #000000' }}>Measure</th>
+                  <th style={{ padding: '6px 8px', fontWeight: 600, border: '1px solid #000000' }}>Value</th>
+                  <th style={{ padding: '6px 8px', fontWeight: 600, textAlign: 'center', border: '1px solid #000000' }}>Action</th>
                 </tr>
               </thead>
               <tbody>
                 {departmentOverview.length === 0 ? (
                   <tr>
-                    <td colSpan="4" style={{ textAlign: 'center', padding: '14px', color: '#94A3B8' }}>
+                    <td colSpan="4" style={{ textAlign: 'center', padding: '14px', color: '#94A3B8', border: '1px solid #000000', backgroundColor: '#FFFFFF' }}>
                       No operational logs recorded.
                     </td>
                   </tr>
                 ) : (
                   departmentOverview.slice((deptTablePage - 1) * 5, deptTablePage * 5).map((row, idx) => (
-                    <tr key={idx} style={{ borderBottom: '1px solid #000000' }}>
-                      <td style={{ padding: '6px 8px', fontWeight: 600, color: '#0F2A4A' }}>{row.department}</td>
-                      <td style={{ padding: '6px 8px', color: '#475569' }}>{row.measure}</td>
-                      <td style={{ padding: '6px 8px', color: '#0F2A4A', fontWeight: 500 }}>{row.value}</td>
-                      <td style={{ padding: '4px 6px', textAlign: 'center' }}>
+                    <tr key={idx} style={{ borderBottom: '1px solid #000000', backgroundColor: idx % 2 === 0 ? '#FFFFFF' : '#FFF7ED' }}>
+                      <td style={{ padding: '6px 8px', fontWeight: 600, color: '#0F2A4A', backgroundColor: '#EFF6FF', border: '1px solid #000000' }}>{row.department}</td>
+                      <td style={{ padding: '6px 8px', color: '#475569', backgroundColor: idx % 2 === 0 ? '#FFFFFF' : '#FFF7ED', border: '1px solid #000000' }}>{row.measure}</td>
+                      <td style={{ padding: '6px 8px', color: '#047857', fontWeight: 700, backgroundColor: '#DCFCE7', border: '1px solid #000000' }}>{row.value}</td>
+                      <td style={{ padding: '4px 6px', textAlign: 'center', backgroundColor: idx % 2 === 0 ? '#FFFFFF' : '#FFF7ED', border: '1px solid #000000' }}>
                         <button
                           type="button"
                           className="btn btn-secondary btn-sm"
@@ -472,7 +472,7 @@ export default function LocationDashboard({
           </div>
         </div>
 
-        <div style={{ backgroundColor: '#FFFFFF', border: '1px solid #000000', borderRadius: '4px', padding: '10px 12px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+        <div style={{ backgroundColor: '#A5F3FC', border: '1px solid #000000', borderRadius: '4px', padding: '10px 12px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
           <div>
             <div style={{ fontSize: '11.5px', fontWeight: '600', color: '#0F2A4A', marginBottom: '8px' }}>
               F. Cost Center Report Register
@@ -481,28 +481,28 @@ export default function LocationDashboard({
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '10.5px' }}>
                 <thead>
                   <tr style={{ backgroundColor: '#0F2A4A', color: '#FFFFFF', textAlign: 'left' }}>
-                    <th style={{ padding: '6px 8px', fontWeight: 600 }}>Period</th>
-                    <th style={{ padding: '6px 8px', fontWeight: 600 }}>Dept</th>
-                    <th style={{ padding: '6px 8px', fontWeight: 600 }}>Report</th>
-                    <th style={{ padding: '6px 8px', fontWeight: 600 }}>Rec</th>
-                    <th style={{ padding: '6px 8px', fontWeight: 600, textAlign: 'center' }}>Action</th>
+                    <th style={{ padding: '6px 8px', fontWeight: 600, border: '1px solid #000000' }}>Period</th>
+                    <th style={{ padding: '6px 8px', fontWeight: 600, border: '1px solid #000000' }}>Dept</th>
+                    <th style={{ padding: '6px 8px', fontWeight: 600, border: '1px solid #000000' }}>Report</th>
+                    <th style={{ padding: '6px 8px', fontWeight: 600, border: '1px solid #000000' }}>Rec</th>
+                    <th style={{ padding: '6px 8px', fontWeight: 600, textAlign: 'center', border: '1px solid #000000' }}>Action</th>
                   </tr>
                 </thead>
                 <tbody>
                   {registerRecords.length === 0 ? (
                     <tr>
-                      <td colSpan="5" style={{ textAlign: 'center', padding: '14px', color: '#94A3B8' }}>
+                      <td colSpan="5" style={{ textAlign: 'center', padding: '14px', color: '#94A3B8', border: '1px solid #000000', backgroundColor: '#FFFFFF' }}>
                         No records logged for this cost center.
                       </td>
                     </tr>
                   ) : (
                     registerRecords.slice((regTablePage - 1) * 5, regTablePage * 5).map((row, idx) => (
-                      <tr key={idx} style={{ borderBottom: '1px solid #000000' }}>
-                        <td style={{ padding: '6px 8px', color: '#475569' }}>{row.period}</td>
-                        <td style={{ padding: '6px 8px', fontWeight: 600, color: '#0F2A4A' }}>{row.dept}</td>
-                        <td style={{ padding: '6px 8px', color: '#475569' }}>{row.report}</td>
-                        <td style={{ padding: '6px 8px', color: '#1F6FEB', fontWeight: 600 }}>{row.rec}</td>
-                        <td style={{ padding: '4px 6px', textAlign: 'center' }}>
+                      <tr key={idx} style={{ borderBottom: '1px solid #000000', backgroundColor: idx % 2 === 0 ? '#FFFFFF' : '#ECFEFF' }}>
+                        <td style={{ padding: '6px 8px', color: '#475569', backgroundColor: idx % 2 === 0 ? '#FFFFFF' : '#ECFEFF', border: '1px solid #000000' }}>{row.period}</td>
+                        <td style={{ padding: '6px 8px', fontWeight: 600, color: '#0F2A4A', backgroundColor: '#EFF6FF', border: '1px solid #000000' }}>{row.dept}</td>
+                        <td style={{ padding: '6px 8px', color: '#475569', backgroundColor: '#F3E8FF', border: '1px solid #000000' }}>{row.report}</td>
+                        <td style={{ padding: '6px 8px', color: '#047857', fontWeight: 700, backgroundColor: '#DCFCE7', border: '1px solid #000000' }}>{row.rec}</td>
+                        <td style={{ padding: '4px 6px', textAlign: 'center', backgroundColor: idx % 2 === 0 ? '#FFFFFF' : '#ECFEFF', border: '1px solid #000000' }}>
                           <button
                             type="button"
                             className="btn btn-secondary btn-sm"
