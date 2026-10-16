@@ -328,7 +328,7 @@ class AggregationService {
 
     let periods = [];
     if (effectiveYear === 'All') {
-      const distinctYears = [...new Set(records.map(r => Number(r.reporting_year)).filter(y => y > 2000))].sort((a, b) => a - b);
+      const distinctYears = [...new Set(records.filter(r => getRecPaid(r) > 0 || (Number(r.paid_amount) > 0)).map(r => Number(r.reporting_year)).filter(y => y > 2000))].sort((a, b) => a - b);
       if (distinctYears.length === 0) distinctYears.push(2025);
       distinctYears.forEach(yr => {
         months.forEach(m => {
@@ -398,6 +398,7 @@ class AggregationService {
         year: yr,
         label: effectiveYear === 'All' ? `${getMonthName(m)} ${yr}` : getMonthName(m),
         periodLabel: `${getMonthName(m)} ${yr}`,
+        shortPeriodLabel: `${getMonthName(m)} '${String(yr).slice(-2)}`,
         totalPaid: Number(sumPaid.toFixed(2)),
         amount: Number(sumPaid.toFixed(2)),
         paidAmount: Number(sumPaid.toFixed(2)),
@@ -756,25 +757,32 @@ class AggregationService {
     const adminPaid = records.filter(isAdminRecord).reduce((sum, r) => sum + getRecPaid(r), 0);
 
     const checkComplianceCategory = (r) => {
+      const repType = String(r.report_type_id || '').toUpperCase();
       const cat = String(r.category || r.data?.category || '').trim().toLowerCase();
+      if (repType === 'FUEL_PURCHASE' || cat === 'fuel' || r.fuel_type || r.data?.fuel_type) {
+        return null;
+      }
       const expType = String(r.data?.expense_type || r.expense_type || '').trim().toLowerCase();
-      const ledger = String(r.ledger_type || r.vendor_name || r.data?.ledger_type || r.data?.vendor_name || '').trim().toLowerCase();
       const remarks = String(r.remarks || r.data?.remarks || '').trim().toLowerCase();
-      const str = `${cat} ${expType} ${ledger} ${remarks}`;
+      const str = `${cat} ${expType} ${remarks}`;
 
-      if (str.includes('insurance')) return 'Insurance';
-      if (str.includes('maintenance') || str.includes('repair') || str.includes('service')) return 'Maintenance';
-      if (str.includes('tax') || str.includes('road tax') || str.includes('toll')) return 'Tax';
-      if (str.includes('permit') || str.includes('fitness') || str.includes('puc')) return 'Permit';
+      if (str.includes('insurance') || expType === 'insurance' || cat === 'insurance') return 'Insurance';
+      if (str.includes('maintenance') || str.includes('vehicle repair') || expType === 'maintenance' || cat === 'maintenance') return 'Maintenance';
+      if (str.includes('road tax') || str.includes('toll tax') || expType === 'tax' || cat === 'tax') return 'Tax';
+      if (str.includes('permit') || str.includes('fitness') || str.includes('puc') || expType === 'permit' || cat === 'permit') return 'Permit';
       return null;
     };
 
     const checkManpowerCategory = (r) => {
+      const repType = String(r.report_type_id || '').toUpperCase();
       const cat = String(r.category || r.data?.category || '').trim().toLowerCase();
+      if (repType === 'FUEL_PURCHASE' || cat === 'fuel' || r.fuel_type || r.data?.fuel_type) {
+        return null;
+      }
       const role = String(r.data?.designation || r.designation || r.data?.role || r.role || '').trim().toLowerCase();
-      const ledger = String(r.ledger_type || r.vendor_name || r.data?.ledger_type || r.data?.vendor_name || '').trim().toLowerCase();
+      const expType = String(r.data?.expense_type || r.expense_type || '').trim().toLowerCase();
       const remarks = String(r.remarks || r.data?.remarks || '').trim().toLowerCase();
-      const str = `${cat} ${role} ${ledger} ${remarks}`;
+      const str = `${cat} ${role} ${expType} ${remarks}`;
 
       if (str.includes('driver')) return 'Drivers';
       if (str.includes('operator')) return 'Operators';
