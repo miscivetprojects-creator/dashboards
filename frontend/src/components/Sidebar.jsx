@@ -50,12 +50,11 @@ export default function Sidebar({
   const primaryDepts = [];
 
   const secondaryDepts = [
-    { id: 'stores', name: 'Stores (MMS)', fullName: 'Materials Management System', icon: Package },
     { id: 'admin', name: 'Admin', fullName: 'Administration', icon: ShieldCheck },
     { id: 'planning', name: 'Planning', fullName: 'Project Planning', icon: CalendarRange }
   ];
 
-  const knownDeptKeys = ['pm', 'stores', 'admin', 'planning', 'mms', 'fuel', 'plant & machinery', 'materials management system'];
+  const knownDeptKeys = ['pm', 'admin', 'planning', 'fuel', 'plant & machinery', 'stores', 'mms'];
   const extraDepts = (departments || []).filter(d => {
     const code = (d.code || d.id || '').toLowerCase();
     const name = (d.name || '').toLowerCase();
