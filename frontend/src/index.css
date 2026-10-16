@@ -197,11 +197,14 @@ table.civet-table tbody tr, table tbody tr {
   border-bottom: 1px solid #000000 !important;
   transition: background 0.1s ease;
 }
-table.civet-table tbody tr:hover, table tbody tr:hover {
-  background-color: #F8FAFD;
-}
 table.civet-table tbody tr:nth-child(even), table tbody tr:nth-child(even) {
-  background-color: #F9FAFB;
+  background-color: #F1F5F9;
+}
+table.civet-table tbody tr:nth-child(odd), table tbody tr:nth-child(odd) {
+  background-color: #FFFFFF;
+}
+table.civet-table tbody tr:hover, table tbody tr:hover {
+  background-color: #E0F2FE !important;
 }
 table.civet-table tbody td, table tbody td {
   padding: 6px 10px;
