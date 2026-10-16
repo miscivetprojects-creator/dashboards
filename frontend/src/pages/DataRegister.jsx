@@ -210,7 +210,7 @@ export default function DataRegister({ prefilterDept, prefilterLocation, onNavig
           <div style={{ position: 'relative', flex: '1 1 200px' }}>
             <input
               type="text"
-              placeholder="Search by author, cost center, keyword..."
+              placeholder="Search by author, project division, keyword..."
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
               style={{ width: '100%', height: '30px', paddingLeft: '28px', boxSizing: 'border-box' }}
@@ -233,7 +233,7 @@ export default function DataRegister({ prefilterDept, prefilterLocation, onNavig
             onChange={e => setLocationFilter(e?.target ? e.target.value : e)}
             style={{ minWidth: '150px' }}
             options={[
-              { value: 'All', label: 'All Cost Centers' },
+              { value: 'All', label: 'All Project Divisions' },
               ...locations.map(l => ({ value: l.name || l.code, label: l.name || l.code }))
             ]}
           />
@@ -261,7 +261,7 @@ export default function DataRegister({ prefilterDept, prefilterLocation, onNavig
             <span style={{ margin: '0 10px', color: '#CBD5E1' }}>|</span>
             <strong style={{ color: '#0F2A4A' }}>Department:</strong> <span style={{ color: '#334155', fontWeight: '600' }}>{departmentFilter !== 'All' ? departmentFilter : 'Plant & Machinery'}</span>
             <span style={{ margin: '0 10px', color: '#CBD5E1' }}>|</span>
-            <strong style={{ color: '#0F2A4A' }}>Cost Center:</strong> <span style={{ color: '#334155', fontWeight: '600' }}>{locationFilter !== 'All' ? locationFilter : 'All Cost Centers'}</span>
+            <strong style={{ color: '#0F2A4A' }}>Project Division:</strong> <span style={{ color: '#334155', fontWeight: '600' }}>{locationFilter !== 'All' ? locationFilter : 'All Project Divisions'}</span>
           </div>
           <div style={{ color: '#0F2A4A', fontWeight: '700' }}>
             {pagination.totalRecords || pagination.total || records.length} Records Found
@@ -273,7 +273,7 @@ export default function DataRegister({ prefilterDept, prefilterLocation, onNavig
               <tr style={{ backgroundColor: '#0F2A4A', color: '#FFFFFF' }}>
                 <th style={{ padding: '8px 10px', border: '1px solid #000000' }}>Date</th>
                 <th style={{ padding: '8px 10px', border: '1px solid #000000' }}>Department</th>
-                <th style={{ padding: '8px 10px', border: '1px solid #000000' }}>Cost Center</th>
+                <th style={{ padding: '8px 10px', border: '1px solid #000000' }}>Project Division</th>
                 <th style={{ padding: '8px 10px', border: '1px solid #000000' }}>Ledger / Vendor</th>
                 <th style={{ textAlign: 'right', padding: '8px 10px', border: '1px solid #000000', backgroundColor: '#B45309' }}>Opening Bal (Rs.)</th>
                 <th style={{ textAlign: 'right', padding: '8px 10px', border: '1px solid #000000', backgroundColor: '#6D28D9' }}>Fuel Qty (Ltrs)</th>
@@ -335,7 +335,7 @@ export default function DataRegister({ prefilterDept, prefilterLocation, onNavig
                     <tr key={rec._id} style={{ borderBottom: '1px solid #000000' }}>
                       <td style={{ fontWeight: '600', whiteSpace: 'nowrap', backgroundColor: isEven ? '#FFFFFF' : '#F8FAFC', border: '1px solid #000000' }}>{formatDateDisplay(rec.report_date)}</td>
                       <td style={{ fontWeight: '600', color: '#0F2A4A', backgroundColor: isEven ? '#FFFFFF' : '#F8FAFC', border: '1px solid #000000' }}>{rec.department_name || rec.department_id || 'Plant & Machinery'}</td>
-                      <td style={{ fontWeight: '600', backgroundColor: isEven ? '#FFFFFF' : '#EFF6FF', border: '1px solid #000000' }}>{rec.location_name || rec.location_id}</td>
+                      <td style={{ fontWeight: '600', backgroundColor: isEven ? '#FFFFFF' : '#EFF6FF', border: '1px solid #000000' }}>{rec.project_division || rec.location_name || rec.location_id}</td>
                       <td style={{ color: '#0F2A4A', backgroundColor: isEven ? '#FFFFFF' : '#F8FAFC', border: '1px solid #000000' }}>{vendor}</td>
                       <td style={{ textAlign: 'right', fontVariantNumeric: 'tabular-nums', fontWeight: '600', color: '#92400E', backgroundColor: isEven ? '#FEF9C3' : '#FEF08A', border: '1px solid #000000' }}>
                         {opBal > 0 ? ('Rs. ' + Math.round(opBal).toLocaleString('en-IN')) : '-'}
@@ -526,8 +526,8 @@ export default function DataRegister({ prefilterDept, prefilterLocation, onNavig
                 <strong>{selectedRecord.department_id}</strong>
               </div>
               <div>
-                <span style={{ color: '#8395A7', display: 'block' }}>Cost Center</span>
-                <strong>{selectedRecord.location_name || selectedRecord.location_id}</strong>
+                <span style={{ color: '#8395A7', display: 'block' }}>Project Division</span>
+                <strong>{selectedRecord.project_division || selectedRecord.location_name || selectedRecord.location_id}</strong>
               </div>
               <div>
                 <span style={{ color: '#8395A7', display: 'block' }}>Created By</span>
