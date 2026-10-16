@@ -54,9 +54,13 @@ class AggregationService {
           { location_id: locRegex },
           { location_name: locClean },
           { location_name: locRegex },
+          { project_division: locClean },
+          { project_division: locRegex },
+          { project_division_id: locClean },
           { 'data.location': locClean },
           { 'data.location_id': locClean },
-          { 'data.location_name': locClean }
+          { 'data.location_name': locClean },
+          { 'data.project_division': locClean }
         ]
       });
     }
@@ -309,6 +313,34 @@ class AggregationService {
       totalMasterOpening = activeLocations.reduce((sum, l) => sum + Number(l.opening_balance || 0), 0);
     }
 
+    const locSpendSummary = {};
+    records.forEach(r => {
+      const divName = r.project_division || r.location_name || (r.data && (r.data.project_division || r.data.location_name || r.data.location)) || r.location_id || 'Unknown';
+      if (divName && divName !== 'Unknown') {
+        locSpendSummary[divName] = (locSpendSummary[divName] || 0) + getRecPaid(r);
+      }
+    });
+    const topDivisions = Object.entries(locSpendSummary)
+      .filter(([name, amt]) => amt > 0)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5)
+      .map(([name]) => name);
+
+    let periods = [];
+    if (effectiveYear === 'All') {
+      const distinctYears = [...new Set(records.map(r => Number(r.reporting_year)).filter(y => y > 2000))].sort((a, b) => a - b);
+      if (distinctYears.length === 0) distinctYears.push(2025);
+      distinctYears.forEach(yr => {
+        months.forEach(m => {
+          periods.push({ year: yr, monthNum: m });
+        });
+      });
+    } else {
+      months.forEach(m => {
+        periods.push({ year: effectiveYear, monthNum: m });
+      });
+    }
+
     const enteredMonths = months.filter(m => records.some(r => {
       const rMonth = Number(r.reporting_month) || (r.report_date ? new Date(r.report_date).getMonth() + 1 : 0);
       return rMonth === m;
@@ -316,10 +348,13 @@ class AggregationService {
     const lastEnteredMonth = enteredMonths.length > 0 ? Math.max(...enteredMonths) : 0;
     let runningMainBalance = totalMasterOpening;
 
-    const spendingTrend = months.map(m => {
+    const spendingTrend = periods.map(p => {
+      const m = p.monthNum;
+      const yr = p.year;
       const mRecs = records.filter(r => {
         const rMonth = Number(r.reporting_month) || (r.report_date ? new Date(r.report_date).getMonth() + 1 : 0);
-        return rMonth === m;
+        const rYear = Number(r.reporting_year) || (r.report_date ? new Date(r.report_date).getFullYear() : 0);
+        return rMonth === m && (effectiveYear === 'All' ? rYear === yr : true);
       });
       const isEntered = mRecs.length > 0;
       const isImmediateNext = (!isEntered && lastEnteredMonth > 0 && m === lastEnteredMonth + 1) || (effectiveYear === 2026 && !isEntered && lastEnteredMonth === 0 && m === 1);
@@ -347,11 +382,23 @@ class AggregationService {
         return payType.includes('cash') || vendor.includes('merchant') || hasCC || (rPaid > 0 && q <= 0);
       }).reduce((acc, r) => acc + getRecPaid(r), 0);
       const regularPaid = Math.max(0, sumPaid - cashCarryPaid);
+
+      const divBreakdown = {};
+      topDivisions.forEach(divName => {
+        const divRecs = mRecs.filter(r => {
+          const rDiv = r.project_division || r.location_name || (r.data && (r.data.project_division || r.data.location_name || r.data.location)) || r.location_id;
+          return String(rDiv).trim().toLowerCase() === String(divName).trim().toLowerCase();
+        });
+        divBreakdown[divName] = Number(divRecs.reduce((acc, r) => acc + getRecPaid(r), 0).toFixed(2));
+      });
+
       return {
         monthNum: m,
         month: getMonthName(m),
-        year: effectiveYear,
-        label: effectiveYear === 'All' ? getMonthName(m) : `${getMonthName(m)} ${effectiveYear}`,
+        year: yr,
+        label: effectiveYear === 'All' ? `${getMonthName(m)} ${yr}` : getMonthName(m),
+        periodLabel: `${getMonthName(m)} ${yr}`,
+        totalPaid: Number(sumPaid.toFixed(2)),
         amount: Number(sumPaid.toFixed(2)),
         paidAmount: Number(sumPaid.toFixed(2)),
         totalCost: Number(sumTotalCost.toFixed(2)),
@@ -367,7 +414,8 @@ class AggregationService {
         totalCostFormatted: formatIndianCurrency(sumTotalCost),
         openingBalanceFormatted: formatIndianCurrency(mOpBal),
         closingBalanceFormatted: formatIndianCurrency(mClBal),
-        balanceFormatted: formatIndianCurrency(mClBal)
+        balanceFormatted: formatIndianCurrency(mClBal),
+        ...divBreakdown
       };
     });
     const deptSpendMap = {};
@@ -686,8 +734,105 @@ class AggregationService {
     };
 
     const avgFuelRate = totalFuelLiters > 0 ? Number((totalPayments / totalFuelLiters).toFixed(2)) : 0;
+
+    const isPMRecord = r => {
+      const did = String(r.department_id || r.department_name || '').trim().toUpperCase();
+      const rDept = String(r.data?.department || r.data?.department_beneficiary || '').trim().toUpperCase();
+      return did === 'PM' || did === 'FUEL' || did === 'DPT-0002' || r.report_type_id === 'FUEL_PURCHASE' || r.report_type_id === 'VEHICLE_UTILIZATION' || r.category === 'Fuel' || did.includes('PLANT') || did.includes('MACHINERY') || rDept.includes('PLANT') || rDept.includes('MACHINERY');
+    };
+    const isITRecord = r => {
+      const did = String(r.department_id || r.department_name || '').trim().toUpperCase();
+      const rDept = String(r.data?.department || r.data?.department_beneficiary || '').trim().toUpperCase();
+      return did === 'IT' || did === 'MIS' || did === 'IT & MIS' || did === 'IT&MIS' || did === 'DPT-0001' || did.includes('IT') || did.includes('MIS') || rDept.includes('IT') || rDept.includes('MIS');
+    };
+    const isAdminRecord = r => {
+      const did = String(r.department_id || r.department_name || '').trim().toUpperCase();
+      const rDept = String(r.data?.department || r.data?.department_beneficiary || '').trim().toUpperCase();
+      return did === 'ADMIN' || did === 'DPT-0004' || did === 'ADMINISTRATION' || r.report_type_id === 'ADMIN_EXPENSE' || did.includes('ADMIN') || rDept.includes('ADMIN');
+    };
+
+    const pmPaid = records.filter(isPMRecord).reduce((sum, r) => sum + getRecPaid(r), 0);
+    const itPaid = records.filter(isITRecord).reduce((sum, r) => sum + getRecPaid(r), 0);
+    const adminPaid = records.filter(isAdminRecord).reduce((sum, r) => sum + getRecPaid(r), 0);
+
+    const checkComplianceCategory = (r) => {
+      const cat = String(r.category || r.data?.category || '').trim().toLowerCase();
+      const expType = String(r.data?.expense_type || r.expense_type || '').trim().toLowerCase();
+      const ledger = String(r.ledger_type || r.vendor_name || r.data?.ledger_type || r.data?.vendor_name || '').trim().toLowerCase();
+      const remarks = String(r.remarks || r.data?.remarks || '').trim().toLowerCase();
+      const str = `${cat} ${expType} ${ledger} ${remarks}`;
+
+      if (str.includes('insurance')) return 'Insurance';
+      if (str.includes('maintenance') || str.includes('repair') || str.includes('service')) return 'Maintenance';
+      if (str.includes('tax') || str.includes('road tax') || str.includes('toll')) return 'Tax';
+      if (str.includes('permit') || str.includes('fitness') || str.includes('puc')) return 'Permit';
+      return null;
+    };
+
+    const checkManpowerCategory = (r) => {
+      const cat = String(r.category || r.data?.category || '').trim().toLowerCase();
+      const role = String(r.data?.designation || r.designation || r.data?.role || r.role || '').trim().toLowerCase();
+      const ledger = String(r.ledger_type || r.vendor_name || r.data?.ledger_type || r.data?.vendor_name || '').trim().toLowerCase();
+      const remarks = String(r.remarks || r.data?.remarks || '').trim().toLowerCase();
+      const str = `${cat} ${role} ${ledger} ${remarks}`;
+
+      if (str.includes('driver')) return 'Drivers';
+      if (str.includes('operator')) return 'Operators';
+      return null;
+    };
+
+    const complianceCategories = ['Insurance', 'Maintenance', 'Tax', 'Permit'];
+    const complianceExpenses = complianceCategories.map(catName => {
+      const matchingRecs = records.filter(r => checkComplianceCategory(r) === catName);
+      const amt = matchingRecs.reduce((sum, r) => sum + getRecPaid(r), 0);
+      return {
+        category: catName,
+        name: catName,
+        amount: Number(amt.toFixed(2)),
+        recordsCount: matchingRecs.length,
+        amountFormatted: formatIndianCurrency(amt)
+      };
+    });
+
+    const manpowerCategories = ['Drivers', 'Operators'];
+    const manpowerCosts = manpowerCategories.map(catName => {
+      const matchingRecs = records.filter(r => checkManpowerCategory(r) === catName);
+      const amt = matchingRecs.reduce((sum, r) => sum + getRecPaid(r), 0);
+      return {
+        category: catName,
+        name: catName,
+        amount: Number(amt.toFixed(2)),
+        recordsCount: matchingRecs.length,
+        amountFormatted: formatIndianCurrency(amt)
+      };
+    });
+
     return {
       kpis: {
+        totalPaid: {
+          value: totalPayments,
+          formatted: formatIndianCurrency(totalPayments),
+          label: 'Total Paid Amount',
+          subtext: null
+        },
+        plantAndMachinery: {
+          value: pmPaid,
+          formatted: formatIndianCurrency(pmPaid),
+          label: 'Plant & Machinery',
+          subtext: null
+        },
+        itAndMis: {
+          value: itPaid,
+          formatted: formatIndianCurrency(itPaid),
+          label: 'IT & MIS',
+          subtext: null
+        },
+        admin: {
+          value: adminPaid,
+          formatted: formatIndianCurrency(adminPaid),
+          label: 'Admin',
+          subtext: null
+        },
         totalPayments: {
           value: totalPayments,
           formatted: formatIndianCurrency(totalPayments),
@@ -720,8 +865,8 @@ class AggregationService {
         },
         activeSites: {
           value: locationsReportingCount > 0 ? locationsReportingCount : activeLocations.length,
-          formatted: `${locationsReportingCount > 0 ? locationsReportingCount : activeLocations.length} Cost Centers`,
-          label: 'Active Cost Centers',
+          formatted: `${locationsReportingCount > 0 ? locationsReportingCount : activeLocations.length} Project Divisions`,
+          label: 'Active Project Divisions',
           subtext: null
         },
         fuelVolume: {
@@ -740,6 +885,9 @@ class AggregationService {
       charts: {
         spendingTrend,
         monthlySpending: spendingTrend,
+        topDivisions,
+        complianceExpenses,
+        manpowerCosts,
         departmentWiseSpending,
         departmentExpenditure: departmentWiseSpending,
         locationWiseSpending,
@@ -1525,8 +1673,8 @@ class AggregationService {
         },
         distinctLedgers: {
           value: distinctVendors,
-          formatted: `${formatIndianNumber(distinctVendors, 0)} Cost Centers`,
-          label: 'Cost Centers / Ledgers',
+          formatted: `${formatIndianNumber(distinctVendors, 0)} Project Divisions`,
+          label: 'Project Divisions / Ledgers',
           subtext: null
         }
       },
@@ -1693,8 +1841,8 @@ class AggregationService {
         },
         fundedSites: {
           value: locSet.size,
-          formatted: `${locSet.size} Cost Centers Funded`,
-          label: 'Cost Centers Funded',
+          formatted: `${locSet.size} Project Divisions Funded`,
+          label: 'Project Divisions Funded',
           subtext: null
         }
       },
@@ -1995,7 +2143,7 @@ class AggregationService {
     const isAllLoc = !locationId || locationId === 'All' || String(locationId).toLowerCase() === 'all';
     let loc;
     if (isAllLoc) {
-      loc = { id: 'All', code: 'ALL', name: 'All Cost Centers', state: 'All Construction Sites' };
+      loc = { id: 'All', code: 'ALL', name: 'All Project Divisions', state: 'All Construction Sites' };
     } else {
       const safePattern = String(locationId).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       const safeRegex = new RegExp(`^${safePattern}$`, 'i');
