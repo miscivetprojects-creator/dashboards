@@ -184,17 +184,17 @@ router.post('/export-pdf', async (req, res) => {
           rows: deptRows
         },
         {
-          title: 'Cost Center (Site) Spending Distribution',
+          title: 'Project Division (Site) Spending Distribution',
           subtitle: 'Consolidated disbursements mapped to active construction project locations',
-          headers: ['Project Location / Cost Center', 'Total Recorded Spend', 'Share %', 'Operational Status'],
+          headers: ['Project Division', 'Total Recorded Spend', 'Share %', 'Operational Status'],
           colWidths: [40, 26, 16, 18],
           aligns: ['left', 'right', 'center', 'center'],
           rows: locRows
         },
         {
           title: 'Submission Compliance Matrix',
-          subtitle: 'Monthly expectation adherence across operational divisions and cost centers',
-          headers: ['Cost Center', 'P&M', 'MMS', 'Accounts', 'Admin', 'Planning', 'Coverage'],
+          subtitle: 'Monthly expectation adherence across operational divisions and project divisions',
+          headers: ['Project Division', 'P&M', 'MMS', 'Accounts', 'Admin', 'Planning', 'Coverage'],
           colWidths: [26, 12, 12, 14, 12, 12, 12],
           aligns: ['left', 'center', 'center', 'center', 'center', 'center', 'center'],
           rows: covRows
