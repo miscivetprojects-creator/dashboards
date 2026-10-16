@@ -384,7 +384,7 @@ export default function DataWorkspace({ currentUser, preselectDept, onNavigate }
     const errors = {};
 
     if (!formData.location || String(formData.location).trim() === '') {
-      errors.location = 'Cost Center is required';
+      errors.location = 'Project Division is required';
     }
 
     if (isFuelPurchase) {
@@ -461,6 +461,9 @@ export default function DataWorkspace({ currentUser, preselectDept, onNavigate }
           ...formData,
           location: formData.location,
           location_id: formData.location,
+          project_division: formData.project_division || formData.location,
+          project_division_id: formData.location,
+          project_name: formData.project_name || formData.site_name || '',
           ledger_type: formData.ledger_type,
           vendor_name: formData.ledger_type,
           department_beneficiary: formData.department || formData.department_beneficiary,
@@ -489,12 +492,15 @@ export default function DataWorkspace({ currentUser, preselectDept, onNavigate }
           ...formData,
           location: formData.location,
           location_id: formData.location,
+          project_division: formData.project_division || formData.location,
+          project_division_id: formData.location,
+          project_name: formData.project_name || formData.site_name || '',
           report_date: formData.report_date || new Date().toISOString().split('T')[0]
         };
       }
       await api.submitManualEntry(selectedSchemaId, payload);
       setSubmitSuccess('Record successfully submitted and logged into Data Register.');
-      setFormData(isFuelPurchase ? { location: formData.location, report_date: formData.report_date } : {});
+      setFormData(isFuelPurchase ? { location: formData.location, project_division: formData.project_division || formData.location, project_name: formData.project_name, report_date: formData.report_date } : {});
     } catch (err) {
       setFormErrors({ _general: err.message });
     } finally {
@@ -742,13 +748,16 @@ export default function DataWorkspace({ currentUser, preselectDept, onNavigate }
               <div className="grid-form-4">
                 <div>
                   <label style={{ display: 'block', fontSize: '11px', fontWeight: '600', color: '#576574', marginBottom: '4px' }}>
-                    Cost Center <span style={{ color: '#C8423A' }}>*</span>
+                    Project Division <span style={{ color: '#C8423A' }}>*</span>
                   </label>
                   <SearchableSelect
-                    value={formData.location || ''}
-                    onChange={val => handleInputChange('location', val)}
+                    value={formData.project_division || formData.location || ''}
+                    onChange={val => {
+                      handleInputChange('project_division', val);
+                      handleInputChange('location', val);
+                    }}
                     options={locations.map(l => ({ value: l.name || l.code, label: l.name || l.code }))}
-                    placeholder="Search Cost Center..."
+                    placeholder="Search Project Division..."
                     style={{ width: '100%', height: '32px', borderColor: formErrors.location ? '#C8423A' : '#000000' }}
                   />
                   {formErrors.location && (
@@ -756,6 +765,22 @@ export default function DataWorkspace({ currentUser, preselectDept, onNavigate }
                       {formErrors.location}
                     </span>
                   )}
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: '11px', fontWeight: '600', color: '#576574', marginBottom: '4px' }}>
+                    Project Name <span style={{ fontSize: '10px', color: '#8395A7', fontWeight: '400' }}>(Optional)</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.project_name ?? formData.site_name ?? ''}
+                    onChange={e => {
+                      handleInputChange('project_name', e.target.value);
+                      handleInputChange('site_name', e.target.value);
+                    }}
+                    placeholder="Enter Project Name..."
+                    style={{ width: '100%', height: '32px', borderColor: '#D9DEE5' }}
+                  />
                 </div>
 
                 <div>
@@ -1226,13 +1251,16 @@ export default function DataWorkspace({ currentUser, preselectDept, onNavigate }
             }}>
               <div>
                 <label style={{ display: 'block', fontSize: '11px', fontWeight: '600', color: '#576574', marginBottom: '4px' }}>
-                  Cost Center <span style={{ color: '#C8423A' }}>*</span>
+                  Project Division <span style={{ color: '#C8423A' }}>*</span>
                 </label>
                 <SearchableSelect
-                  value={formData.location || ''}
-                  onChange={val => handleInputChange('location', val)}
+                  value={formData.project_division || formData.location || ''}
+                  onChange={val => {
+                    handleInputChange('project_division', val);
+                    handleInputChange('location', val);
+                  }}
                   options={locations.map(l => ({ value: l.name || l.code, label: l.name || l.code }))}
-                  placeholder="Search Cost Center..."
+                  placeholder="Search Project Division..."
                   style={{ width: '100%', height: '32px', borderColor: formErrors.location ? '#C8423A' : '#000000' }}
                 />
                 {formErrors.location && (
