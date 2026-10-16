@@ -243,7 +243,7 @@ export default function MainDashboard({ filters, onNavigate }) {
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
               <div>
                 <h2 style={{ fontSize: '15px', fontWeight: '700', color: '#0F2A4A', margin: 0 }}>
-                  Project Division & Project Name Spending Trend
+                  Project Division Spending Trend
                 </h2>
                 {selectedDepartment && (
                   <span style={{ fontSize: '11px', color: '#0284C7', fontWeight: '600' }}>
@@ -269,24 +269,6 @@ export default function MainDashboard({ filters, onNavigate }) {
                 </button>
                 <button
                   type="button"
-                  onClick={() => setTrendView('projects')}
-                  style={{
-                    padding: '4px 10px',
-                    fontSize: '11px',
-                    fontWeight: trendView === 'projects' ? '700' : '500',
-                    backgroundColor: trendView === 'projects' ? '#0F2A4A' : '#FFFFFF',
-                    color: trendView === 'projects' ? '#FFFFFF' : '#0F2A4A',
-                    borderLeft: '1px solid #000000',
-                    borderRight: '1px solid #000000',
-                    borderTop: 'none',
-                    borderBottom: 'none',
-                    cursor: 'pointer'
-                  }}
-                >
-                  Project Names ({activeProjSpending.length})
-                </button>
-                <button
-                  type="button"
                   onClick={() => setTrendView('monthly')}
                   style={{
                     padding: '4px 10px',
@@ -295,6 +277,7 @@ export default function MainDashboard({ filters, onNavigate }) {
                     backgroundColor: trendView === 'monthly' ? '#0F2A4A' : '#FFFFFF',
                     color: trendView === 'monthly' ? '#FFFFFF' : '#0F2A4A',
                     border: 'none',
+                    borderLeft: '1px solid #000000',
                     cursor: 'pointer'
                   }}
                 >
@@ -322,18 +305,11 @@ export default function MainDashboard({ filters, onNavigate }) {
                       cursor: 'pointer'
                     }}
                   >
-                    <option value="All">All Divisions & Projects (Total Paid)</option>
+                    <option value="All">All Divisions (Total Paid)</option>
                     <optgroup label="Project Divisions">
                       {activeLocSpending.map(d => (
                         <option key={d.location || d.name} value={d.location || d.name}>
                           {d.location || d.name}
-                        </option>
-                      ))}
-                    </optgroup>
-                    <optgroup label="Project Names">
-                      {activeProjSpending.map(p => (
-                        <option key={p.projectName || p.name} value={p.projectName || p.name}>
-                          {p.projectName || p.name}
                         </option>
                       ))}
                     </optgroup>
@@ -363,8 +339,6 @@ export default function MainDashboard({ filters, onNavigate }) {
                 <div style={{
                   minWidth: trendView === 'divisions'
                     ? Math.max(1000, activeLocSpending.length * 52) + 'px'
-                    : trendView === 'projects'
-                    ? Math.max(1000, activeProjSpending.length * 48) + 'px'
                     : (isTrendMultiYear ? Math.max(900, spendingTrend.length * 75) + 'px' : '100%'),
                   height: '340px'
                 }}>
@@ -398,44 +372,10 @@ export default function MainDashboard({ filters, onNavigate }) {
                           tick={{ fontSize: 10, fill: '#0F2A4A' }} 
                         />
                         <Tooltip 
-                          formatter={(val) => [formatINR(val), 'Disbursement']}
+                          formatter={(val) => [formatINR(val), 'Total Paid']}
                           labelFormatter={(label) => `Project Division: ${label}`}
                         />
                         <Bar dataKey="amount" fill="url(#divBlueGrad)" stroke="#0369A1" strokeWidth={1} filter="url(#divBar3d)" radius={[3, 3, 0, 0]} />
-                      </BarChart>
-                    ) : trendView === 'projects' ? (
-                      <BarChart data={activeProjSpending} margin={{ top: 14, right: 14, left: 10, bottom: 75 }}>
-                        <defs>
-                          <filter id="projBar3d" x="-10%" y="-10%" width="130%" height="130%">
-                            <feDropShadow dx="2" dy="3" stdDeviation="2" floodColor="#0F2A4A" floodOpacity="0.20" />
-                          </filter>
-                          <linearGradient id="projGreenGrad" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="0%" stopColor="#34D399" />
-                            <stop offset="100%" stopColor="#059669" />
-                          </linearGradient>
-                        </defs>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#CBD5E1" strokeOpacity={0.6} />
-                        <XAxis 
-                          dataKey="projectName" 
-                          interval={0} 
-                          angle={-45} 
-                          textAnchor="end" 
-                          height={80} 
-                          tickLine={{ stroke: '#000000' }} 
-                          axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} 
-                          tick={{ fontSize: 9, fill: '#0F2A4A', fontWeight: '600' }} 
-                        />
-                        <YAxis 
-                          tickFormatter={formatAxisINR} 
-                          tickLine={{ stroke: '#000000' }} 
-                          axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} 
-                          tick={{ fontSize: 10, fill: '#0F2A4A' }} 
-                        />
-                        <Tooltip 
-                          formatter={(val) => [formatINR(val), 'Disbursement']}
-                          labelFormatter={(label) => `Project Name: ${label}`}
-                        />
-                        <Bar dataKey="amount" fill="url(#projGreenGrad)" stroke="#047857" strokeWidth={1} filter="url(#projBar3d)" radius={[3, 3, 0, 0]} />
                       </BarChart>
                     ) : (
                       <LineChart data={chartMonthlyData} margin={{ top: 14, right: 20, left: 0, bottom: isTrendMultiYear ? 24 : 10 }}>
