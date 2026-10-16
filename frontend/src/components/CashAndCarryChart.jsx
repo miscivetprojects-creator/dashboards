@@ -48,7 +48,7 @@ export default function CashAndCarryChart({ data = [], analytics = {} }) {
   };
 
   return (
-    <div className="civet-card" style={{ padding: '16px 20px', border: '1px solid #000000' }}>
+    <div className="civet-card" style={{ padding: '16px 20px', border: '1px solid #000000', backgroundColor: '#FED7AA' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px', marginBottom: '14px' }}>
         <div>
           <h2 style={{ fontSize: '15px', fontWeight: '700', color: '#0F2A4A', margin: 0 }}>
@@ -78,7 +78,7 @@ export default function CashAndCarryChart({ data = [], analytics = {} }) {
         alignItems: 'stretch'
       }}>
         <div style={{
-          backgroundColor: '#FEF3C7',
+          backgroundColor: '#FFFFFF',
           border: '1px solid #000000',
           borderRadius: '6px',
           padding: '14px 12px 6px 4px',
@@ -206,7 +206,7 @@ export default function CashAndCarryChart({ data = [], analytics = {} }) {
         </div>
 
         <div style={{
-          backgroundColor: '#FAFCFE',
+          backgroundColor: '#FFFFFF',
           border: '1px solid #000000',
           borderRadius: '6px',
           padding: '12px 14px',
