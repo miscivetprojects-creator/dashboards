@@ -18,7 +18,6 @@ import { formatDateDisplay } from '../utils/dateUtils';
 
 const DEFAULT_TARGET_DEPTS = [
   'Plant & Machinery',
-  'Stores & Inventory',
   'Administration',
   'Project Planning',
   'IT & MIS',
@@ -632,6 +631,17 @@ export default function DataWorkspace({ currentUser, preselectDept, onNavigate }
     return prioritized;
   }, [vendors, formData.location]);
 
+  const projectNameOptions = React.useMemo(() => {
+    const set = new Set();
+    (locations || []).forEach(l => {
+      const p = l.project_name || l.category;
+      if (p && String(p).trim() && String(p).trim() !== '-' && String(p).trim().toLowerCase() !== 'project site') {
+        set.add(String(p).trim());
+      }
+    });
+    return Array.from(set).map(name => ({ value: name, label: name }));
+  }, [locations]);
+
   return (
     <div style={{ padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
       <div>
@@ -755,6 +765,12 @@ export default function DataWorkspace({ currentUser, preselectDept, onNavigate }
                     onChange={val => {
                       handleInputChange('project_division', val);
                       handleInputChange('location', val);
+                      const matchedLoc = (locations || []).find(l => (l.name || l.code) === val);
+                      if (matchedLoc && (matchedLoc.project_name || matchedLoc.category)) {
+                        const pVal = matchedLoc.project_name || matchedLoc.category;
+                        handleInputChange('project_name', pVal);
+                        handleInputChange('site_name', pVal);
+                      }
                     }}
                     options={locations.map(l => ({ value: l.name || l.code, label: l.name || l.code }))}
                     placeholder="Search Project Division..."
@@ -771,15 +787,15 @@ export default function DataWorkspace({ currentUser, preselectDept, onNavigate }
                   <label style={{ display: 'block', fontSize: '11px', fontWeight: '600', color: '#576574', marginBottom: '4px' }}>
                     Project Name <span style={{ fontSize: '10px', color: '#8395A7', fontWeight: '400' }}>(Optional)</span>
                   </label>
-                  <input
-                    type="text"
-                    value={formData.project_name ?? formData.site_name ?? ''}
-                    onChange={e => {
-                      handleInputChange('project_name', e.target.value);
-                      handleInputChange('site_name', e.target.value);
+                  <SearchableSelect
+                    value={formData.project_name || formData.site_name || ''}
+                    onChange={val => {
+                      handleInputChange('project_name', val);
+                      handleInputChange('site_name', val);
                     }}
-                    placeholder="Enter Project Name..."
-                    style={{ width: '100%', height: '32px', borderColor: '#D9DEE5' }}
+                    options={projectNameOptions}
+                    placeholder="Select or Search Project Name..."
+                    style={{ width: '100%', height: '32px', borderColor: '#000000' }}
                   />
                 </div>
 
