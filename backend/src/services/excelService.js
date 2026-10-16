@@ -32,7 +32,8 @@ const excelService = {
       reportName = 'Fuel Management';
       fields = [
         { name: 'report_date', label: 'Date', type: 'date', required: false, sample: '2026-01-15' },
-        { name: 'location', label: 'Cost Center', type: 'text', required: true, sample: 'Khammam' },
+        { name: 'location', label: 'Project Division', type: 'text', required: true, sample: 'Khammam' },
+        { name: 'project_name', label: 'Project Name', type: 'text', required: false, sample: 'Khammam Site 1' },
         { name: 'department', label: 'Department', type: 'text', required: false, sample: 'Plant & Machinery' },
         { name: 'ledger_type', label: 'Ledger / Vendor', type: 'text', required: false, sample: 'Sri Sai Enterprises' },
         { name: 'fuel_type', label: 'Fuel Type', type: 'select', required: false, options: ['Diesel', 'Petrol', 'Both', 'Diesel (HSD)', 'Engine Oil', 'Hydraulic Oil', 'Lubricants / Grease'], sample: 'Diesel' },
@@ -59,11 +60,11 @@ const excelService = {
         options: f.options || []
       }));
 
-      const hasLoc = extracted.some(f => ['location', 'location_id', 'cost_center', 'site'].includes(String(f.name).toLowerCase()));
+      const hasLoc = extracted.some(f => ['location', 'location_id', 'cost_center', 'site', 'project_division'].includes(String(f.name).toLowerCase()));
       const hasDate = extracted.some(f => ['report_date', 'date', 'entry_date'].includes(String(f.name).toLowerCase()));
 
       if (!hasLoc) {
-        fields.push({ name: 'location', label: 'Cost Center', type: 'text', required: true, sample: 'YG Gudda' });
+        fields.push({ name: 'location', label: 'Project Division', type: 'text', required: true, sample: 'YG Gudda' });
       }
       if (!hasDate) {
         fields.push({ name: 'report_date', label: 'Date', type: 'date', required: true, sample: '2025-10-10' });
@@ -165,7 +166,8 @@ const excelService = {
     let fields = [];
     if (isFuel) {
       fields = [
-        { name: 'location', label: 'Cost Center', type: 'text', required: true, aliases: ['location', 'locationid', 'costcenter', 'site', 'projectlocation'] },
+        { name: 'location', label: 'Project Division', type: 'text', required: true, aliases: ['projectdivision', 'division', 'location', 'locationid', 'costcenter', 'site', 'projectlocation'] },
+        { name: 'project_name', label: 'Project Name', type: 'text', required: false, aliases: ['projectname', 'project', 'sitename', 'sitename1'] },
         { name: 'ledger_type', label: 'Ledger Type', type: 'text', required: false, aliases: ['ledgertype', 'vendor', 'vendorname', 'supplier', 'ledger'] },
         { name: 'department', label: 'Department', type: 'text', required: false, aliases: ['department', 'departmentbeneficiary', 'targetdepartment', 'dept'] },
         { name: 'fuel_type', label: 'Fuel Type', type: 'select', required: false, aliases: ['fueltype', 'fuel'] },
@@ -194,11 +196,11 @@ const excelService = {
         aliases: [normalizeColHeader(f.key || f.name), normalizeColHeader(f.label || '')]
       }));
 
-      const hasLoc = extracted.some(f => ['location', 'location_id', 'cost_center', 'site'].includes(String(f.name).toLowerCase()));
+      const hasLoc = extracted.some(f => ['location', 'location_id', 'cost_center', 'site', 'project_division'].includes(String(f.name).toLowerCase()));
       const hasDate = extracted.some(f => ['report_date', 'date', 'entry_date'].includes(String(f.name).toLowerCase()));
 
       if (!hasLoc) {
-        fields.push({ name: 'location', label: 'Cost Center', type: 'text', required: true, aliases: ['location', 'locationid', 'costcenter', 'site', 'projectlocation'] });
+        fields.push({ name: 'location', label: 'Project Division', type: 'text', required: true, aliases: ['projectdivision', 'division', 'location', 'locationid', 'costcenter', 'site', 'projectlocation'] });
       }
       if (!hasDate) {
         fields.push({ name: 'report_date', label: 'Date', type: 'date', required: true, aliases: ['date', 'reportdate', 'entrydate'] });
@@ -450,6 +452,9 @@ const excelService = {
 
       recordData.location = location_name;
       recordData.location_id = location_id;
+      recordData.project_division = location_name;
+      recordData.project_division_id = location_id;
+      recordData.project_name = recordData.project_name || recordData.site_name || '';
       recordData.report_date = reportDate;
       recordData.total_cost = totalCostVal;
       recordData.paid_amount = paidAmount;
@@ -484,6 +489,9 @@ const excelService = {
         department_id,
         location_id,
         location_name,
+        project_division: location_name,
+        project_division_id: location_id,
+        project_name: recordData.project_name || recordData.site_name || '',
         report_date: reportDate,
         reporting_year,
         reporting_month,
