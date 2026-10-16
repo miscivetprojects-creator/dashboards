@@ -131,6 +131,7 @@ router.get('/previous-balance', async (req, res) => {
           closingBalance: clBal,
           previousDate: latestBunkRec.report_date,
           costCenter: locName,
+          projectDivision: locName,
           ledgerType: targetVendor
         });
       }
@@ -151,6 +152,7 @@ router.get('/previous-balance', async (req, res) => {
           closingBalance: clBal,
           previousDate: overallBunkRec.report_date,
           costCenter: locName,
+          projectDivision: locName,
           ledgerType: targetVendor
         });
       }
@@ -161,6 +163,7 @@ router.get('/previous-balance', async (req, res) => {
         closingBalance: 0,
         previousDate: null,
         costCenter: locName,
+        projectDivision: locName,
         ledgerType: targetVendor
       });
     }
@@ -181,7 +184,8 @@ router.get('/previous-balance', async (req, res) => {
         isFirstEntry: false,
         closingBalance: clBal,
         previousDate: latestRec.report_date,
-        costCenter: locName
+        costCenter: locName,
+        projectDivision: locName
       });
     }
 
@@ -197,7 +201,8 @@ router.get('/previous-balance', async (req, res) => {
         isFirstEntry: false,
         closingBalance: clBal,
         previousDate: overallLatest.report_date,
-        costCenter: locName
+        costCenter: locName,
+        projectDivision: locName
       });
     }
 
@@ -207,7 +212,8 @@ router.get('/previous-balance', async (req, res) => {
       isFirstEntry: true,
       closingBalance: initOp,
       previousDate: null,
-      costCenter: locName
+      costCenter: locName,
+      projectDivision: locName
     });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -398,13 +404,15 @@ router.post('/manual-entry', async (req, res) => {
     const reporting_month = !isNaN(dObj.getMonth()) ? dObj.getMonth() + 1 : 4;
     const m = reporting_month;
     const reporting_quarter = m <= 3 ? 'Q1' : m <= 6 ? 'Q2' : m <= 9 ? 'Q3' : 'Q4';
-    let location_id = data.location || data.location_id || '';
-    let location_name = data.location || data.location_id || '';
+    let location_id = data.project_division || data.location || data.location_id || '';
+    let location_name = data.project_division || data.location || data.location_id || '';
+    const projectName = data.project_name || data.site_name || '';
     const vName = String(data.vendor_name || data.ledger_type || data.vendor || '').toLowerCase();
     if (vName.includes('sai baba') && (!location_name || String(location_name).toLowerCase().includes('khammam'))) {
       location_name = 'Jadcherla';
       data.location = 'Jadcherla';
       data.location_id = 'Jadcherla';
+      data.project_division = 'Jadcherla';
       data.cost_center = 'Jadcherla';
     }
     const finalAmt = Number(data.paid_amount || data.total_cost || data.cash_and_carry || 0);
@@ -438,9 +446,14 @@ router.post('/manual-entry', async (req, res) => {
         location_name = firstLoc.name;
       } else {
         location_id = 'SITE_01';
-        location_name = 'Cost Center';
+        location_name = 'Project Division';
       }
     }
+    data.location = location_name;
+    data.location_id = location_id;
+    data.project_division = location_name;
+    data.project_division_id = location_id;
+    data.project_name = projectName;
     const recordsColl = getCollection('monthly_report_records');
     let rowOpeningBalance = 0;
     if (data.opening_balance !== undefined && data.opening_balance !== null && String(data.opening_balance).trim() !== '' && !isNaN(Number(data.opening_balance))) {
@@ -493,6 +506,9 @@ router.post('/manual-entry', async (req, res) => {
       department_id: deptId.toUpperCase(),
       location_id,
       location_name,
+      project_division: location_name,
+      project_division_id: location_id,
+      project_name: data.project_name || data.site_name || '',
       report_date: reportDate,
       reporting_year,
       reporting_month,
