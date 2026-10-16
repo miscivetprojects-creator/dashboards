@@ -322,7 +322,19 @@ export default function DataRegister({ prefilterDept, prefilterLocation, onNavig
 
                   const fuelTypeStr = String(rec.fuel_type || (rec.data && rec.data.fuel_type) || '').trim().toLowerCase();
                   const isBoth = fuelTypeStr === 'both' || (pQ > 0 && dQ > 0);
-                  const vendor = rec.vendor_name || (rec.data && (rec.data.ledger_type || rec.data.vendor_name || rec.data.vendor)) || '-';
+                  const rawVendor = (rec.vendor_name && rec.vendor_name !== '-') ? rec.vendor_name : (rec.data && (
+                    (rec.data.ledger_type && rec.data.ledger_type !== '-') ? rec.data.ledger_type :
+                    (rec.data.vendor_name && rec.data.vendor_name !== '-') ? rec.data.vendor_name :
+                    (rec.data.vendor && rec.data.vendor !== '-') ? rec.data.vendor : null
+                  ));
+                  const vendor = rawVendor || '-';
+                  const rawProject = (rec.project_name && rec.project_name !== '-' && rec.project_name !== 'Project Site') ? rec.project_name :
+                    (rec.site_name && rec.site_name !== '-' && rec.site_name !== 'Project Site') ? rec.site_name :
+                    (rec.data && (
+                      (rec.data.project_name && rec.data.project_name !== '-' && rec.data.project_name !== 'Project Site') ? rec.data.project_name :
+                      (rec.data.site_name && rec.data.site_name !== '-' && rec.data.site_name !== 'Project Site') ? rec.data.site_name : null
+                    ));
+                  const projectDisplay = rawProject || '-';
                   const isMerchant = String(vendor).toLowerCase().includes('merchant');
                   const rawPType = rec.payment_type || (rec.data && rec.data.payment_type) || '';
                   const ccField = rec.cash_and_carry || (rec.data && rec.data.cash_and_carry) || '';
@@ -337,7 +349,7 @@ export default function DataRegister({ prefilterDept, prefilterLocation, onNavig
                       <td style={{ fontWeight: '600', whiteSpace: 'nowrap', backgroundColor: isEven ? '#FFFFFF' : '#F8FAFC', border: '1px solid #000000' }}>{formatDateDisplay(rec.report_date)}</td>
                       <td style={{ fontWeight: '600', color: '#0F2A4A', backgroundColor: isEven ? '#FFFFFF' : '#F8FAFC', border: '1px solid #000000' }}>{rec.department_name || rec.department_id || 'Plant & Machinery'}</td>
                       <td style={{ fontWeight: '600', backgroundColor: isEven ? '#FFFFFF' : '#EFF6FF', border: '1px solid #000000' }}>{rec.project_division || rec.location_name || rec.location_id}</td>
-                      <td style={{ color: '#0F2A4A', backgroundColor: isEven ? '#FFFFFF' : '#F8FAFC', border: '1px solid #000000' }}>{rec.project_name || rec.site_name || (rec.data && (rec.data.project_name || rec.data.site_name)) || '-'}</td>
+                      <td style={{ color: '#0F2A4A', backgroundColor: isEven ? '#FFFFFF' : '#F8FAFC', border: '1px solid #000000' }}>{projectDisplay}</td>
                       <td style={{ color: '#0F2A4A', backgroundColor: isEven ? '#FFFFFF' : '#F8FAFC', border: '1px solid #000000' }}>{vendor}</td>
                       <td style={{ textAlign: 'right', fontVariantNumeric: 'tabular-nums', fontWeight: '600', color: '#92400E', backgroundColor: isEven ? '#FEF9C3' : '#FEF08A', border: '1px solid #000000' }}>
                         {opBal > 0 ? ('Rs. ' + Math.round(opBal).toLocaleString('en-IN')) : '-'}
@@ -533,7 +545,7 @@ export default function DataRegister({ prefilterDept, prefilterLocation, onNavig
               </div>
               <div>
                 <span style={{ color: '#8395A7', display: 'block' }}>Project Name</span>
-                <strong>{selectedRecord.project_name || selectedRecord.site_name || (selectedRecord.data && (selectedRecord.data.project_name || selectedRecord.data.site_name)) || '-'}</strong>
+                <strong>{((selectedRecord.project_name && selectedRecord.project_name !== 'Project Site') ? selectedRecord.project_name : (selectedRecord.site_name && selectedRecord.site_name !== 'Project Site') ? selectedRecord.site_name : (selectedRecord.data && ((selectedRecord.data.project_name && selectedRecord.data.project_name !== 'Project Site') ? selectedRecord.data.project_name : (selectedRecord.data.site_name && selectedRecord.data.site_name !== 'Project Site') ? selectedRecord.data.site_name : null))) || '-'}</strong>
               </div>
               <div>
                 <span style={{ color: '#8395A7', display: 'block' }}>Created By</span>
