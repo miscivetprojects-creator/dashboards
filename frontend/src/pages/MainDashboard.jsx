@@ -145,6 +145,7 @@ export default function MainDashboard({ filters, onNavigate }) {
   })();
 
   const isTrendMultiYear = spendingTrend.some(s => s.year && s.year !== spendingTrend[0]?.year);
+  const isPlantOrAll = !selectedDepartment || selectedDepartment === 'Plant & Machinery';
 
   return (
     <div style={{ padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
@@ -153,10 +154,7 @@ export default function MainDashboard({ filters, onNavigate }) {
           onClick={() => setSelectedDepartment(null)}
           style={{ 
             cursor: 'pointer',
-            borderRadius: '6px',
-            transition: 'all 0.15s ease',
-            boxShadow: selectedDepartment === null ? '0 0 0 2px #0F2A4A, 0 4px 12px rgba(15, 42, 74, 0.15)' : 'none',
-            transform: selectedDepartment === null ? 'translateY(-2px)' : 'none'
+            borderRadius: '6px'
           }}
           title="Click to view overall data across all departments"
         >
@@ -173,10 +171,7 @@ export default function MainDashboard({ filters, onNavigate }) {
           onClick={() => setSelectedDepartment('Plant & Machinery')}
           style={{ 
             cursor: 'pointer',
-            borderRadius: '6px',
-            transition: 'all 0.15s ease',
-            boxShadow: selectedDepartment === 'Plant & Machinery' ? '0 0 0 2px #0284C7, 0 4px 12px rgba(2, 132, 199, 0.20)' : 'none',
-            transform: selectedDepartment === 'Plant & Machinery' ? 'translateY(-2px)' : 'none'
+            borderRadius: '6px'
           }}
           title="Click to drill down into Plant & Machinery"
         >
@@ -193,10 +188,7 @@ export default function MainDashboard({ filters, onNavigate }) {
           onClick={() => setSelectedDepartment('IT & MIS')}
           style={{ 
             cursor: 'pointer',
-            borderRadius: '6px',
-            transition: 'all 0.15s ease',
-            boxShadow: selectedDepartment === 'IT & MIS' ? '0 0 0 2px #7C3AED, 0 4px 12px rgba(124, 58, 237, 0.20)' : 'none',
-            transform: selectedDepartment === 'IT & MIS' ? 'translateY(-2px)' : 'none'
+            borderRadius: '6px'
           }}
           title="Click to drill down into IT & MIS"
         >
@@ -213,10 +205,7 @@ export default function MainDashboard({ filters, onNavigate }) {
           onClick={() => setSelectedDepartment('Admin')}
           style={{ 
             cursor: 'pointer',
-            borderRadius: '6px',
-            transition: 'all 0.15s ease',
-            boxShadow: selectedDepartment === 'Admin' ? '0 0 0 2px #16A34A, 0 4px 12px rgba(22, 163, 74, 0.20)' : 'none',
-            transform: selectedDepartment === 'Admin' ? 'translateY(-2px)' : 'none'
+            borderRadius: '6px'
           }}
           title="Click to drill down into Admin"
         >
@@ -264,9 +253,9 @@ export default function MainDashboard({ filters, onNavigate }) {
                 borderRadius: '6px',
                 padding: '14px 12px 8px 6px'
               }}>
-                <div style={{ width: '100%', height: '260px' }}>
+                <div style={{ width: '100%', height: isTrendMultiYear ? '280px' : '260px' }}>
                   <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={spendingTrend} margin={{ top: 10, right: 14, left: -10, bottom: 0 }}>
+                    <LineChart data={spendingTrend} margin={{ top: 10, right: 14, left: -10, bottom: isTrendMultiYear ? 18 : 6 }}>
                       <defs>
                         <filter id="mainLine3d" x="-10%" y="-10%" width="130%" height="130%">
                           <feDropShadow dx="1" dy="2" stdDeviation="1.5" floodColor="#0F2A4A" floodOpacity="0.25" />
@@ -274,11 +263,16 @@ export default function MainDashboard({ filters, onNavigate }) {
                       </defs>
                       <CartesianGrid strokeDasharray="3 3" stroke="#94A3B8" strokeOpacity={0.4} />
                       <XAxis 
-                        dataKey={isTrendMultiYear ? 'periodLabel' : 'month'} 
+                        dataKey={isTrendMultiYear ? 'shortPeriodLabel' : 'month'} 
                         interval={0} 
                         tickLine={{ stroke: '#000000' }} 
                         axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} 
-                        tick={{ fontSize: 10, fill: '#0F2A4A' }} 
+                        angle={isTrendMultiYear ? -35 : 0}
+                        textAnchor={isTrendMultiYear ? 'end' : 'middle'}
+                        height={isTrendMultiYear ? 44 : 26}
+                        dx={isTrendMultiYear ? -4 : 0}
+                        dy={isTrendMultiYear ? 4 : 0}
+                        tick={{ fontSize: isTrendMultiYear ? 9.5 : 10, fill: '#0F2A4A' }} 
                       />
                       <YAxis 
                         tickFormatter={formatAxisINR} 
@@ -417,11 +411,12 @@ export default function MainDashboard({ filters, onNavigate }) {
           )}
         </div>
 
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))',
-          gap: '16px'
-        }}>
+        {isPlantOrAll && (
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))',
+            gap: '16px'
+          }}>
           <div className="civet-card" style={{ border: '1px solid #000000', padding: '16px 20px', backgroundColor: '#FEF3C7' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
               <div>
@@ -548,10 +543,11 @@ export default function MainDashboard({ filters, onNavigate }) {
             </div>
           </div>
         </div>
+      )}
 
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(460px, 1fr))',
+          gridTemplateColumns: isPlantOrAll ? 'repeat(auto-fit, minmax(460px, 1fr))' : '1fr',
           gap: '16px'
         }}>
           <div className="civet-card" style={{ border: '1px solid #000000', padding: '16px 20px', backgroundColor: '#F3E8FF' }}>
@@ -623,74 +619,76 @@ export default function MainDashboard({ filters, onNavigate }) {
             )}
           </div>
 
-          <div className="civet-card" style={{ border: '1px solid #000000', padding: '16px 20px', backgroundColor: '#BAE6FD' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-              <div>
-                <h2 className="text-h2">Fuel & Operational Breakdown</h2>
-              </div>
-            </div>
-            {activeServiceSpending.length === 0 ? (
-              <EmptyState message="No service-type payments recorded for this period." />
-            ) : (
-              <div>
-                <div style={{
-                  backgroundColor: '#E0F2FE',
-                  border: '1px solid #000000',
-                  borderRadius: '6px',
-                  padding: '10px 14px 4px 10px',
-                  marginBottom: '12px'
-                }}>
-                  <div style={{ width: '100%', height: '190px' }}>
-                    <ResponsiveContainer width="100%" height="100%">
-                      <BarChart data={activeServiceSpending} layout="vertical" margin={{ top: 10, right: 10, left: 30, bottom: 0 }}>
-                        <defs>
-                          <filter id="mainSrvBar3d" x="-10%" y="-10%" width="130%" height="130%">
-                            <feDropShadow dx="2" dy="3" stdDeviation="2" floodColor="#0F2A4A" floodOpacity="0.20" />
-                          </filter>
-                          <linearGradient id="mainSrvBlueGrad" x1="0" y1="0" x2="1" y2="0">
-                            <stop offset="0%" stopColor="#38BDF8" />
-                            <stop offset="100%" stopColor="#0284C7" />
-                          </linearGradient>
-                        </defs>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#BAE6FD" />
-                        <XAxis type="number" tickFormatter={formatAxisINR} tickLine={{ stroke: '#000000' }} axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} tick={{ fontSize: 9.5, fill: '#0F2A4A' }} />
-                        <YAxis dataKey="service" type="category" tickLine={{ stroke: '#000000' }} axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} tick={{ fontSize: 9.5, fill: '#0F2A4A' }} width={80} />
-                        <Tooltip formatter={(val) => [formatINR(val), 'Amount']} />
-                        <Bar dataKey="amount" fill="url(#mainSrvBlueGrad)" stroke="#0369A1" strokeWidth={1} filter="url(#mainSrvBar3d)" radius={[0, 3, 3, 0]} />
-                      </BarChart>
-                    </ResponsiveContainer>
-                  </div>
+          {isPlantOrAll && (
+            <div className="civet-card" style={{ border: '1px solid #000000', padding: '16px 20px', backgroundColor: '#BAE6FD' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                <div>
+                  <h2 className="text-h2">Fuel & Operational Breakdown</h2>
                 </div>
+              </div>
+              {activeServiceSpending.length === 0 ? (
+                <EmptyState message="No service-type payments recorded for this period." />
+              ) : (
+                <div>
+                  <div style={{
+                    backgroundColor: '#E0F2FE',
+                    border: '1px solid #000000',
+                    borderRadius: '6px',
+                    padding: '10px 14px 4px 10px',
+                    marginBottom: '12px'
+                  }}>
+                    <div style={{ width: '100%', height: '190px' }}>
+                      <ResponsiveContainer width="100%" height="100%">
+                        <BarChart data={activeServiceSpending} layout="vertical" margin={{ top: 10, right: 10, left: 30, bottom: 0 }}>
+                          <defs>
+                            <filter id="mainSrvBar3d" x="-10%" y="-10%" width="130%" height="130%">
+                              <feDropShadow dx="2" dy="3" stdDeviation="2" floodColor="#0F2A4A" floodOpacity="0.20" />
+                            </filter>
+                            <linearGradient id="mainSrvBlueGrad" x1="0" y1="0" x2="1" y2="0">
+                              <stop offset="0%" stopColor="#38BDF8" />
+                              <stop offset="100%" stopColor="#0284C7" />
+                            </linearGradient>
+                          </defs>
+                          <CartesianGrid strokeDasharray="3 3" stroke="#BAE6FD" />
+                          <XAxis type="number" tickFormatter={formatAxisINR} tickLine={{ stroke: '#000000' }} axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} tick={{ fontSize: 9.5, fill: '#0F2A4A' }} />
+                          <YAxis dataKey="service" type="category" tickLine={{ stroke: '#000000' }} axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} tick={{ fontSize: 9.5, fill: '#0F2A4A' }} width={80} />
+                          <Tooltip formatter={(val) => [formatINR(val), 'Amount']} />
+                          <Bar dataKey="amount" fill="url(#mainSrvBlueGrad)" stroke="#0369A1" strokeWidth={1} filter="url(#mainSrvBar3d)" radius={[0, 3, 3, 0]} />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </div>
 
-                <div style={{
-                  backgroundColor: '#F0F9FF',
-                  border: '1px solid #000000',
-                  borderRadius: '4px',
-                  padding: '10px 12px'
-                }}>
-                  <span style={{ fontSize: '10.5px', fontWeight: '700', color: '#0F2A4A', display: 'block', marginBottom: '6px' }}>
-                    Service Category Allocation:
-                  </span>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-                    {activeServiceSpending.slice(0, 4).map(srv => {
-                      const pct = Math.round(((srv.amount || 0) / maxSrvAmt) * 100);
-                      return (
-                        <div key={srv.service} style={{ fontSize: '10.5px' }}>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2px' }}>
-                            <span style={{ color: '#1C2733' }}>{srv.service}</span>
-                            <strong style={{ color: '#0F2A4A' }}>{formatINR(srv.amount)}</strong>
+                  <div style={{
+                    backgroundColor: '#F0F9FF',
+                    border: '1px solid #000000',
+                    borderRadius: '4px',
+                    padding: '10px 12px'
+                  }}>
+                    <span style={{ fontSize: '10.5px', fontWeight: '700', color: '#0F2A4A', display: 'block', marginBottom: '6px' }}>
+                      Service Category Allocation:
+                    </span>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                      {activeServiceSpending.slice(0, 4).map(srv => {
+                        const pct = Math.round(((srv.amount || 0) / maxSrvAmt) * 100);
+                        return (
+                          <div key={srv.service} style={{ fontSize: '10.5px' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2px' }}>
+                              <span style={{ color: '#1C2733' }}>{srv.service}</span>
+                              <strong style={{ color: '#0F2A4A' }}>{formatINR(srv.amount)}</strong>
+                            </div>
+                            <div style={{ width: '100%', height: '5px', backgroundColor: '#E2E8F0', borderRadius: '3px', overflow: 'hidden' }}>
+                              <div style={{ width: `${pct}%`, height: '100%', backgroundColor: '#0284C7', border: '1px solid #0369A1', borderRadius: '3px', boxShadow: '0 1px 2px rgba(0,0,0,0.12)' }} />
+                            </div>
                           </div>
-                          <div style={{ width: '100%', height: '5px', backgroundColor: '#E2E8F0', borderRadius: '3px', overflow: 'hidden' }}>
-                            <div style={{ width: `${pct}%`, height: '100%', backgroundColor: '#0284C7', border: '1px solid #0369A1', borderRadius: '3px', boxShadow: '0 1px 2px rgba(0,0,0,0.12)' }} />
-                          </div>
-                        </div>
-                      );
-                    })}
+                        );
+                      })}
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
-          </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
