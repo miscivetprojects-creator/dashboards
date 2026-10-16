@@ -274,6 +274,7 @@ export default function DataRegister({ prefilterDept, prefilterLocation, onNavig
                 <th style={{ padding: '8px 10px', border: '1px solid #000000' }}>Date</th>
                 <th style={{ padding: '8px 10px', border: '1px solid #000000' }}>Department</th>
                 <th style={{ padding: '8px 10px', border: '1px solid #000000' }}>Project Division</th>
+                <th style={{ padding: '8px 10px', border: '1px solid #000000' }}>Project Name</th>
                 <th style={{ padding: '8px 10px', border: '1px solid #000000' }}>Ledger / Vendor</th>
                 <th style={{ textAlign: 'right', padding: '8px 10px', border: '1px solid #000000', backgroundColor: '#B45309' }}>Opening Bal (Rs.)</th>
                 <th style={{ textAlign: 'right', padding: '8px 10px', border: '1px solid #000000', backgroundColor: '#6D28D9' }}>Fuel Qty (Ltrs)</th>
@@ -287,13 +288,13 @@ export default function DataRegister({ prefilterDept, prefilterLocation, onNavig
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan="11" style={{ textAlign: 'center', padding: '24px', color: '#576574', border: '1px solid #000000' }}>
+                  <td colSpan="12" style={{ textAlign: 'center', padding: '24px', color: '#576574', border: '1px solid #000000' }}>
                     Loading register records...
                   </td>
                 </tr>
               ) : records.length === 0 ? (
                 <tr>
-                  <td colSpan="11" style={{ textAlign: 'center', padding: '30px', color: '#8395A7', border: '1px solid #000000' }}>
+                  <td colSpan="12" style={{ textAlign: 'center', padding: '30px', color: '#8395A7', border: '1px solid #000000' }}>
                     No records found in Data Register matching active criteria.
                   </td>
                 </tr>
@@ -336,6 +337,7 @@ export default function DataRegister({ prefilterDept, prefilterLocation, onNavig
                       <td style={{ fontWeight: '600', whiteSpace: 'nowrap', backgroundColor: isEven ? '#FFFFFF' : '#F8FAFC', border: '1px solid #000000' }}>{formatDateDisplay(rec.report_date)}</td>
                       <td style={{ fontWeight: '600', color: '#0F2A4A', backgroundColor: isEven ? '#FFFFFF' : '#F8FAFC', border: '1px solid #000000' }}>{rec.department_name || rec.department_id || 'Plant & Machinery'}</td>
                       <td style={{ fontWeight: '600', backgroundColor: isEven ? '#FFFFFF' : '#EFF6FF', border: '1px solid #000000' }}>{rec.project_division || rec.location_name || rec.location_id}</td>
+                      <td style={{ color: '#0F2A4A', backgroundColor: isEven ? '#FFFFFF' : '#F8FAFC', border: '1px solid #000000' }}>{rec.project_name || rec.site_name || (rec.data && (rec.data.project_name || rec.data.site_name)) || '-'}</td>
                       <td style={{ color: '#0F2A4A', backgroundColor: isEven ? '#FFFFFF' : '#F8FAFC', border: '1px solid #000000' }}>{vendor}</td>
                       <td style={{ textAlign: 'right', fontVariantNumeric: 'tabular-nums', fontWeight: '600', color: '#92400E', backgroundColor: isEven ? '#FEF9C3' : '#FEF08A', border: '1px solid #000000' }}>
                         {opBal > 0 ? ('Rs. ' + Math.round(opBal).toLocaleString('en-IN')) : '-'}
@@ -436,7 +438,7 @@ export default function DataRegister({ prefilterDept, prefilterLocation, onNavig
               return (
                 <tfoot>
                   <tr style={{ backgroundColor: '#F1F5F9', borderTop: '2px solid #0F2A4A', fontWeight: '700' }}>
-                    <td colSpan="4" style={{ color: '#0F2A4A' }}>FINAL TOTAL ({records.length} Records)</td>
+                    <td colSpan="5" style={{ color: '#0F2A4A' }}>FINAL TOTAL ({records.length} Records)</td>
                     <td style={{ textAlign: 'right', color: '#0F2A4A' }}>
                       {totalOpBal > 0 ? ('Rs. ' + Math.round(totalOpBal).toLocaleString('en-IN')) : '-'}
                     </td>
@@ -509,7 +511,7 @@ export default function DataRegister({ prefilterDept, prefilterLocation, onNavig
             </div>
             <div style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(4, 1fr)',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(110px, 1fr))',
               gap: '8px',
               padding: '10px 12px',
               backgroundColor: '#F4F6F9',
@@ -528,6 +530,10 @@ export default function DataRegister({ prefilterDept, prefilterLocation, onNavig
               <div>
                 <span style={{ color: '#8395A7', display: 'block' }}>Project Division</span>
                 <strong>{selectedRecord.project_division || selectedRecord.location_name || selectedRecord.location_id}</strong>
+              </div>
+              <div>
+                <span style={{ color: '#8395A7', display: 'block' }}>Project Name</span>
+                <strong>{selectedRecord.project_name || selectedRecord.site_name || (selectedRecord.data && (selectedRecord.data.project_name || selectedRecord.data.site_name)) || '-'}</strong>
               </div>
               <div>
                 <span style={{ color: '#8395A7', display: 'block' }}>Created By</span>
