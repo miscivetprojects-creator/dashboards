@@ -613,7 +613,7 @@ export default function DeptDashboard({ deptId = 'pm', departments = [], filters
               <div className="civet-card" style={{ gridColumn: '1 / -1', border: '1px solid #000000', padding: '16px 20px', backgroundColor: '#F3E8FF' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
                   <div>
-                    <h2 className="text-h2">Cost Center Fuel Payments & All Cost Centers Ledger Breakdown</h2>
+                    <h2 className="text-h2">Project Division Fuel Payments & All Project Divisions Ledger Breakdown</h2>
                   </div>
                   <div style={{ display: 'flex', gap: '16px', fontSize: '11px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -756,7 +756,7 @@ export default function DeptDashboard({ deptId = 'pm', departments = [], filters
                       alignItems: 'center'
                     }}>
                       <strong style={{ fontSize: '12px', color: '#0F2A4A' }}>
-                        All Cost Centers Summary Table ({locationSpendingData.length} Cost Centers)
+                        All Project Divisions Summary Table ({locationSpendingData.length} Project Divisions)
                       </strong>
                     </div>
 
@@ -765,7 +765,7 @@ export default function DeptDashboard({ deptId = 'pm', departments = [], filters
                         <thead>
                           <tr style={{ backgroundColor: '#0F2A4A', color: '#FFFFFF' }}>
                             <th style={{ padding: '7px 10px', textAlign: 'center', width: '40px', border: '1px solid #000000' }}>#</th>
-                            <th style={{ padding: '7px 10px', textAlign: 'left', border: '1px solid #000000' }}>Cost Center</th>
+                            <th style={{ padding: '7px 10px', textAlign: 'left', border: '1px solid #000000' }}>Project Division</th>
                             <th style={{ padding: '7px 10px', textAlign: 'right', border: '1px solid #000000', backgroundColor: '#B45309' }}>Opening Balance</th>
                             <th style={{ padding: '7px 10px', textAlign: 'right', border: '1px solid #000000', backgroundColor: '#0369A1' }}>Total Cost (Without Op/Cl)</th>
                             <th style={{ padding: '7px 10px', textAlign: 'right', border: '1px solid #000000', backgroundColor: '#047857' }}>Paid Amount</th>
@@ -804,7 +804,7 @@ export default function DeptDashboard({ deptId = 'pm', departments = [], filters
                             return (
                               <tr style={{ fontWeight: '700', borderTop: '2px solid #000000' }}>
                                 <td colSpan={2} style={{ padding: '8px 10px', textAlign: 'left', color: '#FFFFFF', backgroundColor: '#0F2A4A', border: '1px solid #000000' }}>
-                                  Total ({locationSpendingData.length} Cost Centers)
+                                  Total ({locationSpendingData.length} Project Divisions)
                                 </td>
                                 <td style={{ padding: '8px 10px', textAlign: 'right', color: '#78350F', backgroundColor: '#FDE047', border: '1px solid #000000' }}>{formatINR(totOp)}</td>
                                 <td style={{ padding: '8px 10px', textAlign: 'right', color: '#0369A1', backgroundColor: '#7DD3FC', border: '1px solid #000000' }}>{formatINR(totCost)}</td>
