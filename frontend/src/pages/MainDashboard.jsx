@@ -27,6 +27,8 @@ export default function MainDashboard({ filters, onNavigate }) {
   const [overallKpis, setOverallKpis] = useState(null);
   const [errorMessage, setErrorMessage] = useState(null);
   const [selectedDepartment, setSelectedDepartment] = useState(null);
+  const [trendView, setTrendView] = useState('divisions');
+  const [selectedEntity, setSelectedEntity] = useState('All');
 
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewRecord, setPreviewRecord] = useState(null);
@@ -94,7 +96,27 @@ export default function MainDashboard({ filters, onNavigate }) {
   const topDivisions = charts.topDivisions || [];
   const spendingTrend = charts.spendingTrend || [];
   const activeLocSpending = (charts.locationWiseSpending || []).filter(l => (l.amount || 0) > 0);
+  const activeProjSpending = (charts.projectNameWiseSpending || []).filter(p => (p.amount || 0) > 0);
   const activeServiceSpending = (charts.serviceSpending || []).filter(s => (s.amount || 0) > 0);
+
+  const chartMonthlyData = spendingTrend.map(s => {
+    let plotVal = s.totalPaid || s.amount || 0;
+    if (selectedEntity !== 'All') {
+      if (s.divisions && s.divisions[selectedEntity] !== undefined) {
+        plotVal = s.divisions[selectedEntity];
+      } else if (s.projects && s.projects[selectedEntity] !== undefined) {
+        plotVal = s.projects[selectedEntity];
+      } else if (s[selectedEntity] !== undefined) {
+        plotVal = s[selectedEntity];
+      } else {
+        plotVal = 0;
+      }
+    }
+    return {
+      ...s,
+      plotAmount: Number(plotVal) || 0
+    };
+  });
 
   const complianceExpenses = charts.complianceExpenses || [
     { category: 'Insurance', name: 'Insurance', amount: 0, amountFormatted: 'Rs. 0.00' },
@@ -217,137 +239,276 @@ export default function MainDashboard({ filters, onNavigate }) {
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
         <div className="civet-card" style={{ border: '1px solid #000000', padding: '16px 20px', backgroundColor: '#E0F2FE' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px', flexWrap: 'wrap', gap: '8px' }}>
-            <div>
-              <h2 style={{ fontSize: '15px', fontWeight: '700', color: '#0F2A4A', margin: 0 }}>
-                Project Division Spending Trend
-              </h2>
-              {selectedDepartment && (
-                <span style={{ fontSize: '11px', color: '#0284C7', fontWeight: '600' }}>
-                  Showing: {selectedDepartment}
-                </span>
-              )}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', flexWrap: 'wrap', gap: '10px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+              <div>
+                <h2 style={{ fontSize: '15px', fontWeight: '700', color: '#0F2A4A', margin: 0 }}>
+                  Project Division & Project Name Spending Trend
+                </h2>
+                {selectedDepartment && (
+                  <span style={{ fontSize: '11px', color: '#0284C7', fontWeight: '600' }}>
+                    Showing: {selectedDepartment}
+                  </span>
+                )}
+              </div>
+              <div style={{ display: 'inline-flex', borderRadius: '4px', border: '1px solid #000000', overflow: 'hidden', backgroundColor: '#FFFFFF' }}>
+                <button
+                  type="button"
+                  onClick={() => setTrendView('divisions')}
+                  style={{
+                    padding: '4px 10px',
+                    fontSize: '11px',
+                    fontWeight: trendView === 'divisions' ? '700' : '500',
+                    backgroundColor: trendView === 'divisions' ? '#0F2A4A' : '#FFFFFF',
+                    color: trendView === 'divisions' ? '#FFFFFF' : '#0F2A4A',
+                    border: 'none',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Project Divisions ({activeLocSpending.length})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setTrendView('projects')}
+                  style={{
+                    padding: '4px 10px',
+                    fontSize: '11px',
+                    fontWeight: trendView === 'projects' ? '700' : '500',
+                    backgroundColor: trendView === 'projects' ? '#0F2A4A' : '#FFFFFF',
+                    color: trendView === 'projects' ? '#FFFFFF' : '#0F2A4A',
+                    borderLeft: '1px solid #000000',
+                    borderRight: '1px solid #000000',
+                    borderTop: 'none',
+                    borderBottom: 'none',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Project Names ({activeProjSpending.length})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setTrendView('monthly')}
+                  style={{
+                    padding: '4px 10px',
+                    fontSize: '11px',
+                    fontWeight: trendView === 'monthly' ? '700' : '500',
+                    backgroundColor: trendView === 'monthly' ? '#0F2A4A' : '#FFFFFF',
+                    color: trendView === 'monthly' ? '#FFFFFF' : '#0F2A4A',
+                    border: 'none',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Monthly Trend
+                </button>
+              </div>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '11px' }}>
-              <span style={{ color: '#64748B' }}>Total Paid:</span>
-              <strong style={{ color: '#0F2A4A', fontWeight: '700' }}>{formatINR(totalFilteredPaid)}</strong>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '11px', flexWrap: 'wrap' }}>
+              {trendView === 'monthly' && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <span style={{ color: '#576574', fontWeight: '600' }}>Filter:</span>
+                  <select
+                    value={selectedEntity}
+                    onChange={e => setSelectedEntity(e.target.value)}
+                    style={{
+                      height: '26px',
+                      fontSize: '11px',
+                      fontWeight: '600',
+                      color: '#0F2A4A',
+                      border: '1px solid #000000',
+                      borderRadius: '4px',
+                      padding: '0 6px',
+                      backgroundColor: '#FFFFFF',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    <option value="All">All Divisions & Projects (Total Paid)</option>
+                    <optgroup label="Project Divisions">
+                      {activeLocSpending.map(d => (
+                        <option key={d.location || d.name} value={d.location || d.name}>
+                          {d.location || d.name}
+                        </option>
+                      ))}
+                    </optgroup>
+                    <optgroup label="Project Names">
+                      {activeProjSpending.map(p => (
+                        <option key={p.projectName || p.name} value={p.projectName || p.name}>
+                          {p.projectName || p.name}
+                        </option>
+                      ))}
+                    </optgroup>
+                  </select>
+                </div>
+              )}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <span style={{ color: '#64748B' }}>Total Paid:</span>
+                <strong style={{ color: '#0F2A4A', fontWeight: '700' }}>{formatINR(totalFilteredPaid)}</strong>
+              </div>
             </div>
           </div>
 
           {(!spendingTrend || spendingTrend.length === 0) ? (
             <EmptyState message="No payment transactions recorded for spending trend." />
           ) : (
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'minmax(0, 1.9fr) minmax(280px, 1fr)',
-              gap: '20px',
-              alignItems: 'stretch'
-            }}>
+            <div>
               <div style={{
                 backgroundColor: '#BAE6FD',
                 border: '1px solid #000000',
                 borderRadius: '6px',
-                padding: '14px 12px 8px 6px'
+                padding: '14px 12px 10px 10px',
+                overflowX: 'auto',
+                overflowY: 'hidden',
+                scrollbarWidth: 'thin'
               }}>
-                <div style={{ width: '100%', height: isTrendMultiYear ? '280px' : '260px' }}>
+                <div style={{
+                  minWidth: trendView === 'divisions'
+                    ? Math.max(1000, activeLocSpending.length * 52) + 'px'
+                    : trendView === 'projects'
+                    ? Math.max(1000, activeProjSpending.length * 48) + 'px'
+                    : (isTrendMultiYear ? Math.max(900, spendingTrend.length * 75) + 'px' : '100%'),
+                  height: '340px'
+                }}>
                   <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={spendingTrend} margin={{ top: 10, right: 14, left: -10, bottom: isTrendMultiYear ? 18 : 6 }}>
-                      <defs>
-                        <filter id="mainLine3d" x="-10%" y="-10%" width="130%" height="130%">
-                          <feDropShadow dx="1" dy="2" stdDeviation="1.5" floodColor="#0F2A4A" floodOpacity="0.25" />
-                        </filter>
-                      </defs>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#94A3B8" strokeOpacity={0.4} />
-                      <XAxis 
-                        dataKey={isTrendMultiYear ? 'shortPeriodLabel' : 'month'} 
-                        interval={0} 
-                        tickLine={{ stroke: '#000000' }} 
-                        axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} 
-                        angle={isTrendMultiYear ? -35 : 0}
-                        textAnchor={isTrendMultiYear ? 'end' : 'middle'}
-                        height={isTrendMultiYear ? 44 : 26}
-                        dx={isTrendMultiYear ? -4 : 0}
-                        dy={isTrendMultiYear ? 4 : 0}
-                        tick={{ fontSize: isTrendMultiYear ? 9.5 : 10, fill: '#0F2A4A' }} 
-                      />
-                      <YAxis 
-                        tickFormatter={formatAxisINR} 
-                        tickLine={{ stroke: '#000000' }} 
-                        axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} 
-                        tick={{ fontSize: 10, fill: '#0F2A4A' }} 
-                      />
-                      <Tooltip 
-                        content={({ active, payload, label }) => {
-                          if (active && payload && payload.length) {
-                            const pData = payload[0]?.payload || {};
-                            return (
-                              <div style={{
-                                backgroundColor: '#FFFFFF',
-                                border: '1px solid #000000',
-                                borderRadius: '6px',
-                                boxShadow: '0 4px 14px rgba(15, 42, 74, 0.15)',
-                                padding: '10px 14px',
-                                minWidth: '200px'
-                              }}>
-                                <div style={{
-                                  fontSize: '12px',
-                                  fontWeight: '700',
-                                  color: '#0F2A4A',
-                                  marginBottom: '8px',
-                                  borderBottom: '1px solid #F1F5F9',
-                                  paddingBottom: '4px'
-                                }}>
-                                  {pData.periodLabel || `${label} ${pData.year || activeYear}`}
-                                </div>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '11px', marginBottom: '4px' }}>
-                                  <span style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#0F2A4A', fontWeight: '700' }}>
-                                    <span style={{ width: '9px', height: '9px', borderRadius: '2px', backgroundColor: '#0F2A4A', border: '1px solid #000000' }}></span>
-                                    Total Paid
-                                  </span>
-                                  <strong style={{ color: '#0F2A4A', fontWeight: '800' }}>{formatINR(pData.totalPaid ?? pData.amount ?? 0)}</strong>
-                                </div>
-                                {topDivisions.map((divName, idx) => {
-                                  const divAmt = Number(pData[divName] || 0);
-                                  if (divAmt <= 0) return null;
-                                  return (
-                                    <div key={divName} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '10.5px', marginTop: '3px' }}>
-                                      <span style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#576574' }}>
-                                        <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: PALETTE[idx % PALETTE.length], border: `1px solid ${PALETTE_STROKES[idx % PALETTE_STROKES.length]}` }}></span>
-                                        {divName}
-                                      </span>
-                                      <strong style={{ color: '#0F2A4A' }}>{formatINR(divAmt)}</strong>
-                                    </div>
-                                  );
-                                })}
-                              </div>
-                            );
-                          }
-                          return null;
-                        }}
-                      />
-                      <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '6px' }} />
-                      <Line 
-                        type="monotone" 
-                        dataKey="totalPaid" 
-                        name="Total Paid" 
-                        stroke="#0F2A4A" 
-                        strokeWidth={3} 
-                        dot={{ r: 3.5, fill: '#0F2A4A' }} 
-                        activeDot={{ r: 5 }} 
-                        filter="url(#mainLine3d)"
-                      />
-                      {topDivisions.map((divName, idx) => (
-                        <Line 
-                          key={divName} 
-                          type="monotone" 
-                          dataKey={divName} 
-                          name={divName} 
-                          stroke={PALETTE[idx % PALETTE.length]} 
-                          strokeWidth={2} 
-                          dot={{ r: 2.5 }} 
+                    {trendView === 'divisions' ? (
+                      <BarChart data={activeLocSpending} margin={{ top: 14, right: 14, left: 10, bottom: 65 }}>
+                        <defs>
+                          <filter id="divBar3d" x="-10%" y="-10%" width="130%" height="130%">
+                            <feDropShadow dx="2" dy="3" stdDeviation="2" floodColor="#0F2A4A" floodOpacity="0.20" />
+                          </filter>
+                          <linearGradient id="divBlueGrad" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stopColor="#38BDF8" />
+                            <stop offset="100%" stopColor="#0284C7" />
+                          </linearGradient>
+                        </defs>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#CBD5E1" strokeOpacity={0.6} />
+                        <XAxis 
+                          dataKey="location" 
+                          interval={0} 
+                          angle={-45} 
+                          textAnchor="end" 
+                          height={70} 
+                          tickLine={{ stroke: '#000000' }} 
+                          axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} 
+                          tick={{ fontSize: 9.5, fill: '#0F2A4A', fontWeight: '600' }} 
                         />
-                      ))}
-                    </LineChart>
+                        <YAxis 
+                          tickFormatter={formatAxisINR} 
+                          tickLine={{ stroke: '#000000' }} 
+                          axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} 
+                          tick={{ fontSize: 10, fill: '#0F2A4A' }} 
+                        />
+                        <Tooltip 
+                          formatter={(val) => [formatINR(val), 'Disbursement']}
+                          labelFormatter={(label) => `Project Division: ${label}`}
+                        />
+                        <Bar dataKey="amount" fill="url(#divBlueGrad)" stroke="#0369A1" strokeWidth={1} filter="url(#divBar3d)" radius={[3, 3, 0, 0]} />
+                      </BarChart>
+                    ) : trendView === 'projects' ? (
+                      <BarChart data={activeProjSpending} margin={{ top: 14, right: 14, left: 10, bottom: 75 }}>
+                        <defs>
+                          <filter id="projBar3d" x="-10%" y="-10%" width="130%" height="130%">
+                            <feDropShadow dx="2" dy="3" stdDeviation="2" floodColor="#0F2A4A" floodOpacity="0.20" />
+                          </filter>
+                          <linearGradient id="projGreenGrad" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stopColor="#34D399" />
+                            <stop offset="100%" stopColor="#059669" />
+                          </linearGradient>
+                        </defs>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#CBD5E1" strokeOpacity={0.6} />
+                        <XAxis 
+                          dataKey="projectName" 
+                          interval={0} 
+                          angle={-45} 
+                          textAnchor="end" 
+                          height={80} 
+                          tickLine={{ stroke: '#000000' }} 
+                          axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} 
+                          tick={{ fontSize: 9, fill: '#0F2A4A', fontWeight: '600' }} 
+                        />
+                        <YAxis 
+                          tickFormatter={formatAxisINR} 
+                          tickLine={{ stroke: '#000000' }} 
+                          axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} 
+                          tick={{ fontSize: 10, fill: '#0F2A4A' }} 
+                        />
+                        <Tooltip 
+                          formatter={(val) => [formatINR(val), 'Disbursement']}
+                          labelFormatter={(label) => `Project Name: ${label}`}
+                        />
+                        <Bar dataKey="amount" fill="url(#projGreenGrad)" stroke="#047857" strokeWidth={1} filter="url(#projBar3d)" radius={[3, 3, 0, 0]} />
+                      </BarChart>
+                    ) : (
+                      <LineChart data={chartMonthlyData} margin={{ top: 14, right: 20, left: 0, bottom: isTrendMultiYear ? 24 : 10 }}>
+                        <defs>
+                          <filter id="mainLine3d" x="-10%" y="-10%" width="130%" height="130%">
+                            <feDropShadow dx="1" dy="2" stdDeviation="1.5" floodColor="#0F2A4A" floodOpacity="0.25" />
+                          </filter>
+                        </defs>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#94A3B8" strokeOpacity={0.4} />
+                        <XAxis 
+                          dataKey={isTrendMultiYear ? 'shortPeriodLabel' : 'month'} 
+                          interval={0} 
+                          tickLine={{ stroke: '#000000' }} 
+                          axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} 
+                          angle={isTrendMultiYear ? -35 : 0}
+                          textAnchor={isTrendMultiYear ? 'end' : 'middle'}
+                          height={isTrendMultiYear ? 44 : 26}
+                          tick={{ fontSize: isTrendMultiYear ? 9.5 : 10, fill: '#0F2A4A' }} 
+                        />
+                        <YAxis 
+                          tickFormatter={formatAxisINR} 
+                          tickLine={{ stroke: '#000000' }} 
+                          axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} 
+                          tick={{ fontSize: 10, fill: '#0F2A4A' }} 
+                        />
+                        <Tooltip 
+                          content={({ active, payload, label }) => {
+                            if (active && payload && payload.length) {
+                              const pData = payload[0]?.payload || {};
+                              const amt = Number(pData.plotAmount ?? pData.totalPaid ?? pData.amount ?? 0);
+                              return (
+                                <div style={{
+                                  backgroundColor: '#FFFFFF',
+                                  border: '1px solid #000000',
+                                  borderRadius: '6px',
+                                  boxShadow: '0 4px 14px rgba(15, 42, 74, 0.15)',
+                                  padding: '10px 14px',
+                                  minWidth: '200px'
+                                }}>
+                                  <div style={{
+                                    fontSize: '12px',
+                                    fontWeight: '700',
+                                    color: '#0F2A4A',
+                                    marginBottom: '6px',
+                                    borderBottom: '1px solid #F1F5F9',
+                                    paddingBottom: '4px'
+                                  }}>
+                                    {pData.periodLabel || `${label} ${pData.year || activeYear}`}
+                                  </div>
+                                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '11px' }}>
+                                    <span style={{ color: '#576574', fontWeight: '600' }}>
+                                      {selectedEntity === 'All' ? 'Total Paid:' : `${selectedEntity}:`}
+                                    </span>
+                                    <strong style={{ color: '#0F2A4A', fontWeight: '800' }}>{formatINR(amt)}</strong>
+                                  </div>
+                                </div>
+                              );
+                            }
+                            return null;
+                          }}
+                        />
+                        <Line 
+                          type="monotone" 
+                          dataKey="plotAmount" 
+                          name={selectedEntity === 'All' ? 'Total Paid' : selectedEntity} 
+                          stroke="#0F2A4A" 
+                          strokeWidth={3} 
+                          dot={{ r: 4, fill: '#0F2A4A' }} 
+                          activeDot={{ r: 6 }} 
+                          filter="url(#mainLine3d)"
+                        />
+                      </LineChart>
+                    )}
                   </ResponsiveContainer>
                 </div>
               </div>
@@ -356,50 +517,59 @@ export default function MainDashboard({ filters, onNavigate }) {
                 backgroundColor: '#F0F9FF',
                 border: '1px solid #000000',
                 borderRadius: '6px',
-                padding: '12px 14px',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '8px'
+                padding: '12px 16px',
+                marginTop: '12px'
               }}>
-                <h3 style={{ fontSize: '12px', fontWeight: '700', color: '#0F2A4A', margin: 0, borderBottom: '1px solid #000000', paddingBottom: '6px' }}>
-                  Payment Summary
-                </h3>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-                  <div style={{ backgroundColor: '#E0F2FE', border: '1px solid #000000', borderRadius: '4px', padding: '6px 8px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px', borderBottom: '1px solid #000000', paddingBottom: '6px', flexWrap: 'wrap', gap: '6px' }}>
+                  <h3 style={{ fontSize: '12.5px', fontWeight: '700', color: '#0F2A4A', margin: 0 }}>
+                    Payment Summary
+                  </h3>
+                  <span style={{ fontSize: '11px', color: '#576574' }}>
+                    Annual Financial & Seasonal Performance Highlights
+                  </span>
+                </div>
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+                  gap: '10px'
+                }}>
+                  <div style={{ backgroundColor: '#E0F2FE', border: '1px solid #000000', borderRadius: '4px', padding: '8px 10px' }}>
                     <span style={{ fontSize: '10px', color: '#64748B', display: 'block' }}>Peak Month</span>
-                    <strong style={{ fontSize: '12px', color: '#0F2A4A' }}>{peakSpendingMonth?.month || 'Jan'}</strong>
-                    <div style={{ fontSize: '10px', color: '#1F6FEB', fontWeight: '600' }}>
+                    <strong style={{ fontSize: '13px', color: '#0F2A4A' }}>{peakSpendingMonth?.month || 'Jan'}</strong>
+                    <div style={{ fontSize: '10.5px', color: '#1F6FEB', fontWeight: '700', fontVariantNumeric: 'tabular-nums' }}>
                       {formatINR(peakSpendingMonth?.amount || 0)}
                     </div>
                   </div>
-                  <div style={{ backgroundColor: '#DCFCE7', border: '1px solid #000000', borderRadius: '4px', padding: '6px 8px' }}>
+                  <div style={{ backgroundColor: '#DCFCE7', border: '1px solid #000000', borderRadius: '4px', padding: '8px 10px' }}>
                     <span style={{ fontSize: '10px', color: '#64748B', display: 'block' }}>Monthly Average</span>
-                    <strong style={{ fontSize: '12px', color: '#2E9E6B' }}>
+                    <strong style={{ fontSize: '13px', color: '#2E9E6B', fontVariantNumeric: 'tabular-nums' }}>
                       {formatINR(avgMonthlySpending)}
                     </strong>
                     <div style={{ fontSize: '10px', color: '#64748B' }}>Active Months: {totalMonthsWithData}</div>
                   </div>
-                </div>
-
-                <div style={{ fontSize: '10.5px', marginTop: '4px' }}>
-                  <span style={{ fontWeight: '700', color: '#0F2A4A', display: 'block', marginBottom: '4px' }}>Quarterly Highlights:</span>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 6px', backgroundColor: '#FAF5FF', border: '1px solid #000000', borderRadius: '3px' }}>
-                      <span>Q1 (Jan - Mar)</span>
-                      <strong>{formatINR(spendingTrend.slice(0, 3).reduce((acc, m) => acc + (m.amount || 0), 0))}</strong>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 6px', backgroundColor: '#FAF5FF', border: '1px solid #000000', borderRadius: '3px' }}>
-                      <span>Q2 (Apr - Jun)</span>
-                      <strong>{formatINR(spendingTrend.slice(3, 6).reduce((acc, m) => acc + (m.amount || 0), 0))}</strong>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 6px', backgroundColor: '#FAF5FF', border: '1px solid #000000', borderRadius: '3px' }}>
-                      <span>Q3 (Jul - Sep)</span>
-                      <strong>{formatINR(spendingTrend.slice(6, 9).reduce((acc, m) => acc + (m.amount || 0), 0))}</strong>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 6px', backgroundColor: '#FAF5FF', border: '1px solid #000000', borderRadius: '3px' }}>
-                      <span>Q4 (Oct - Dec)</span>
-                      <strong>{formatINR(spendingTrend.slice(9, 12).reduce((acc, m) => acc + (m.amount || 0), 0))}</strong>
-                    </div>
+                  <div style={{ backgroundColor: '#FAF5FF', border: '1px solid #000000', borderRadius: '4px', padding: '8px 10px' }}>
+                    <span style={{ fontSize: '10px', color: '#64748B', display: 'block' }}>Q1 (Jan - Mar)</span>
+                    <strong style={{ fontSize: '12.5px', color: '#0F2A4A', fontVariantNumeric: 'tabular-nums' }}>
+                      {formatINR(spendingTrend.slice(0, 3).reduce((acc, m) => acc + (m.amount || 0), 0))}
+                    </strong>
+                  </div>
+                  <div style={{ backgroundColor: '#FAF5FF', border: '1px solid #000000', borderRadius: '4px', padding: '8px 10px' }}>
+                    <span style={{ fontSize: '10px', color: '#64748B', display: 'block' }}>Q2 (Apr - Jun)</span>
+                    <strong style={{ fontSize: '12.5px', color: '#0F2A4A', fontVariantNumeric: 'tabular-nums' }}>
+                      {formatINR(spendingTrend.slice(3, 6).reduce((acc, m) => acc + (m.amount || 0), 0))}
+                    </strong>
+                  </div>
+                  <div style={{ backgroundColor: '#FAF5FF', border: '1px solid #000000', borderRadius: '4px', padding: '8px 10px' }}>
+                    <span style={{ fontSize: '10px', color: '#64748B', display: 'block' }}>Q3 (Jul - Sep)</span>
+                    <strong style={{ fontSize: '12.5px', color: '#0F2A4A', fontVariantNumeric: 'tabular-nums' }}>
+                      {formatINR(spendingTrend.slice(6, 9).reduce((acc, m) => acc + (m.amount || 0), 0))}
+                    </strong>
+                  </div>
+                  <div style={{ backgroundColor: '#FAF5FF', border: '1px solid #000000', borderRadius: '4px', padding: '8px 10px' }}>
+                    <span style={{ fontSize: '10px', color: '#64748B', display: 'block' }}>Q4 (Oct - Dec)</span>
+                    <strong style={{ fontSize: '12.5px', color: '#0F2A4A', fontVariantNumeric: 'tabular-nums' }}>
+                      {formatINR(spendingTrend.slice(9, 12).reduce((acc, m) => acc + (m.amount || 0), 0))}
+                    </strong>
                   </div>
                 </div>
               </div>
