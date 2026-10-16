@@ -384,12 +384,24 @@ class AggregationService {
       const regularPaid = Math.max(0, sumPaid - cashCarryPaid);
 
       const divBreakdown = {};
-      topDivisions.forEach(divName => {
-        const divRecs = mRecs.filter(r => {
-          const rDiv = r.project_division || r.location_name || (r.data && (r.data.project_division || r.data.location_name || r.data.location)) || r.location_id;
-          return String(rDiv).trim().toLowerCase() === String(divName).trim().toLowerCase();
-        });
-        divBreakdown[divName] = Number(divRecs.reduce((acc, r) => acc + getRecPaid(r), 0).toFixed(2));
+      const projBreakdown = {};
+      mRecs.forEach(r => {
+        const rDiv = r.project_division || r.location_name || (r.data && (r.data.project_division || r.data.location_name || r.data.location)) || r.location_id;
+        const rawPName = (r.project_name && r.project_name !== '-' && r.project_name !== 'Project Site') ? r.project_name :
+          (r.site_name && r.site_name !== '-' && r.site_name !== 'Project Site') ? r.site_name :
+          (r.data && (
+            (r.data.project_name && r.data.project_name !== '-' && r.data.project_name !== 'Project Site') ? r.data.project_name :
+            (r.data.site_name && r.data.site_name !== '-' && r.data.site_name !== 'Project Site') ? r.data.site_name : null
+          ));
+        const rPaid = getRecPaid(r);
+        if (rDiv) {
+          const k = String(rDiv).trim();
+          divBreakdown[k] = Number(((divBreakdown[k] || 0) + rPaid).toFixed(2));
+        }
+        if (rawPName) {
+          const pk = String(rawPName).trim();
+          projBreakdown[pk] = Number(((projBreakdown[pk] || 0) + rPaid).toFixed(2));
+        }
       });
 
       return {
@@ -416,6 +428,8 @@ class AggregationService {
         openingBalanceFormatted: formatIndianCurrency(mOpBal),
         closingBalanceFormatted: formatIndianCurrency(mClBal),
         balanceFormatted: formatIndianCurrency(mClBal),
+        divisions: divBreakdown,
+        projects: projBreakdown,
         ...divBreakdown
       };
     });
@@ -499,6 +513,33 @@ class AggregationService {
       if (b.amount !== a.amount) return b.amount - a.amount;
       return (b.closingBalance || 0) - (a.closingBalance || 0);
     });
+    const projNameSpendMap = {};
+    records.forEach(r => {
+      const recPaid = getRecPaid(r);
+      const rawPName = (r.project_name && r.project_name !== '-' && r.project_name !== 'Project Site') ? r.project_name :
+        (r.site_name && r.site_name !== '-' && r.site_name !== 'Project Site') ? r.site_name :
+        (r.data && (
+          (r.data.project_name && r.data.project_name !== '-' && r.data.project_name !== 'Project Site') ? r.data.project_name :
+          (r.data.site_name && r.data.site_name !== '-' && r.data.site_name !== 'Project Site') ? r.data.site_name : null
+        ));
+      const pName = rawPName || r.project_division || r.location_name || 'General';
+      if (pName && recPaid > 0) {
+        if (!projNameSpendMap[pName]) {
+          projNameSpendMap[pName] = { name: pName, projectName: pName, amount: 0, count: 0 };
+        }
+        projNameSpendMap[pName].amount += recPaid;
+        projNameSpendMap[pName].count += 1;
+      }
+    });
+    const projectNameWiseSpending = Object.values(projNameSpendMap)
+      .map(p => ({
+        ...p,
+        projectName: p.name,
+        amount: Number(p.amount.toFixed(2)),
+        amountFormatted: formatIndianCurrency(p.amount),
+        percentage: totalPayments > 0 ? Number(((p.amount / totalPayments) * 100).toFixed(1)) : 0
+      }))
+      .sort((a, b) => b.amount - a.amount);
     const serviceSpendMap = {};
     records.forEach(r => {
       const sName = (r.data && (r.data.fuel_type || r.data.payment_type)) || r.fuel_type || r.payment_type || r.service_type_name || 'Diesel';
@@ -894,6 +935,10 @@ class AggregationService {
         spendingTrend,
         monthlySpending: spendingTrend,
         topDivisions,
+        allProjectDivisions: locationWiseSpending.map(l => l.name || l.location).filter(Boolean),
+        allProjectNames: projectNameWiseSpending.map(p => p.projectName || p.name).filter(Boolean),
+        projectNameWiseSpending,
+        projectSpending: projectNameWiseSpending,
         complianceExpenses,
         manpowerCosts,
         departmentWiseSpending,
