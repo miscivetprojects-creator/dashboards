@@ -87,7 +87,10 @@ function buildRegisterQuery(params = {}, user = {}) {
         { location_id: locRegex },
         { location_name: locClean },
         { location_name: locRegex },
+        { project_division: locClean },
+        { project_division: locRegex },
         { 'data.location': locClean },
+        { 'data.project_division': locClean },
         { 'data.location_id': locClean },
         { 'data.location_name': locClean }
       ]
@@ -224,7 +227,7 @@ router.post('/record/:id/revise', async (req, res) => {
     };
     let resolvedLocId = existing.location_id;
     let resolvedLocName = existing.location_name;
-    const targetLoc = updatedData.location || updatedData.location_id || updatedData.location_name;
+    const targetLoc = updatedData.project_division || updatedData.location || updatedData.location_id || updatedData.location_name;
     if (targetLoc) {
       const locColl = getCollection('project_locations');
       const safeLoc = String(targetLoc).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -243,6 +246,11 @@ router.post('/record/:id/revise', async (req, res) => {
         resolvedLocId = targetLoc;
       }
     }
+    updatedData.project_division = resolvedLocName;
+    updatedData.project_division_id = resolvedLocId;
+    updatedData.location = resolvedLocName;
+    updatedData.location_id = resolvedLocId;
+    updatedData.project_name = updatedData.project_name || updatedData.site_name || existing.project_name || existing.site_name || '';
     const isBothFuel = String(updatedData.fuel_type || existing.fuel_type || (existing.data && existing.data.fuel_type) || '').toLowerCase().includes('both');
     let pQ = Number(updatedData.petrol_quantity || (existing.data && existing.data.petrol_quantity) || existing.petrol_quantity || 0);
     let pR = Number(updatedData.petrol_rate || (existing.data && existing.data.petrol_rate) || existing.petrol_rate || 0);
@@ -381,7 +389,7 @@ router.get('/export/excel', async (req, res) => {
     };
     const reportTypeName = reportTypeLabels[reportTypeRaw] || reportTypeRaw;
     const deptName = req.query.department && req.query.department !== 'All' ? req.query.department : 'Plant & Machinery';
-    const locName = req.query.location && req.query.location !== 'All' ? req.query.location : 'All Cost Centers';
+    const locName = req.query.location && req.query.location !== 'All' ? req.query.location : 'All Project Divisions';
 
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet('MIS Report');
@@ -400,7 +408,7 @@ router.get('/export/excel', async (req, res) => {
 
     worksheet.mergeCells('A2:O2');
     const headerParaCell = worksheet.getCell('A2');
-    headerParaCell.value = `Report Type: ${reportTypeName}   |   Department: ${deptName}   |   Cost Center: ${locName}   |   Generated: ${formatDateDDMMYYYY(new Date())}   |   Total Entries: ${records.length}`;
+    headerParaCell.value = `Report Type: ${reportTypeName}   |   Department: ${deptName}   |   Project Division: ${locName}   |   Generated: ${formatDateDDMMYYYY(new Date())}   |   Total Entries: ${records.length}`;
     headerParaCell.font = { name: 'Calibri', size: 10.5, bold: true, color: { argb: 'FF0F2A4A' } };
     headerParaCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF1F5F9' } };
     headerParaCell.alignment = { vertical: 'middle', horizontal: 'center' };
@@ -413,7 +421,7 @@ router.get('/export/excel', async (req, res) => {
     const headers = [
       'Date',
       'Department',
-      'Cost Center',
+      'Project Division',
       'Ledger / Vendor',
       'Opening Bal (Rs.)',
       'Diesel Qty (Ltrs)',
@@ -577,11 +585,11 @@ router.get('/export/pdf', async (req, res) => {
     };
     const reportTypeName = reportTypeLabels[reportTypeRaw] || reportTypeRaw;
     const deptName = req.query.department && req.query.department !== 'All' ? req.query.department : 'Plant & Machinery';
-    const locName = req.query.location && req.query.location !== 'All' ? req.query.location : 'All Cost Centers';
+    const locName = req.query.location && req.query.location !== 'All' ? req.query.location : 'All Project Divisions';
 
     const headers = [
       'Date',
-      'Cost Center',
+      'Project Division',
       'Ledger / Vendor',
       'Opening Bal',
       'Diesel Qty',
@@ -651,7 +659,7 @@ router.get('/export/pdf', async (req, res) => {
 
     const pdfBuffer = await pdfService.generateTablePdf({
       title: 'MANAGEMENT MIS REPORT',
-      subtitle: `Report Type: ${reportTypeName}   •   Department: ${deptName}   •   Cost Center: ${locName}   •   Generated: ${formatDateDDMMYYYY(new Date())}`,
+      subtitle: `Report Type: ${reportTypeName}   •   Department: ${deptName}   •   Project Division: ${locName}   •   Generated: ${formatDateDDMMYYYY(new Date())}`,
       headers,
       rows,
       summaryRow,
