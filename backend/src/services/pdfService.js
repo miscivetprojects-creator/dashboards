@@ -246,13 +246,13 @@ const pdfService = {
             const halfW = (contentWidth - 10) / 2;
             if (deptData.length > 0 && locData.length > 0) {
               drawHorizontalBarChart('Department Spending Breakdown', deptData, startX, y, halfW, 100);
-              drawHorizontalBarChart('Cost Center Spending Breakdown', locData, startX + halfW + 10, y, halfW, 100);
+              drawHorizontalBarChart('Project Division Spending Breakdown', locData, startX + halfW + 10, y, halfW, 100);
               y += 108;
             } else if (deptData.length > 0) {
               drawHorizontalBarChart('Department Spending Breakdown', deptData, startX, y, contentWidth, 100);
               y += 108;
             } else if (locData.length > 0) {
-              drawHorizontalBarChart('Cost Center Spending Breakdown', locData, startX, y, contentWidth, 100);
+              drawHorizontalBarChart('Project Division Spending Breakdown', locData, startX, y, contentWidth, 100);
               y += 108;
             }
           }
