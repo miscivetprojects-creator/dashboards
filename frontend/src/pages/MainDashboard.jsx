@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { 
-  BarChart, Bar, PieChart, Pie, Cell, 
-  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer 
+  LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, 
+  XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer 
 } from 'recharts';
-import { TrendingUp, Layers, Building2, MapPin, Eye, Calendar, DollarSign, CheckCircle2 } from 'lucide-react';
+import { TrendingUp, Layers, Building2, MapPin, Eye, Calendar, DollarSign, CheckCircle2, ShieldCheck, Users } from 'lucide-react';
 import KPICard from '../components/KPICard';
 import EmptyState from '../components/EmptyState';
 import TablePagination from '../components/TablePagination';
@@ -24,7 +24,9 @@ function formatAxisINR(val) {
 export default function MainDashboard({ filters, onNavigate }) {
   const [loading, setLoading] = useState(true);
   const [dashboardData, setDashboardData] = useState(null);
+  const [overallKpis, setOverallKpis] = useState(null);
   const [errorMessage, setErrorMessage] = useState(null);
+  const [selectedDepartment, setSelectedDepartment] = useState(null);
 
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewRecord, setPreviewRecord] = useState(null);
@@ -33,14 +35,21 @@ export default function MainDashboard({ filters, onNavigate }) {
 
   useEffect(() => {
     fetchDashboardAnalytics();
-  }, [filters]);
+  }, [filters, selectedDepartment]);
 
   async function fetchDashboardAnalytics() {
     setLoading(true);
     setErrorMessage(null);
     try {
-      const response = await api.getMainDashboard(filters);
+      const activeFilters = {
+        ...filters,
+        department: selectedDepartment ? selectedDepartment : (filters?.department || 'All')
+      };
+      const response = await api.getMainDashboard(activeFilters);
       setDashboardData(response);
+      if (!selectedDepartment) {
+        setOverallKpis(response.kpis);
+      }
     } catch (err) {
       setErrorMessage(err.message);
     } finally {
@@ -62,7 +71,7 @@ export default function MainDashboard({ filters, onNavigate }) {
     }
   };
 
-  if (loading) {
+  if (loading && !dashboardData) {
     return (
       <div style={{ padding: '24px', display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '300px' }}>
         <div style={{ color: '#576574', fontSize: '12px' }}>Loading management analytics...</div>
@@ -70,7 +79,7 @@ export default function MainDashboard({ filters, onNavigate }) {
     );
   }
 
-  if (errorMessage) {
+  if (errorMessage && !dashboardData) {
     return (
       <div style={{ padding: '20px' }}>
         <div className="badge badge-danger" style={{ padding: '8px 12px', fontSize: '12px' }}>
@@ -82,19 +91,25 @@ export default function MainDashboard({ filters, onNavigate }) {
 
   const kpis = dashboardData?.kpis || {};
   const charts = dashboardData?.charts || {};
-  const complianceMatrix = (dashboardData?.coverageMatrix || []).map(row => {
-    const copy = { ...row };
-    if (copy.departments) {
-      delete copy.departments.ACCOUNTS;
-      delete copy.departments.accounts;
-    }
-    return copy;
-  });
-
+  const topDivisions = charts.topDivisions || [];
   const spendingTrend = charts.spendingTrend || [];
-  const activeDeptSpending = (charts.departmentWiseSpending || []).filter(d => (d.amount || 0) > 0);
   const activeLocSpending = (charts.locationWiseSpending || []).filter(l => (l.amount || 0) > 0);
   const activeServiceSpending = (charts.serviceSpending || []).filter(s => (s.amount || 0) > 0);
+
+  const complianceExpenses = charts.complianceExpenses || [
+    { category: 'Insurance', name: 'Insurance', amount: 0, amountFormatted: 'Rs. 0.00' },
+    { category: 'Maintenance', name: 'Maintenance', amount: 0, amountFormatted: 'Rs. 0.00' },
+    { category: 'Tax', name: 'Tax', amount: 0, amountFormatted: 'Rs. 0.00' },
+    { category: 'Permit', name: 'Permit', amount: 0, amountFormatted: 'Rs. 0.00' }
+  ];
+
+  const manpowerCosts = charts.manpowerCosts || [
+    { category: 'Drivers', name: 'Drivers', amount: 0, amountFormatted: 'Rs. 0.00' },
+    { category: 'Operators', name: 'Operators', amount: 0, amountFormatted: 'Rs. 0.00' }
+  ];
+
+  const totalComplianceAmount = complianceExpenses.reduce((sum, c) => sum + (Number(c.amount) || 0), 0);
+  const totalManpowerAmount = manpowerCosts.reduce((sum, m) => sum + (Number(m.amount) || 0), 0);
 
   let peakSpendingMonth = spendingTrend[0];
   spendingTrend.forEach(m => {
@@ -103,12 +118,14 @@ export default function MainDashboard({ filters, onNavigate }) {
     }
   });
 
-  const totalPaymentsAmount = Number(kpis.totalPayments?.value || 0);
-  const totalCostAmount = Number(kpis.totalCost?.value || 0);
-  const totalOpeningAmount = Number(kpis.openingBalance?.value || 0);
-  const totalClosingAmount = Number(kpis.closingBalance?.value || 0);
+  const displayTotalPaid = Number(overallKpis?.totalPaid?.value ?? kpis.totalPaid?.value ?? kpis.totalPayments?.value ?? 0);
+  const displayPM = Number(overallKpis?.plantAndMachinery?.value ?? kpis.plantAndMachinery?.value ?? 0);
+  const displayIT = Number(overallKpis?.itAndMis?.value ?? kpis.itAndMis?.value ?? 0);
+  const displayAdmin = Number(overallKpis?.admin?.value ?? kpis.admin?.value ?? 0);
+
+  const totalFilteredPaid = Number(kpis.totalPayments?.value || kpis.totalPaid?.value || 0);
   const totalMonthsWithData = spendingTrend.filter(m => (m.amount || 0) > 0).length || 1;
-  const avgMonthlySpending = totalPaymentsAmount > 0 ? Math.round(totalPaymentsAmount / totalMonthsWithData) : 0;
+  const avgMonthlySpending = totalFilteredPaid > 0 ? Math.round(totalFilteredPaid / totalMonthsWithData) : 0;
 
   const maxLocAmt = Math.max(...activeLocSpending.map(l => l.amount || 1), 1);
   const maxSrvAmt = Math.max(...activeServiceSpending.map(s => s.amount || 1), 1);
@@ -127,55 +144,113 @@ export default function MainDashboard({ filters, onNavigate }) {
     return '2025';
   })();
 
+  const isTrendMultiYear = spendingTrend.some(s => s.year && s.year !== spendingTrend[0]?.year);
+
   return (
     <div style={{ padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
       <div className="grid-kpis" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px' }}>
-        <KPICard 
-          label="Total Paid Amount" 
-          value={formatINR(totalPaymentsAmount)} 
-          bg="#FFEDB9"
-          borderLeftColor="#D99A1E"
-        />
-        <KPICard 
-          label="Total Amount (Fuel Cost)" 
-          value={formatINR(totalCostAmount)} 
-          bg="#BAE6FD"
-          borderLeftColor="#0284C7"
-        />
-        <KPICard 
-          label="Opening Balance" 
-          value={formatINR(totalOpeningAmount)} 
-          bg="#BBF7D0"
-          borderLeftColor="#16A34A"
-        />
-        <KPICard 
-          label="Closing Balance" 
-          value={formatINR(totalClosingAmount)} 
-          bg="#FED7AA"
-          borderLeftColor="#EA580C"
-        />
-        <KPICard 
-          label="Active Cost Centers" 
-          value={kpis.activeSites?.formatted || `${activeLocSpending.length || 39} Cost Centers`} 
-          bg="#DDD6FE"
-          borderLeftColor="#7C3AED"
-        />
+        <div 
+          onClick={() => setSelectedDepartment(null)}
+          style={{ 
+            cursor: 'pointer',
+            borderRadius: '6px',
+            transition: 'all 0.15s ease',
+            boxShadow: selectedDepartment === null ? '0 0 0 2px #0F2A4A, 0 4px 12px rgba(15, 42, 74, 0.15)' : 'none',
+            transform: selectedDepartment === null ? 'translateY(-2px)' : 'none'
+          }}
+          title="Click to view overall data across all departments"
+        >
+          <KPICard 
+            label="Total Paid Amount" 
+            value={formatINR(displayTotalPaid)} 
+            bg="#FFEDB9"
+            borderLeftColor="#D99A1E"
+            badge={selectedDepartment === null ? { text: 'Active View', type: 'badge-primary' } : null}
+          />
+        </div>
+
+        <div 
+          onClick={() => setSelectedDepartment('Plant & Machinery')}
+          style={{ 
+            cursor: 'pointer',
+            borderRadius: '6px',
+            transition: 'all 0.15s ease',
+            boxShadow: selectedDepartment === 'Plant & Machinery' ? '0 0 0 2px #0284C7, 0 4px 12px rgba(2, 132, 199, 0.20)' : 'none',
+            transform: selectedDepartment === 'Plant & Machinery' ? 'translateY(-2px)' : 'none'
+          }}
+          title="Click to drill down into Plant & Machinery"
+        >
+          <KPICard 
+            label="Plant & Machinery" 
+            value={formatINR(displayPM)} 
+            bg="#BAE6FD"
+            borderLeftColor="#0284C7"
+            badge={selectedDepartment === 'Plant & Machinery' ? { text: 'Filtered', type: 'badge-info' } : null}
+          />
+        </div>
+
+        <div 
+          onClick={() => setSelectedDepartment('IT & MIS')}
+          style={{ 
+            cursor: 'pointer',
+            borderRadius: '6px',
+            transition: 'all 0.15s ease',
+            boxShadow: selectedDepartment === 'IT & MIS' ? '0 0 0 2px #7C3AED, 0 4px 12px rgba(124, 58, 237, 0.20)' : 'none',
+            transform: selectedDepartment === 'IT & MIS' ? 'translateY(-2px)' : 'none'
+          }}
+          title="Click to drill down into IT & MIS"
+        >
+          <KPICard 
+            label="IT & MIS" 
+            value={formatINR(displayIT)} 
+            bg="#DDD6FE"
+            borderLeftColor="#7C3AED"
+            badge={selectedDepartment === 'IT & MIS' ? { text: 'Filtered', type: 'badge-purple' } : null}
+          />
+        </div>
+
+        <div 
+          onClick={() => setSelectedDepartment('Admin')}
+          style={{ 
+            cursor: 'pointer',
+            borderRadius: '6px',
+            transition: 'all 0.15s ease',
+            boxShadow: selectedDepartment === 'Admin' ? '0 0 0 2px #16A34A, 0 4px 12px rgba(22, 163, 74, 0.20)' : 'none',
+            transform: selectedDepartment === 'Admin' ? 'translateY(-2px)' : 'none'
+          }}
+          title="Click to drill down into Admin"
+        >
+          <KPICard 
+            label="Admin" 
+            value={formatINR(displayAdmin)} 
+            bg="#BBF7D0"
+            borderLeftColor="#16A34A"
+            badge={selectedDepartment === 'Admin' ? { text: 'Filtered', type: 'badge-success' } : null}
+          />
+        </div>
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
         <div className="civet-card" style={{ border: '1px solid #000000', padding: '16px 20px', backgroundColor: '#E0F2FE' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px', flexWrap: 'wrap', gap: '8px' }}>
             <div>
-              <h2 style={{ fontSize: '15px', fontWeight: '700', color: '#0F2A4A', margin: 0 }}>Monthly Payments</h2>
+              <h2 style={{ fontSize: '15px', fontWeight: '700', color: '#0F2A4A', margin: 0 }}>
+                Project Division Spending Trend
+              </h2>
+              {selectedDepartment && (
+                <span style={{ fontSize: '11px', color: '#0284C7', fontWeight: '600' }}>
+                  Showing: {selectedDepartment}
+                </span>
+              )}
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '11px' }}>
-              <span style={{ color: '#64748B' }}>Total Amount:</span>
-              <strong style={{ color: '#0F2A4A', fontWeight: '700' }}>{formatINR(totalPaymentsAmount)}</strong>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '11px' }}>
+              <span style={{ color: '#64748B' }}>Total Paid:</span>
+              <strong style={{ color: '#0F2A4A', fontWeight: '700' }}>{formatINR(totalFilteredPaid)}</strong>
             </div>
           </div>
 
           {(!spendingTrend || spendingTrend.length === 0) ? (
-            <EmptyState message="No payment transactions recorded for monthly trend." />
+            <EmptyState message="No payment transactions recorded for spending trend." />
           ) : (
             <div style={{
               display: 'grid',
@@ -189,38 +264,38 @@ export default function MainDashboard({ filters, onNavigate }) {
                 borderRadius: '6px',
                 padding: '14px 12px 8px 6px'
               }}>
-                <div style={{ width: '100%', height: '240px' }}>
+                <div style={{ width: '100%', height: '260px' }}>
                   <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={spendingTrend} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+                    <LineChart data={spendingTrend} margin={{ top: 10, right: 14, left: -10, bottom: 0 }}>
                       <defs>
-                        <filter id="mainBar3d" x="-10%" y="-10%" width="130%" height="130%">
-                          <feDropShadow dx="2" dy="3" stdDeviation="2" floodColor="#0F2A4A" floodOpacity="0.20" />
+                        <filter id="mainLine3d" x="-10%" y="-10%" width="130%" height="130%">
+                          <feDropShadow dx="1" dy="2" stdDeviation="1.5" floodColor="#0F2A4A" floodOpacity="0.25" />
                         </filter>
-                        <linearGradient id="mainPaidGrad" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="0%" stopColor="#38BDF8" />
-                          <stop offset="100%" stopColor="#0284C7" />
-                        </linearGradient>
-                        <linearGradient id="mainClosingGrad" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="0%" stopColor="#FB7185" />
-                          <stop offset="100%" stopColor="#BE123C" />
-                        </linearGradient>
                       </defs>
                       <CartesianGrid strokeDasharray="3 3" stroke="#94A3B8" strokeOpacity={0.4} />
-                      <XAxis dataKey="month" interval={0} tickLine={{ stroke: '#000000' }} axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} tick={{ fontSize: 10, fill: '#0F2A4A' }} />
-                      <YAxis tickFormatter={formatAxisINR} tickLine={{ stroke: '#000000' }} axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} tick={{ fontSize: 10, fill: '#0F2A4A' }} />
+                      <XAxis 
+                        dataKey={isTrendMultiYear ? 'periodLabel' : 'month'} 
+                        interval={0} 
+                        tickLine={{ stroke: '#000000' }} 
+                        axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} 
+                        tick={{ fontSize: 10, fill: '#0F2A4A' }} 
+                      />
+                      <YAxis 
+                        tickFormatter={formatAxisINR} 
+                        tickLine={{ stroke: '#000000' }} 
+                        axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} 
+                        tick={{ fontSize: 10, fill: '#0F2A4A' }} 
+                      />
                       <Tooltip 
                         content={({ active, payload, label }) => {
                           if (active && payload && payload.length) {
                             const pData = payload[0]?.payload || {};
-                            const tot = pData.amount || 0;
-                            const bal = pData.balance || 0;
-                            const cost = pData.totalCost || (tot + bal);
                             return (
                               <div style={{
                                 backgroundColor: '#FFFFFF',
-                                border: '1px solid #D9DEE5',
+                                border: '1px solid #000000',
                                 borderRadius: '6px',
-                                boxShadow: '0 4px 14px rgba(15, 42, 74, 0.10)',
+                                boxShadow: '0 4px 14px rgba(15, 42, 74, 0.15)',
                                 padding: '10px 14px',
                                 minWidth: '200px'
                               }}>
@@ -232,49 +307,57 @@ export default function MainDashboard({ filters, onNavigate }) {
                                   borderBottom: '1px solid #F1F5F9',
                                   paddingBottom: '4px'
                                 }}>
-                                  {label} {pData.year || activeYear}
-                                </div>
-                                {(pData.openingBalance > 0 || bal > 0) && (
-                                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '11px', marginBottom: '4px' }}>
-                                    <span style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#7C3AED' }}>
-                                      <span style={{ width: '9px', height: '9px', borderRadius: '2px', backgroundColor: '#7C3AED', border: '1px solid #5B21B6' }}></span>
-                                      Opening Balance
-                                    </span>
-                                    <strong style={{ color: '#7C3AED', fontWeight: '700' }}>{formatINR(pData.openingBalance || 0)}</strong>
-                                  </div>
-                                )}
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '11px', marginBottom: '4px' }}>
-                                  <span style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#059669' }}>
-                                    <span style={{ width: '9px', height: '9px', borderRadius: '2px', backgroundColor: '#059669', border: '1px solid #047857' }}></span>
-                                    Total Cost
-                                  </span>
-                                  <strong style={{ color: '#0F2A4A', fontWeight: '700' }}>{formatINR(cost)}</strong>
+                                  {pData.periodLabel || `${label} ${pData.year || activeYear}`}
                                 </div>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '11px', marginBottom: '4px' }}>
-                                  <span style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#0284C7' }}>
-                                    <span style={{ width: '9px', height: '9px', borderRadius: '2px', backgroundColor: '#0284C7', border: '1px solid #0369A1' }}></span>
-                                    Paid Amount
+                                  <span style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#0F2A4A', fontWeight: '700' }}>
+                                    <span style={{ width: '9px', height: '9px', borderRadius: '2px', backgroundColor: '#0F2A4A', border: '1px solid #000000' }}></span>
+                                    Total Paid
                                   </span>
-                                  <strong style={{ color: '#0F2A4A', fontWeight: '700' }}>{formatINR(tot)}</strong>
+                                  <strong style={{ color: '#0F2A4A', fontWeight: '800' }}>{formatINR(pData.totalPaid ?? pData.amount ?? 0)}</strong>
                                 </div>
-                                {(bal > 0 || pData.openingBalance > 0) && (
-                                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '11px', borderTop: '1px solid #F1F5F9', paddingTop: '4px' }}>
-                                    <span style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#BE123C' }}>
-                                      <span style={{ width: '9px', height: '9px', borderRadius: '2px', backgroundColor: '#BE123C', border: '1px solid #9F1239' }}></span>
-                                      Closing Balance
-                                    </span>
-                                    <strong style={{ color: '#BE123C', fontWeight: '700' }}>{formatINR(bal)}</strong>
-                                  </div>
-                                )}
+                                {topDivisions.map((divName, idx) => {
+                                  const divAmt = Number(pData[divName] || 0);
+                                  if (divAmt <= 0) return null;
+                                  return (
+                                    <div key={divName} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '10.5px', marginTop: '3px' }}>
+                                      <span style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#576574' }}>
+                                        <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: PALETTE[idx % PALETTE.length], border: `1px solid ${PALETTE_STROKES[idx % PALETTE_STROKES.length]}` }}></span>
+                                        {divName}
+                                      </span>
+                                      <strong style={{ color: '#0F2A4A' }}>{formatINR(divAmt)}</strong>
+                                    </div>
+                                  );
+                                })}
                               </div>
                             );
                           }
                           return null;
                         }}
                       />
-                      <Bar dataKey="amount" fill="url(#mainPaidGrad)" stroke="#0369A1" strokeWidth={1} filter="url(#mainBar3d)" stackId="main" radius={[0, 0, 0, 0]} name="Paid Amount (Rs.)" />
-                      <Bar dataKey="balance" fill="url(#mainClosingGrad)" stroke="#9F1239" strokeWidth={1} filter="url(#mainBar3d)" stackId="main" radius={[3, 3, 0, 0]} name="Closing Balance (Rs.)" />
-                    </BarChart>
+                      <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '6px' }} />
+                      <Line 
+                        type="monotone" 
+                        dataKey="totalPaid" 
+                        name="Total Paid" 
+                        stroke="#0F2A4A" 
+                        strokeWidth={3} 
+                        dot={{ r: 3.5, fill: '#0F2A4A' }} 
+                        activeDot={{ r: 5 }} 
+                        filter="url(#mainLine3d)"
+                      />
+                      {topDivisions.map((divName, idx) => (
+                        <Line 
+                          key={divName} 
+                          type="monotone" 
+                          dataKey={divName} 
+                          name={divName} 
+                          stroke={PALETTE[idx % PALETTE.length]} 
+                          strokeWidth={2} 
+                          dot={{ r: 2.5 }} 
+                        />
+                      ))}
+                    </LineChart>
                   </ResponsiveContainer>
                 </div>
               </div>
@@ -308,46 +391,22 @@ export default function MainDashboard({ filters, onNavigate }) {
                   </div>
                 </div>
 
-                <div style={{
-                  backgroundColor: '#FEF3C7',
-                  border: '1px solid #000000',
-                  borderRadius: '4px',
-                  padding: '8px 10px',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '4px'
-                }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2px' }}>
-                    <span style={{ fontSize: '11px', fontWeight: '700', color: '#0F2A4A' }}>Department Allocation</span>
-                  </div>
-
-                  {activeDeptSpending.map((d, idx) => (
-                    <div key={d.name || idx} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10.5px' }}>
-                      <span style={{ color: '#64748B' }}>{d.name || d.id}</span>
-                      <strong style={{ color: '#0F2A4A' }}>{formatINR(d.amount)}</strong>
-                    </div>
-                  ))}
-                  {activeDeptSpending.length === 0 && (
-                    <div style={{ fontSize: '10.5px', color: '#64748B' }}>No departmental spend logged</div>
-                  )}
-                </div>
-
-                <div style={{ fontSize: '10.5px', marginTop: '2px' }}>
+                <div style={{ fontSize: '10.5px', marginTop: '4px' }}>
                   <span style={{ fontWeight: '700', color: '#0F2A4A', display: 'block', marginBottom: '4px' }}>Quarterly Highlights:</span>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', padding: '3px 6px', backgroundColor: '#FAF5FF', border: '1px solid #000000', borderRadius: '3px' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 6px', backgroundColor: '#FAF5FF', border: '1px solid #000000', borderRadius: '3px' }}>
                       <span>Q1 (Jan - Mar)</span>
                       <strong>{formatINR(spendingTrend.slice(0, 3).reduce((acc, m) => acc + (m.amount || 0), 0))}</strong>
                     </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', padding: '3px 6px', backgroundColor: '#FAF5FF', border: '1px solid #000000', borderRadius: '3px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 6px', backgroundColor: '#FAF5FF', border: '1px solid #000000', borderRadius: '3px' }}>
                       <span>Q2 (Apr - Jun)</span>
                       <strong>{formatINR(spendingTrend.slice(3, 6).reduce((acc, m) => acc + (m.amount || 0), 0))}</strong>
                     </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', padding: '3px 6px', backgroundColor: '#FAF5FF', border: '1px solid #000000', borderRadius: '3px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 6px', backgroundColor: '#FAF5FF', border: '1px solid #000000', borderRadius: '3px' }}>
                       <span>Q3 (Jul - Sep)</span>
                       <strong>{formatINR(spendingTrend.slice(6, 9).reduce((acc, m) => acc + (m.amount || 0), 0))}</strong>
                     </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', padding: '3px 6px', backgroundColor: '#FAF5FF', border: '1px solid #000000', borderRadius: '3px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 6px', backgroundColor: '#FAF5FF', border: '1px solid #000000', borderRadius: '3px' }}>
                       <span>Q4 (Oct - Dec)</span>
                       <strong>{formatINR(spendingTrend.slice(9, 12).reduce((acc, m) => acc + (m.amount || 0), 0))}</strong>
                     </div>
@@ -358,194 +417,136 @@ export default function MainDashboard({ filters, onNavigate }) {
           )}
         </div>
 
-        <div className="civet-card" style={{ border: '1px solid #000000', padding: '16px 20px', backgroundColor: '#F3E8FF' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
-            <h2 style={{ fontSize: '15px', fontWeight: '700', color: '#0F2A4A', margin: 0 }}>Department Spending Share</h2>
-            <span style={{ fontSize: '10.5px', color: '#8395A7', fontWeight: '600' }}>Distribution %</span>
-          </div>
-
-          {activeDeptSpending.length === 0 ? (
-            <EmptyState message="No department spending recorded for this period." />
-          ) : (
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'minmax(0, 1.3fr) minmax(280px, 1.2fr)',
-              gap: '20px',
-              alignItems: 'center'
-            }}>
-              <div style={{
-                backgroundColor: '#DDD6FE',
-                border: '1px solid #000000',
-                borderRadius: '6px',
-                padding: '12px 14px',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                position: 'relative'
-              }}>
-                <div style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  marginBottom: '4px',
-                  borderBottom: '1px solid #000000',
-                  paddingBottom: '4px'
-                }}>
-                  <span style={{ fontSize: '11px', fontWeight: '700', color: '#0F2A4A' }}>
-                    Visual Allocation
-                  </span>
-                  <span style={{ fontSize: '10.5px', color: '#576574' }}>
-                    {activeDeptSpending.length} {activeDeptSpending.length === 1 ? 'Department' : 'Departments'}
-                  </span>
-                </div>
-
-                <div style={{ width: '100%', height: '230px', position: 'relative' }}>
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <defs>
-                        <filter id="mainPie3d" x="-20%" y="-20%" width="140%" height="140%">
-                          <feDropShadow dx="2" dy="3" stdDeviation="2.5" floodColor="#0F2A4A" floodOpacity="0.22" />
-                        </filter>
-                      </defs>
-                      <Pie
-                        data={activeDeptSpending}
-                        cx="50%"
-                        cy="50%"
-                        innerRadius={68}
-                        outerRadius={94}
-                        paddingAngle={2}
-                        dataKey="amount"
-                        nameKey="name"
-                        label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                        labelLine={true}
-                        filter="url(#mainPie3d)"
-                      >
-                        {activeDeptSpending.map((entry, index) => (
-                          <Cell 
-                            key={`cell-${index}`} 
-                            fill={PALETTE[index % PALETTE.length]} 
-                            stroke={PALETTE_STROKES[index % PALETTE_STROKES.length]}
-                            strokeWidth={2}
-                          />
-                        ))}
-                      </Pie>
-                      <Tooltip 
-                        formatter={(val, name) => [`Rs. ${Number(val).toLocaleString('en-IN')}`, name]} 
-                        contentStyle={{ fontSize: '11px', borderRadius: '4px' }}
-                      />
-                    </PieChart>
-                  </ResponsiveContainer>
-
-                  <div style={{
-                    position: 'absolute',
-                    top: '50%',
-                    left: '50%',
-                    transform: 'translate(-50%, -50%)',
-                    textAlign: 'center',
-                    pointerEvents: 'none',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    width: '130px',
-                    maxWidth: '130px'
-                  }}>
-                    <span style={{ fontSize: '9px', color: '#64748B', display: 'block', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '2px' }}>
-                      Total Spend
-                    </span>
-                    <strong style={{
-                      fontSize: String(formatINR(totalPaymentsAmount)).length > 17 ? '11px' : (String(formatINR(totalPaymentsAmount)).length > 13 ? '12px' : '13px'),
-                      fontWeight: '800',
-                      color: '#0F2A4A',
-                      display: 'block',
-                      whiteSpace: 'nowrap',
-                      lineHeight: '1.2'
-                    }}>
-                      {formatINR(totalPaymentsAmount)}
-                    </strong>
-                  </div>
-                </div>
-
-                <div style={{
-                  display: 'flex',
-                  flexWrap: 'wrap',
-                  gap: '8px',
-                  justifyContent: 'center',
-                  marginTop: '4px',
-                  paddingTop: '6px',
-                  borderTop: '1px solid #000000'
-                }}>
-                  {activeDeptSpending.map((entry, index) => {
-                    const total = activeDeptSpending.reduce((sum, d) => sum + d.amount, 0);
-                    const pct = total > 0 ? (entry.amount / total) * 100 : 0;
-                    return (
-                      <div key={entry.name || index} style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '10.5px' }}>
-                        <span style={{ width: '9px', height: '9px', borderRadius: '50%', backgroundColor: PALETTE[index % PALETTE.length], border: `1.5px solid ${PALETTE_STROKES[index % PALETTE_STROKES.length]}`, boxShadow: '0 1px 3px rgba(0,0,0,0.18)', display: 'inline-block' }} />
-                        <span style={{ color: '#0F2A4A', fontWeight: '600' }}>{entry.name || entry.id}:</span>
-                        <span style={{ color: '#1F6FEB', fontWeight: '700' }}>
-                          {formatINR(entry.amount)}
-                        </span>
-                        <span style={{ color: '#576574' }}>({pct.toFixed(1)}%)</span>
-                      </div>
-                    );
-                  })}
-                </div>
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))',
+          gap: '16px'
+        }}>
+          <div className="civet-card" style={{ border: '1px solid #000000', padding: '16px 20px', backgroundColor: '#FEF3C7' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+              <div>
+                <h2 className="text-h2" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <ShieldCheck size={16} color="#D97706" />
+                  Compliance Expenses
+                </h2>
+                <span style={{ fontSize: '10.5px', color: '#78350F' }}>Insurance, Maintenance, Tax, Permit</span>
               </div>
-
-              <div style={{
-                backgroundColor: '#FAF5FF',
-                border: '1px solid #000000',
-                borderRadius: '6px',
-                padding: '12px 14px',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '8px'
-              }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #000000', paddingBottom: '6px' }}>
-                  <h3 style={{ fontSize: '12px', fontWeight: '700', color: '#0F2A4A', margin: 0 }}>
-                    Ranked Department Allocation
-                  </h3>
-                  <span style={{ fontSize: '10px', color: '#64748B', fontWeight: '600' }}>
-                    Share & Volume
-                  </span>
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                  {activeDeptSpending.map((entry, index) => {
-                    const total = activeDeptSpending.reduce((sum, d) => sum + d.amount, 0);
-                    const pct = total > 0 ? (entry.amount / total) * 100 : 0;
-                    const pctStr = pct < 0.01 && entry.amount > 0 ? '<0.01%' : `${pct.toFixed(1)}%`;
-                    const formattedAmt = formatINR(entry.amount);
-                    return (
-                      <div key={entry.name || index} style={{
-                        padding: '8px 10px',
-                        backgroundColor: '#F3E8FF',
-                        border: '1px solid #000000',
-                        borderRadius: '4px',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: '6px',
-                        fontSize: '11px'
-                      }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                            <span style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: PALETTE[index % PALETTE.length], border: `1.5px solid ${PALETTE_STROKES[index % PALETTE_STROKES.length]}`, boxShadow: '0 1px 3px rgba(0,0,0,0.18)' }} />
-                            <strong style={{ color: '#0F2A4A' }}>{entry.name || entry.id}</strong>
-                          </div>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <span style={{ color: '#1F6FEB', fontWeight: '700' }}>{formattedAmt}</span>
-                            <span style={{ fontSize: '10.5px', color: '#64748B', fontWeight: '600' }}>{pctStr}</span>
-                          </div>
-                        </div>
-                        <div style={{ width: '100%', height: '6px', backgroundColor: '#E2E8F0', borderRadius: '3px', overflow: 'hidden' }}>
-                          <div style={{ width: `${Math.min(pct, 100)}%`, height: '100%', backgroundColor: PALETTE[index % PALETTE.length], border: `1px solid ${PALETTE_STROKES[index % PALETTE_STROKES.length]}`, borderRadius: '3px', boxShadow: '0 1px 2px rgba(0,0,0,0.15)' }} />
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
+              <div style={{ textAlign: 'right' }}>
+                <span style={{ fontSize: '10px', color: '#78350F', display: 'block' }}>Total Compliance</span>
+                <strong style={{ fontSize: '12.5px', color: '#92400E' }}>{formatINR(totalComplianceAmount)}</strong>
               </div>
             </div>
-          )}
+
+            <div style={{
+              backgroundColor: '#FEF08A',
+              border: '1px solid #000000',
+              borderRadius: '6px',
+              padding: '12px 10px 6px 0',
+              marginBottom: '10px'
+            }}>
+              <div style={{ width: '100%', height: '190px' }}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={complianceExpenses} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+                    <defs>
+                      <filter id="compBar3d" x="-10%" y="-10%" width="130%" height="130%">
+                        <feDropShadow dx="2" dy="3" stdDeviation="2" floodColor="#0F2A4A" floodOpacity="0.20" />
+                      </filter>
+                      <linearGradient id="compAmberGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#FBBF24" />
+                        <stop offset="100%" stopColor="#D97706" />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#CBD5E1" />
+                    <XAxis dataKey="category" tickLine={{ stroke: '#000000' }} axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} tick={{ fontSize: 10, fill: '#0F2A4A' }} />
+                    <YAxis tickFormatter={formatAxisINR} tickLine={{ stroke: '#000000' }} axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} tick={{ fontSize: 9.5, fill: '#0F2A4A' }} />
+                    <Tooltip formatter={(val) => [formatINR(val), 'Disbursement']} />
+                    <Bar dataKey="amount" fill="url(#compAmberGrad)" stroke="#B45309" strokeWidth={1} filter="url(#compBar3d)" radius={[3, 3, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+
+            <div style={{
+              backgroundColor: '#FFFBEB',
+              border: '1px solid #000000',
+              borderRadius: '4px',
+              padding: '8px 12px'
+            }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '8px' }}>
+                {complianceExpenses.map(item => (
+                  <div key={item.category} style={{ fontSize: '10.5px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2px' }}>
+                      <span style={{ color: '#78350F', fontWeight: '600' }}>{item.category}:</span>
+                      <strong style={{ color: '#0F2A4A' }}>{formatINR(item.amount)}</strong>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="civet-card" style={{ border: '1px solid #000000', padding: '16px 20px', backgroundColor: '#DCFCE7' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+              <div>
+                <h2 className="text-h2" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <Users size={16} color="#059669" />
+                  Manpower Cost
+                </h2>
+                <span style={{ fontSize: '10.5px', color: '#065F46' }}>Drivers & Operators</span>
+              </div>
+              <div style={{ textAlign: 'right' }}>
+                <span style={{ fontSize: '10px', color: '#065F46', display: 'block' }}>Total Manpower</span>
+                <strong style={{ fontSize: '12.5px', color: '#065F46' }}>{formatINR(totalManpowerAmount)}</strong>
+              </div>
+            </div>
+
+            <div style={{
+              backgroundColor: '#BBF7D0',
+              border: '1px solid #000000',
+              borderRadius: '6px',
+              padding: '12px 10px 6px 0',
+              marginBottom: '10px'
+            }}>
+              <div style={{ width: '100%', height: '190px' }}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={manpowerCosts} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+                    <defs>
+                      <filter id="manpowerBar3d" x="-10%" y="-10%" width="130%" height="130%">
+                        <feDropShadow dx="2" dy="3" stdDeviation="2" floodColor="#0F2A4A" floodOpacity="0.20" />
+                      </filter>
+                      <linearGradient id="manpowerGreenGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#34D399" />
+                        <stop offset="100%" stopColor="#059669" />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#A7F3D0" />
+                    <XAxis dataKey="category" tickLine={{ stroke: '#000000' }} axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} tick={{ fontSize: 10, fill: '#0F2A4A' }} />
+                    <YAxis tickFormatter={formatAxisINR} tickLine={{ stroke: '#000000' }} axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} tick={{ fontSize: 9.5, fill: '#0F2A4A' }} />
+                    <Tooltip formatter={(val) => [formatINR(val), 'Disbursement']} />
+                    <Bar dataKey="amount" fill="url(#manpowerGreenGrad)" stroke="#047857" strokeWidth={1} filter="url(#manpowerBar3d)" radius={[3, 3, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+
+            <div style={{
+              backgroundColor: '#F0FDF4',
+              border: '1px solid #000000',
+              borderRadius: '4px',
+              padding: '8px 12px'
+            }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '8px' }}>
+                {manpowerCosts.map(item => (
+                  <div key={item.category} style={{ fontSize: '10.5px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2px' }}>
+                      <span style={{ color: '#065F46', fontWeight: '600' }}>{item.category}:</span>
+                      <strong style={{ color: '#0F2A4A' }}>{formatINR(item.amount)}</strong>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
 
         <div style={{
@@ -553,18 +554,18 @@ export default function MainDashboard({ filters, onNavigate }) {
           gridTemplateColumns: 'repeat(auto-fit, minmax(460px, 1fr))',
           gap: '16px'
         }}>
-          <div className="civet-card" style={{ border: '1px solid #000000', padding: '16px 20px', backgroundColor: '#FEF3C7' }}>
+          <div className="civet-card" style={{ border: '1px solid #000000', padding: '16px 20px', backgroundColor: '#F3E8FF' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
               <div>
-                <h2 className="text-h2">Cost Center Payments</h2>
+                <h2 className="text-h2">Project Division Payments</h2>
               </div>
             </div>
             {activeLocSpending.length === 0 ? (
-              <EmptyState message="No cost center spending data recorded for this period." />
+              <EmptyState message="No project division spending data recorded for this period." />
             ) : (
               <div>
                 <div style={{
-                  backgroundColor: '#FEF08A',
+                  backgroundColor: '#DDD6FE',
                   border: '1px solid #000000',
                   borderRadius: '6px',
                   padding: '10px 8px 4px 0',
@@ -577,29 +578,29 @@ export default function MainDashboard({ filters, onNavigate }) {
                           <filter id="mainLocBar3d" x="-10%" y="-10%" width="130%" height="130%">
                             <feDropShadow dx="2" dy="3" stdDeviation="2" floodColor="#0F2A4A" floodOpacity="0.20" />
                           </filter>
-                          <linearGradient id="mainLocBlueGrad" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="0%" stopColor="#38BDF8" />
-                            <stop offset="100%" stopColor="#0284C7" />
+                          <linearGradient id="mainLocPurpleGrad" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stopColor="#A78BFA" />
+                            <stop offset="100%" stopColor="#7C3AED" />
                           </linearGradient>
                         </defs>
                         <CartesianGrid strokeDasharray="3 3" stroke="#CBD5E1" />
                         <XAxis dataKey="location" tickLine={{ stroke: '#000000' }} axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} tick={{ fontSize: 9.5, fill: '#0F2A4A' }} />
                         <YAxis tickFormatter={formatAxisINR} tickLine={{ stroke: '#000000' }} axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} tick={{ fontSize: 9.5, fill: '#0F2A4A' }} />
                         <Tooltip formatter={(val) => [formatINR(val), 'Spending']} />
-                        <Bar dataKey="amount" fill="url(#mainLocBlueGrad)" stroke="#0369A1" strokeWidth={1} filter="url(#mainLocBar3d)" radius={[3, 3, 0, 0]} />
+                        <Bar dataKey="amount" fill="url(#mainLocPurpleGrad)" stroke="#5B21B6" strokeWidth={1} filter="url(#mainLocBar3d)" radius={[3, 3, 0, 0]} />
                       </BarChart>
                     </ResponsiveContainer>
                   </div>
                 </div>
 
                 <div style={{
-                  backgroundColor: '#FFFBEB',
+                  backgroundColor: '#FAF5FF',
                   border: '1px solid #000000',
                   borderRadius: '4px',
                   padding: '10px 12px'
                 }}>
                   <span style={{ fontSize: '10.5px', fontWeight: '700', color: '#0F2A4A', display: 'block', marginBottom: '6px' }}>
-                    Top Cost Centers:
+                    Top Project Divisions:
                   </span>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
                     {activeLocSpending.slice(0, 4).map(loc => {
@@ -611,7 +612,7 @@ export default function MainDashboard({ filters, onNavigate }) {
                             <strong style={{ color: '#0F2A4A' }}>{formatINR(loc.amount)}</strong>
                           </div>
                           <div style={{ width: '100%', height: '5px', backgroundColor: '#E2E8F0', borderRadius: '3px', overflow: 'hidden' }}>
-                            <div style={{ width: `${pct}%`, height: '100%', backgroundColor: '#0284C7', border: '1px solid #0369A1', borderRadius: '3px', boxShadow: '0 1px 2px rgba(0,0,0,0.12)' }} />
+                            <div style={{ width: `${pct}%`, height: '100%', backgroundColor: '#7C3AED', border: '1px solid #5B21B6', borderRadius: '3px', boxShadow: '0 1px 2px rgba(0,0,0,0.12)' }} />
                           </div>
                         </div>
                       );
@@ -622,7 +623,7 @@ export default function MainDashboard({ filters, onNavigate }) {
             )}
           </div>
 
-          <div className="civet-card" style={{ border: '1px solid #000000', padding: '16px 20px', backgroundColor: '#DCFCE7' }}>
+          <div className="civet-card" style={{ border: '1px solid #000000', padding: '16px 20px', backgroundColor: '#BAE6FD' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
               <div>
                 <h2 className="text-h2">Fuel & Operational Breakdown</h2>
@@ -633,7 +634,7 @@ export default function MainDashboard({ filters, onNavigate }) {
             ) : (
               <div>
                 <div style={{
-                  backgroundColor: '#BBF7D0',
+                  backgroundColor: '#E0F2FE',
                   border: '1px solid #000000',
                   borderRadius: '6px',
                   padding: '10px 14px 4px 10px',
@@ -646,23 +647,23 @@ export default function MainDashboard({ filters, onNavigate }) {
                           <filter id="mainSrvBar3d" x="-10%" y="-10%" width="130%" height="130%">
                             <feDropShadow dx="2" dy="3" stdDeviation="2" floodColor="#0F2A4A" floodOpacity="0.20" />
                           </filter>
-                          <linearGradient id="mainSrvGreenGrad" x1="0" y1="0" x2="1" y2="0">
-                            <stop offset="0%" stopColor="#34D399" />
-                            <stop offset="100%" stopColor="#059669" />
+                          <linearGradient id="mainSrvBlueGrad" x1="0" y1="0" x2="1" y2="0">
+                            <stop offset="0%" stopColor="#38BDF8" />
+                            <stop offset="100%" stopColor="#0284C7" />
                           </linearGradient>
                         </defs>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#A7F3D0" />
+                        <CartesianGrid strokeDasharray="3 3" stroke="#BAE6FD" />
                         <XAxis type="number" tickFormatter={formatAxisINR} tickLine={{ stroke: '#000000' }} axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} tick={{ fontSize: 9.5, fill: '#0F2A4A' }} />
                         <YAxis dataKey="service" type="category" tickLine={{ stroke: '#000000' }} axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} tick={{ fontSize: 9.5, fill: '#0F2A4A' }} width={80} />
                         <Tooltip formatter={(val) => [formatINR(val), 'Amount']} />
-                        <Bar dataKey="amount" fill="url(#mainSrvGreenGrad)" stroke="#047857" strokeWidth={1} filter="url(#mainSrvBar3d)" radius={[0, 3, 3, 0]} />
+                        <Bar dataKey="amount" fill="url(#mainSrvBlueGrad)" stroke="#0369A1" strokeWidth={1} filter="url(#mainSrvBar3d)" radius={[0, 3, 3, 0]} />
                       </BarChart>
                     </ResponsiveContainer>
                   </div>
                 </div>
 
                 <div style={{
-                  backgroundColor: '#F0FDF4',
+                  backgroundColor: '#F0F9FF',
                   border: '1px solid #000000',
                   borderRadius: '4px',
                   padding: '10px 12px'
@@ -680,7 +681,7 @@ export default function MainDashboard({ filters, onNavigate }) {
                             <strong style={{ color: '#0F2A4A' }}>{formatINR(srv.amount)}</strong>
                           </div>
                           <div style={{ width: '100%', height: '5px', backgroundColor: '#E2E8F0', borderRadius: '3px', overflow: 'hidden' }}>
-                            <div style={{ width: `${pct}%`, height: '100%', backgroundColor: '#059669', border: '1px solid #047857', borderRadius: '3px', boxShadow: '0 1px 2px rgba(0,0,0,0.12)' }} />
+                            <div style={{ width: `${pct}%`, height: '100%', backgroundColor: '#0284C7', border: '1px solid #0369A1', borderRadius: '3px', boxShadow: '0 1px 2px rgba(0,0,0,0.12)' }} />
                           </div>
                         </div>
                       );
