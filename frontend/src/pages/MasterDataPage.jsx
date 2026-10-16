@@ -29,7 +29,7 @@ import { api } from '../services/api';
 
 const CONFIGURATION_SECTIONS = [
   { id: 'departments', label: 'Departments', icon: Building2 },
-  { id: 'locations', label: 'Cost Centers', icon: MapPin },
+  { id: 'locations', label: 'Project Divisions', icon: MapPin },
   { id: 'fuel-types', label: 'Fuel Types', icon: Fuel },
   { id: 'payment-types', label: 'Payment Types', icon: CreditCard },
   { id: 'equipment-types', label: 'Equipment Types', icon: Wrench },
@@ -332,7 +332,7 @@ export default function MasterDataPage({ currentUser, initialTab, openAdd }) {
           </button>
           <button className="btn btn-primary btn-sm" onClick={handleOpenAdd}>
             <Plus size={13} />
-            Add New {currentTabLabel.slice(0, -1)}
+            Add New {activeTab === 'locations' ? 'Project Division' : currentTabLabel.slice(0, -1)}
           </button>
         </div>
       </div>
@@ -365,14 +365,14 @@ export default function MasterDataPage({ currentUser, initialTab, openAdd }) {
                     <th>Full Name</th>
                     <th>Role</th>
                     <th>Department</th>
-                    <th>Location / Site</th>
+                    <th>Project Division</th>
                     <th>Created Date</th>
                     <th style={{ textAlign: 'center' }}>Actions</th>
                   </>
                 ) : (
                   <>
                     <th>Code / Identifier</th>
-                    <th>Name / Description</th>
+                    <th>{activeTab === 'locations' ? 'Project Division' : 'Name / Description'}</th>
                     <th>Category / Type</th>
                     <th>Created Date</th>
                     <th style={{ textAlign: 'center' }}>Actions</th>
@@ -551,7 +551,7 @@ export default function MasterDataPage({ currentUser, initialTab, openAdd }) {
                 />
               </div>
               <div>
-                <label style={{ display: 'block', fontSize: '11px', fontWeight: '600', marginBottom: '4px' }}>Location / Site Scope</label>
+                <label style={{ display: 'block', fontSize: '11px', fontWeight: '600', marginBottom: '4px' }}>Project Division Scope</label>
                 <SearchableSelect
                   value={formFields.location || formFields.location_id || 'All'}
                   onChange={val => {
@@ -559,7 +559,7 @@ export default function MasterDataPage({ currentUser, initialTab, openAdd }) {
                     setFormFields({ ...formFields, location: v, location_id: v });
                   }}
                   options={['All', ...locOptions]}
-                  placeholder="Select or search location..."
+                  placeholder="Select or search project division..."
                   style={{ width: '100%', height: '30px' }}
                 />
               </div>
@@ -578,7 +578,7 @@ export default function MasterDataPage({ currentUser, initialTab, openAdd }) {
                 />
               </div>
               <div>
-                <label style={{ display: 'block', fontSize: '11px', fontWeight: '600', marginBottom: '4px' }}>Name / Title *</label>
+                <label style={{ display: 'block', fontSize: '11px', fontWeight: '600', marginBottom: '4px' }}>{activeTab === 'locations' ? 'Project Division *' : 'Name / Title *'}</label>
                 <input
                   type="text"
                   required
