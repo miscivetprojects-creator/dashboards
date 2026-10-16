@@ -373,7 +373,7 @@ export default function MasterDataPage({ currentUser, initialTab, openAdd }) {
                   <>
                     <th>Code / Identifier</th>
                     <th>{activeTab === 'locations' ? 'Project Division' : 'Name / Description'}</th>
-                    <th>Category / Type</th>
+                    <th>{activeTab === 'locations' ? 'Project Name' : 'Category / Type'}</th>
                     <th>Created Date</th>
                     <th style={{ textAlign: 'center' }}>Actions</th>
                   </>
@@ -435,7 +435,7 @@ export default function MasterDataPage({ currentUser, initialTab, openAdd }) {
                             {formatItemCode(item, activeTab, globalIndex)}
                           </td>
                           <td>{item.name || item.full_name || item.report_name}</td>
-                          <td style={{ color: '#576574' }}>{item.category || item.unit || item.department_id || '-'}</td>
+                          <td style={{ color: '#576574' }}>{activeTab === 'locations' ? (item.project_name || item.category || '-') : (item.category || item.unit || item.department_id || '-')}</td>
                           <td style={{ textAlign: 'center', color: '#576574' }}>
                             {formatDateDisplay(item.created_at || new Date())}
                           </td>
@@ -588,11 +588,11 @@ export default function MasterDataPage({ currentUser, initialTab, openAdd }) {
                 />
               </div>
               <div>
-                <label style={{ display: 'block', fontSize: '11px', fontWeight: '600', marginBottom: '4px' }}>Category / Notes</label>
+                <label style={{ display: 'block', fontSize: '11px', fontWeight: '600', marginBottom: '4px' }}>{activeTab === 'locations' ? 'Project Name' : 'Category / Notes'}</label>
                 <input
                   type="text"
-                  value={formFields.category || ''}
-                  onChange={e => setFormFields({ ...formFields, category: e.target.value })}
+                  value={formFields.project_name !== undefined ? formFields.project_name : (formFields.category || '')}
+                  onChange={e => setFormFields({ ...formFields, project_name: e.target.value, category: e.target.value })}
                   style={{ width: '100%', height: '30px' }}
                 />
               </div>
