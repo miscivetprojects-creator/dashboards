@@ -184,7 +184,7 @@ export default function MainDashboard({ filters, onNavigate }) {
               alignItems: 'stretch'
             }}>
               <div style={{
-                backgroundColor: '#FFFFFF',
+                backgroundColor: '#BAE6FD',
                 border: '1px solid #000000',
                 borderRadius: '6px',
                 padding: '14px 12px 8px 6px'
@@ -205,7 +205,7 @@ export default function MainDashboard({ filters, onNavigate }) {
                           <stop offset="100%" stopColor="#BE123C" />
                         </linearGradient>
                       </defs>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#EAEFF5" />
+                      <CartesianGrid strokeDasharray="3 3" stroke="#94A3B8" strokeOpacity={0.4} />
                       <XAxis dataKey="month" interval={0} tickLine={{ stroke: '#000000' }} axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} tick={{ fontSize: 10, fill: '#0F2A4A' }} />
                       <YAxis tickFormatter={formatAxisINR} tickLine={{ stroke: '#000000' }} axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} tick={{ fontSize: 10, fill: '#0F2A4A' }} />
                       <Tooltip 
@@ -280,7 +280,7 @@ export default function MainDashboard({ filters, onNavigate }) {
               </div>
 
               <div style={{
-                backgroundColor: '#FFFFFF',
+                backgroundColor: '#F0F9FF',
                 border: '1px solid #000000',
                 borderRadius: '6px',
                 padding: '12px 14px',
@@ -292,14 +292,14 @@ export default function MainDashboard({ filters, onNavigate }) {
                   Payment Summary
                 </h3>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-                  <div style={{ backgroundColor: '#FFFFFF', border: '1px solid #CBD5E1', borderRadius: '4px', padding: '6px 8px' }}>
+                  <div style={{ backgroundColor: '#E0F2FE', border: '1px solid #000000', borderRadius: '4px', padding: '6px 8px' }}>
                     <span style={{ fontSize: '10px', color: '#64748B', display: 'block' }}>Peak Month</span>
                     <strong style={{ fontSize: '12px', color: '#0F2A4A' }}>{peakSpendingMonth?.month || 'Jan'}</strong>
                     <div style={{ fontSize: '10px', color: '#1F6FEB', fontWeight: '600' }}>
                       {formatINR(peakSpendingMonth?.amount || 0)}
                     </div>
                   </div>
-                  <div style={{ backgroundColor: '#FFFFFF', border: '1px solid #CBD5E1', borderRadius: '4px', padding: '6px 8px' }}>
+                  <div style={{ backgroundColor: '#DCFCE7', border: '1px solid #000000', borderRadius: '4px', padding: '6px 8px' }}>
                     <span style={{ fontSize: '10px', color: '#64748B', display: 'block' }}>Monthly Average</span>
                     <strong style={{ fontSize: '12px', color: '#2E9E6B' }}>
                       {formatINR(avgMonthlySpending)}
@@ -309,8 +309,8 @@ export default function MainDashboard({ filters, onNavigate }) {
                 </div>
 
                 <div style={{
-                  backgroundColor: '#FFFFFF',
-                  border: '1px solid #CBD5E1',
+                  backgroundColor: '#FEF3C7',
+                  border: '1px solid #000000',
                   borderRadius: '4px',
                   padding: '8px 10px',
                   display: 'flex',
@@ -335,19 +335,19 @@ export default function MainDashboard({ filters, onNavigate }) {
                 <div style={{ fontSize: '10.5px', marginTop: '2px' }}>
                   <span style={{ fontWeight: '700', color: '#0F2A4A', display: 'block', marginBottom: '4px' }}>Quarterly Highlights:</span>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', padding: '3px 6px', backgroundColor: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '3px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', padding: '3px 6px', backgroundColor: '#FAF5FF', border: '1px solid #000000', borderRadius: '3px' }}>
                       <span>Q1 (Jan - Mar)</span>
                       <strong>{formatINR(spendingTrend.slice(0, 3).reduce((acc, m) => acc + (m.amount || 0), 0))}</strong>
                     </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', padding: '3px 6px', backgroundColor: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '3px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', padding: '3px 6px', backgroundColor: '#FAF5FF', border: '1px solid #000000', borderRadius: '3px' }}>
                       <span>Q2 (Apr - Jun)</span>
                       <strong>{formatINR(spendingTrend.slice(3, 6).reduce((acc, m) => acc + (m.amount || 0), 0))}</strong>
                     </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', padding: '3px 6px', backgroundColor: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '3px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', padding: '3px 6px', backgroundColor: '#FAF5FF', border: '1px solid #000000', borderRadius: '3px' }}>
                       <span>Q3 (Jul - Sep)</span>
                       <strong>{formatINR(spendingTrend.slice(6, 9).reduce((acc, m) => acc + (m.amount || 0), 0))}</strong>
                     </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', padding: '3px 6px', backgroundColor: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '3px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', padding: '3px 6px', backgroundColor: '#FAF5FF', border: '1px solid #000000', borderRadius: '3px' }}>
                       <span>Q4 (Oct - Dec)</span>
                       <strong>{formatINR(spendingTrend.slice(9, 12).reduce((acc, m) => acc + (m.amount || 0), 0))}</strong>
                     </div>
@@ -374,7 +374,7 @@ export default function MainDashboard({ filters, onNavigate }) {
               alignItems: 'center'
             }}>
               <div style={{
-                backgroundColor: '#FFFFFF',
+                backgroundColor: '#DDD6FE',
                 border: '1px solid #000000',
                 borderRadius: '6px',
                 padding: '12px 14px',
@@ -388,7 +388,7 @@ export default function MainDashboard({ filters, onNavigate }) {
                   justifyContent: 'space-between',
                   alignItems: 'center',
                   marginBottom: '4px',
-                  borderBottom: '1px solid #EAEFF5',
+                  borderBottom: '1px solid #000000',
                   paddingBottom: '4px'
                 }}>
                   <span style={{ fontSize: '11px', fontWeight: '700', color: '#0F2A4A' }}>
@@ -460,7 +460,7 @@ export default function MainDashboard({ filters, onNavigate }) {
                   justifyContent: 'center',
                   marginTop: '4px',
                   paddingTop: '6px',
-                  borderTop: '1px solid #EAEFF5'
+                  borderTop: '1px solid #000000'
                 }}>
                   {activeDeptSpending.map((entry, index) => {
                     const total = activeDeptSpending.reduce((sum, d) => sum + d.amount, 0);
@@ -480,7 +480,7 @@ export default function MainDashboard({ filters, onNavigate }) {
               </div>
 
               <div style={{
-                backgroundColor: '#FFFFFF',
+                backgroundColor: '#FAF5FF',
                 border: '1px solid #000000',
                 borderRadius: '6px',
                 padding: '12px 14px',
@@ -505,8 +505,8 @@ export default function MainDashboard({ filters, onNavigate }) {
                     return (
                       <div key={entry.name || index} style={{
                         padding: '8px 10px',
-                        backgroundColor: '#FFFFFF',
-                        border: '1px solid #CBD5E1',
+                        backgroundColor: '#F3E8FF',
+                        border: '1px solid #000000',
                         borderRadius: '4px',
                         display: 'flex',
                         flexDirection: 'column',
@@ -551,7 +551,7 @@ export default function MainDashboard({ filters, onNavigate }) {
             ) : (
               <div>
                 <div style={{
-                  backgroundColor: '#FFFFFF',
+                  backgroundColor: '#FEF08A',
                   border: '1px solid #000000',
                   borderRadius: '6px',
                   padding: '10px 8px 4px 0',
@@ -569,7 +569,7 @@ export default function MainDashboard({ filters, onNavigate }) {
                             <stop offset="100%" stopColor="#0284C7" />
                           </linearGradient>
                         </defs>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#EAEFF5" />
+                        <CartesianGrid strokeDasharray="3 3" stroke="#CBD5E1" />
                         <XAxis dataKey="location" tickLine={{ stroke: '#000000' }} axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} tick={{ fontSize: 9.5, fill: '#0F2A4A' }} />
                         <YAxis tickFormatter={formatAxisINR} tickLine={{ stroke: '#000000' }} axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} tick={{ fontSize: 9.5, fill: '#0F2A4A' }} />
                         <Tooltip formatter={(val) => [formatINR(val), 'Spending']} />
@@ -580,7 +580,7 @@ export default function MainDashboard({ filters, onNavigate }) {
                 </div>
 
                 <div style={{
-                  backgroundColor: '#FFFFFF',
+                  backgroundColor: '#FFFBEB',
                   border: '1px solid #000000',
                   borderRadius: '4px',
                   padding: '10px 12px'
@@ -620,7 +620,7 @@ export default function MainDashboard({ filters, onNavigate }) {
             ) : (
               <div>
                 <div style={{
-                  backgroundColor: '#FFFFFF',
+                  backgroundColor: '#BBF7D0',
                   border: '1px solid #000000',
                   borderRadius: '6px',
                   padding: '10px 14px 4px 10px',
@@ -638,7 +638,7 @@ export default function MainDashboard({ filters, onNavigate }) {
                             <stop offset="100%" stopColor="#059669" />
                           </linearGradient>
                         </defs>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#EAEFF5" />
+                        <CartesianGrid strokeDasharray="3 3" stroke="#A7F3D0" />
                         <XAxis type="number" tickFormatter={formatAxisINR} tickLine={{ stroke: '#000000' }} axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} tick={{ fontSize: 9.5, fill: '#0F2A4A' }} />
                         <YAxis dataKey="service" type="category" tickLine={{ stroke: '#000000' }} axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} tick={{ fontSize: 9.5, fill: '#0F2A4A' }} width={80} />
                         <Tooltip formatter={(val) => [formatINR(val), 'Amount']} />
@@ -649,7 +649,7 @@ export default function MainDashboard({ filters, onNavigate }) {
                 </div>
 
                 <div style={{
-                  backgroundColor: '#FAFCFE',
+                  backgroundColor: '#F0FDF4',
                   border: '1px solid #000000',
                   borderRadius: '4px',
                   padding: '10px 12px'
