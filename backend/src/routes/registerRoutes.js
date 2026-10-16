@@ -394,7 +394,7 @@ router.get('/export/excel', async (req, res) => {
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet('MIS Report');
 
-    worksheet.mergeCells('A1:O1');
+    worksheet.mergeCells('A1:P1');
     const titleCell = worksheet.getCell('A1');
     titleCell.value = 'CIVET PROJECTS PRIVATE LIMITED — MANAGEMENT MIS REPORT';
     titleCell.font = { name: 'Calibri', size: 13, bold: true, color: { argb: 'FFFFFFFF' } };
@@ -402,11 +402,11 @@ router.get('/export/excel', async (req, res) => {
     titleCell.alignment = { vertical: 'middle', horizontal: 'center' };
     worksheet.getRow(1).height = 32;
 
-    for (let col = 1; col <= 15; col++) {
+    for (let col = 1; col <= 16; col++) {
       worksheet.getRow(1).getCell(col).border = blackBorder;
     }
 
-    worksheet.mergeCells('A2:O2');
+    worksheet.mergeCells('A2:P2');
     const headerParaCell = worksheet.getCell('A2');
     headerParaCell.value = `Report Type: ${reportTypeName}   |   Department: ${deptName}   |   Project Division: ${locName}   |   Generated: ${formatDateDDMMYYYY(new Date())}   |   Total Entries: ${records.length}`;
     headerParaCell.font = { name: 'Calibri', size: 10.5, bold: true, color: { argb: 'FF0F2A4A' } };
@@ -414,7 +414,7 @@ router.get('/export/excel', async (req, res) => {
     headerParaCell.alignment = { vertical: 'middle', horizontal: 'center' };
     worksheet.getRow(2).height = 24;
 
-    for (let col = 1; col <= 15; col++) {
+    for (let col = 1; col <= 16; col++) {
       worksheet.getRow(2).getCell(col).border = blackBorder;
     }
 
@@ -422,6 +422,7 @@ router.get('/export/excel', async (req, res) => {
       'Date',
       'Department',
       'Project Division',
+      'Project Name',
       'Ledger / Vendor',
       'Opening Bal (Rs.)',
       'Diesel Qty (Ltrs)',
@@ -476,7 +477,8 @@ router.get('/export/excel', async (req, res) => {
       row.values = [
         formatDateDDMMYYYY(rec.report_date),
         cleanStr(rec.department_name || rec.department_id || 'Plant & Machinery'),
-        cleanStr(rec.location_name || rec.location_id),
+        cleanStr(rec.project_division || rec.location_name || rec.location_id),
+        cleanStr(rec.project_name || rec.site_name || (rec.data && (rec.data.project_name || rec.data.site_name)) || '-'),
         ledger,
         opBal,
         dQty,
@@ -495,9 +497,9 @@ router.get('/export/excel', async (req, res) => {
       row.eachCell((cell, colNumber) => {
         cell.font = { name: 'Calibri', size: 10, color: { argb: 'FF000000' } };
         cell.border = blackBorder;
-        if (colNumber === 1 || colNumber === 15) {
+        if (colNumber === 1 || colNumber === 16) {
           cell.alignment = { vertical: 'middle', horizontal: 'center' };
-        } else if ([5, 6, 7, 8, 9, 10, 11, 12, 13, 14].includes(colNumber)) {
+        } else if ([6, 7, 8, 9, 10, 11, 12, 13, 14, 15].includes(colNumber)) {
           cell.alignment = { vertical: 'middle', horizontal: 'right' };
           cell.numFmt = '#,##0.00';
         } else {
@@ -509,6 +511,7 @@ router.get('/export/excel', async (req, res) => {
     const summaryRow = worksheet.getRow(records.length + 4);
     summaryRow.values = [
       'TOTAL',
+      '',
       '',
       '',
       '',
@@ -531,7 +534,7 @@ router.get('/export/excel', async (req, res) => {
       cell.border = blackBorder;
       if (colNumber === 1) {
         cell.alignment = { vertical: 'middle', horizontal: 'center' };
-      } else if ([5, 6, 8, 9, 11, 12, 13, 14].includes(colNumber)) {
+      } else if ([6, 7, 9, 10, 12, 13, 14, 15].includes(colNumber)) {
         cell.alignment = { vertical: 'middle', horizontal: 'right' };
         cell.numFmt = '#,##0.00';
       }
@@ -540,7 +543,8 @@ router.get('/export/excel', async (req, res) => {
     worksheet.columns = [
       { width: 13 },
       { width: 16 },
-      { width: 20 },
+      { width: 18 },
+      { width: 22 },
       { width: 28 },
       { width: 16 },
       { width: 15 },
@@ -590,6 +594,7 @@ router.get('/export/pdf', async (req, res) => {
     const headers = [
       'Date',
       'Project Division',
+      'Project Name',
       'Ledger / Vendor',
       'Opening Bal',
       'Diesel Qty',
@@ -628,7 +633,8 @@ router.get('/export/pdf', async (req, res) => {
 
       return [
         formatDateDDMMYYYY(rec.report_date),
-        cleanStr(rec.location_name || rec.location_id),
+        cleanStr(rec.project_division || rec.location_name || rec.location_id),
+        cleanStr(rec.project_name || rec.site_name || (rec.data && (rec.data.project_name || rec.data.site_name)) || '-'),
         ledger,
         opBal > 0 ? ('Rs. ' + Math.round(opBal).toLocaleString('en-IN')) : '-',
         dQty > 0 ? Math.round(dQty).toLocaleString('en-IN') : '-',
@@ -644,6 +650,7 @@ router.get('/export/pdf', async (req, res) => {
 
     const summaryRow = [
       'FINAL TOTAL',
+      '-',
       '-',
       '-',
       sumOp > 0 ? ('Rs. ' + Math.round(sumOp).toLocaleString('en-IN')) : '-',
@@ -669,8 +676,8 @@ router.get('/export/pdf', async (req, res) => {
         qtyFormatted: Math.round(sumDQty + sumPQty).toLocaleString('en-IN') + ' Ltrs',
         amountFormatted: 'Rs. ' + sumPaid.toLocaleString('en-IN')
       },
-      colWidths: [8, 11, 14, 8, 7, 8, 6, 7, 9, 9, 8, 5],
-      aligns: ['center', 'left', 'left', 'right', 'right', 'right', 'right', 'right', 'right', 'right', 'right', 'center'],
+      colWidths: [7, 10, 10, 11, 7, 6, 7, 6, 7, 8, 8, 7, 6],
+      aligns: ['center', 'left', 'left', 'left', 'right', 'right', 'right', 'right', 'right', 'right', 'right', 'right', 'center'],
       generatedBy: req.user ? req.user.email : 'MIS Admin',
       orientation: 'landscape'
     });
