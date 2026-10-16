@@ -159,7 +159,7 @@ export default function App() {
         crumbs.push('Departments', deptName);
       }
     } else if (route.view === 'dashboard-location') {
-      crumbs.push('Cost Centers', route.location);
+      crumbs.push('Project Divisions', route.location);
     } else if (route.view === 'workspace') {
       crumbs.push('Data Operations', 'Data Workspace');
     } else if (route.view === 'register') {
@@ -175,7 +175,7 @@ export default function App() {
     try {
       const title = route.view === 'dashboard-main' ? 'CIVET Management MIS Executive Summary' :
                     route.view === 'dashboard-dept' ? `CIVET Management MIS — ${route.deptId?.toUpperCase()} Department Report` :
-                    route.view === 'dashboard-location' ? `CIVET Management MIS — ${route.location} Cost Center Report` :
+                    route.view === 'dashboard-location' ? `CIVET Management MIS — ${route.location} Project Division Report` :
                     'CIVET Management MIS Operational Report';
 
       const blob = await api.exportDashboardPdf({
