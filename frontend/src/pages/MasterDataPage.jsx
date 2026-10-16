@@ -435,7 +435,7 @@ export default function MasterDataPage({ currentUser, initialTab, openAdd }) {
                             {formatItemCode(item, activeTab, globalIndex)}
                           </td>
                           <td>{item.name || item.full_name || item.report_name}</td>
-                          <td style={{ color: '#576574' }}>{activeTab === 'locations' ? (item.project_name || item.category || '-') : (item.category || item.unit || item.department_id || '-')}</td>
+                          <td style={{ color: '#576574' }}>{activeTab === 'locations' ? ((item.project_name && item.project_name !== 'Project Site') ? item.project_name : (item.category && item.category !== 'Project Site' ? item.category : '-')) : (item.category || item.unit || item.department_id || '-')}</td>
                           <td style={{ textAlign: 'center', color: '#576574' }}>
                             {formatDateDisplay(item.created_at || new Date())}
                           </td>
@@ -591,7 +591,7 @@ export default function MasterDataPage({ currentUser, initialTab, openAdd }) {
                 <label style={{ display: 'block', fontSize: '11px', fontWeight: '600', marginBottom: '4px' }}>{activeTab === 'locations' ? 'Project Name' : 'Category / Notes'}</label>
                 <input
                   type="text"
-                  value={formFields.project_name !== undefined ? formFields.project_name : (formFields.category || '')}
+                  value={formFields.project_name !== undefined ? formFields.project_name : (formFields.category && formFields.category !== 'Project Site' ? formFields.category : '')}
                   onChange={e => setFormFields({ ...formFields, project_name: e.target.value, category: e.target.value })}
                   style={{ width: '100%', height: '30px' }}
                 />
