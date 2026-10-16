@@ -293,7 +293,7 @@ export default function CashAndCarryChart({ data = [], analytics = {} }) {
 
           <div style={{ marginTop: '2px' }}>
             <span style={{ fontSize: '10.5px', fontWeight: '700', color: '#0F2A4A', display: 'block', marginBottom: '6px' }}>
-              Top Cost Centers (Cash & Carry Intake):
+              Top Project Divisions (Cash & Carry Intake):
             </span>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
               {topLocations.map(loc => {
