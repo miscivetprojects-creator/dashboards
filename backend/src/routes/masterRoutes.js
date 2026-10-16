@@ -64,7 +64,7 @@ function getCollectionCodePrefix(collectionName) {
 function getCollectionDisplayName(collectionName) {
   const map = {
     departments: 'Departments',
-    project_locations: 'Cost Centers & Project Locations',
+    project_locations: 'Project Divisions',
     equipment_types: 'Equipment Types',
     assets: 'Assets & Machinery',
     material_items: 'Material Items',
