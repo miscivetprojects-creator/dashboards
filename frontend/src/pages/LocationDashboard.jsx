@@ -175,9 +175,9 @@ export default function LocationDashboard({
             }}
           >
             <option value="All">All Project Divisions</option>
-            {locations.map(loc => (
-              <option key={loc.code || loc.name} value={loc.name || loc.code}>
-                {loc.name || loc.code}
+            {Array.from(new Set(locations.map(loc => loc.name || loc.code).filter(Boolean))).map(name => (
+              <option key={name} value={name}>
+                {name}
               </option>
             ))}
           </select>

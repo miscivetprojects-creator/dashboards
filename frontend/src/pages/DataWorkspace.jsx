@@ -774,7 +774,7 @@ export default function DataWorkspace({ currentUser, preselectDept, onNavigate }
                         }
                       }
                     }}
-                    options={locations.map(l => ({ value: l.name || l.code, label: l.name || l.code }))}
+                    options={Array.from(new Set(locations.map(l => l.name || l.code).filter(Boolean))).map(name => ({ value: name, label: name }))}
                     placeholder="Search Project Division..."
                     style={{ width: '100%', height: '32px', borderColor: formErrors.location ? '#C8423A' : '#000000' }}
                   />
@@ -1277,7 +1277,7 @@ export default function DataWorkspace({ currentUser, preselectDept, onNavigate }
                     handleInputChange('project_division', val);
                     handleInputChange('location', val);
                   }}
-                  options={locations.map(l => ({ value: l.name || l.code, label: l.name || l.code }))}
+                  options={Array.from(new Set(locations.map(l => l.name || l.code).filter(Boolean))).map(name => ({ value: name, label: name }))}
                   placeholder="Search Project Division..."
                   style={{ width: '100%', height: '32px', borderColor: formErrors.location ? '#C8423A' : '#000000' }}
                 />

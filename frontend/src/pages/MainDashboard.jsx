@@ -15,9 +15,16 @@ const PALETTE = ['#0284C7', '#059669', '#EA580C', '#7C3AED', '#EAB308', '#BE123C
 const PALETTE_STROKES = ['#0369A1', '#047857', '#C2410C', '#5B21B6', '#A16207', '#9F1239'];
 
 function formatAxisINR(val) {
-  if (val >= 10000000) return `${(val / 10000000).toFixed(1)} Cr`;
-  if (val >= 100000) return `${(val / 100000).toFixed(1)} L`;
-  if (val >= 1000) return `${(val / 1000).toFixed(0)}k`;
+  if (val === 0) return '0';
+  if (val >= 10000000) {
+    const cr = val / 10000000;
+    return Number.isInteger(cr) ? `${cr} Cr` : `${cr.toFixed(1)} Cr`;
+  }
+  if (val >= 100000) {
+    const l = val / 100000;
+    return Number.isInteger(l) ? `${l} L` : `${l.toFixed(1)} L`;
+  }
+  if (val >= 1000) return `${Math.round(val / 1000)}k`;
   return val;
 }
 
@@ -366,6 +373,8 @@ export default function MainDashboard({ filters, onNavigate }) {
                           tick={{ fontSize: 9.5, fill: '#0F2A4A', fontWeight: '600' }} 
                         />
                         <YAxis 
+                          domain={[0, 500000000]}
+                          ticks={[0, 50000000, 100000000, 150000000, 200000000, 250000000, 300000000, 350000000, 400000000, 450000000, 500000000]}
                           tickFormatter={formatAxisINR} 
                           tickLine={{ stroke: '#000000' }} 
                           axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} 

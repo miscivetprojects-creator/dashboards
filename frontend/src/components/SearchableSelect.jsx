@@ -10,7 +10,8 @@ export default function SearchableSelect({
   className = '',
   disabled = false,
   title = '',
-  name = ''
+  name = '',
+  allowCustom = true
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -41,16 +42,26 @@ export default function SearchableSelect({
     return { value: String(opt), label: String(opt) };
   });
 
-  const selectedOption = normalizedOptions.find(o => o.value === stringValue) || null;
+  const uniqueOptions = [];
+  const seenOptionKeys = new Set();
+  for (const opt of normalizedOptions) {
+    const key = (opt.value || opt.label).trim().toLowerCase();
+    if (!seenOptionKeys.has(key)) {
+      seenOptionKeys.add(key);
+      uniqueOptions.push(opt);
+    }
+  }
+
+  const selectedOption = uniqueOptions.find(o => o.value === stringValue) || null;
   const displayLabel = selectedOption ? selectedOption.label : (stringValue ? stringValue : placeholder);
 
-  const filteredOptions = normalizedOptions.filter(opt => {
+  const filteredOptions = uniqueOptions.filter(opt => {
     if (!searchTerm.trim()) return true;
     const term = searchTerm.toLowerCase();
     return opt.label.toLowerCase().includes(term) || opt.value.toLowerCase().includes(term);
   });
 
-  if (searchTerm.trim() && !normalizedOptions.some(o => o.value.toLowerCase() === searchTerm.trim().toLowerCase())) {
+  if (allowCustom && searchTerm.trim() && !uniqueOptions.some(o => o.value.toLowerCase() === searchTerm.trim().toLowerCase())) {
     filteredOptions.push({ value: searchTerm.trim(), label: `Use "${searchTerm.trim()}"` });
   }
 

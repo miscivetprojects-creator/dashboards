@@ -129,9 +129,16 @@ function getDepartmentProfile(deptId, departments = []) {
 }
 
 function formatAxisINR(val) {
-  if (val >= 10000000) return `${(val / 10000000).toFixed(1)} Cr`;
-  if (val >= 100000) return `${(val / 100000).toFixed(1)} L`;
-  if (val >= 1000) return `${(val / 1000).toFixed(0)}k`;
+  if (val === 0) return '0';
+  if (val >= 10000000) {
+    const cr = val / 10000000;
+    return Number.isInteger(cr) ? `${cr} Cr` : `${cr.toFixed(1)} Cr`;
+  }
+  if (val >= 100000) {
+    const l = val / 100000;
+    return Number.isInteger(l) ? `${l} L` : `${l.toFixed(1)} L`;
+  }
+  if (val >= 1000) return `${Math.round(val / 1000)}k`;
   return val;
 }
 

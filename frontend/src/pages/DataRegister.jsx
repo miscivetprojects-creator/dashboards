@@ -222,9 +222,13 @@ export default function DataRegister({ prefilterDept, prefilterLocation, onNavig
             value={departmentFilter}
             onChange={e => setDepartmentFilter(e?.target ? e.target.value : e)}
             style={{ minWidth: '150px' }}
+            allowCustom={false}
             options={[
               { value: 'All', label: 'All Departments' },
-              ...departments.map(d => ({ value: d.code || d.id, label: d.name }))
+              ...Array.from(new Set(departments.map(d => d.name).filter(Boolean))).map(name => {
+                const d = departments.find(item => item.name === name);
+                return { value: d?.code || d?.id || name, label: name };
+              })
             ]}
           />
 
@@ -232,9 +236,10 @@ export default function DataRegister({ prefilterDept, prefilterLocation, onNavig
             value={locationFilter}
             onChange={e => setLocationFilter(e?.target ? e.target.value : e)}
             style={{ minWidth: '150px' }}
+            allowCustom={false}
             options={[
               { value: 'All', label: 'All Project Divisions' },
-              ...locations.map(l => ({ value: l.name || l.code, label: l.name || l.code }))
+              ...Array.from(new Set(locations.map(l => l.name || l.code).filter(Boolean))).map(name => ({ value: name, label: name }))
             ]}
           />
 
@@ -242,6 +247,7 @@ export default function DataRegister({ prefilterDept, prefilterLocation, onNavig
             value={reportTypeFilter}
             onChange={e => setReportTypeFilter(e?.target ? e.target.value : e)}
             style={{ minWidth: '170px' }}
+            allowCustom={false}
             options={[
               { value: 'All', label: 'All Report Types' },
               ...schemas.map(s => ({ value: s.report_type_id || s.reportType, label: s.report_name || s.reportName }))
