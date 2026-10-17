@@ -24,7 +24,7 @@ const REPORT_TYPE_LABELS = {
   PLANNING_PROGRESS: 'Project Progress'
 };
 
-export default function DataRegister({ prefilterDept, prefilterLocation, onNavigate }) {
+export default function DataRegister({ prefilterDept, prefilterLocation, onNavigate, globalFilters }) {
   const [records, setRecords] = useState([]);
   const [pagination, setPagination] = useState({ total: 0, page: 1, limit: 25, totalPages: 1 });
   const [loading, setLoading] = useState(false);
@@ -34,7 +34,7 @@ export default function DataRegister({ prefilterDept, prefilterLocation, onNavig
 
   const [searchQuery, setSearchQuery] = useState('');
   const [departmentFilter, setDepartmentFilter] = useState(prefilterDept || 'All');
-  const [locationFilter, setLocationFilter] = useState(prefilterLocation || 'All');
+  const [locationFilter, setLocationFilter] = useState(prefilterLocation || (globalFilters?.location && globalFilters.location !== 'All' ? globalFilters.location : 'All'));
   const [reportTypeFilter, setReportTypeFilter] = useState('All');
 
   const [selectedRecord, setSelectedRecord] = useState(null);
@@ -54,8 +54,14 @@ export default function DataRegister({ prefilterDept, prefilterLocation, onNavig
   }, []);
 
   useEffect(() => {
+    if (globalFilters?.location && globalFilters.location !== 'All' && globalFilters.location !== locationFilter) {
+      setLocationFilter(globalFilters.location);
+    }
+  }, [globalFilters?.location]);
+
+  useEffect(() => {
     fetchRecords(1);
-  }, [departmentFilter, locationFilter, reportTypeFilter]);
+  }, [departmentFilter, locationFilter, reportTypeFilter, globalFilters?.year, globalFilters?.from_date, globalFilters?.to_date]);
 
   async function loadFilterOptions() {
     try {
@@ -75,14 +81,24 @@ export default function DataRegister({ prefilterDept, prefilterLocation, onNavig
   async function fetchRecords(targetPage = 1) {
     setLoading(true);
     try {
-      const res = await api.getRegisterRecords({
+      const params = {
         page: targetPage,
         limit: 25,
         search: searchQuery,
         department: departmentFilter,
         location: locationFilter,
         reportType: reportTypeFilter
-      });
+      };
+      if (globalFilters?.year && globalFilters.year !== 'All') {
+        params.year = globalFilters.year;
+      }
+      if (globalFilters?.from_date) {
+        params.from_date = globalFilters.from_date;
+      }
+      if (globalFilters?.to_date) {
+        params.to_date = globalFilters.to_date;
+      }
+      const res = await api.getRegisterRecords(params);
       setRecords(res.records || []);
       setPagination(res.pagination || { total: 0, page: 1, limit: 25, totalPages: 1 });
     } catch (err) {
@@ -149,11 +165,15 @@ export default function DataRegister({ prefilterDept, prefilterLocation, onNavig
 
   const handleExportExcel = async () => {
     try {
-      const blob = await api.exportRegisterExcel({
+      const params = {
         department: departmentFilter,
         location: locationFilter,
         reportType: reportTypeFilter
-      });
+      };
+      if (globalFilters?.year && globalFilters.year !== 'All') params.year = globalFilters.year;
+      if (globalFilters?.from_date) params.from_date = globalFilters.from_date;
+      if (globalFilters?.to_date) params.to_date = globalFilters.to_date;
+      const blob = await api.exportRegisterExcel(params);
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
@@ -169,11 +189,15 @@ export default function DataRegister({ prefilterDept, prefilterLocation, onNavig
 
   const handleExportPdf = async () => {
     try {
-      const blob = await api.exportRegisterPdf({
+      const params = {
         department: departmentFilter,
         location: locationFilter,
         reportType: reportTypeFilter
-      });
+      };
+      if (globalFilters?.year && globalFilters.year !== 'All') params.year = globalFilters.year;
+      if (globalFilters?.from_date) params.from_date = globalFilters.from_date;
+      if (globalFilters?.to_date) params.to_date = globalFilters.to_date;
+      const blob = await api.exportRegisterPdf(params);
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
@@ -263,11 +287,17 @@ export default function DataRegister({ prefilterDept, prefilterLocation, onNavig
       <div className="civet-card" style={{ padding: 0, overflow: 'hidden', border: '1px solid #000000' }}>
         <div style={{ padding: '12px 18px', backgroundColor: '#F8FAFC', borderBottom: '1px solid #000000', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '12px' }}>
           <div>
-            <strong style={{ color: '#0F2A4A' }}>Report Type:</strong> <span style={{ color: '#1F6FEB', fontWeight: '700' }}>{REPORT_TYPE_LABELS[reportTypeFilter] || (reportTypeFilter !== 'All' ? reportTypeFilter : 'Fuel Purchase Log')}</span>
+            <strong style={{ color: '#0F2A4A' }}>Report Type:</strong> <span style={{ color: '#1F6FEB', fontWeight: '700' }}>{reportTypeFilter === 'All' ? 'All Report Types' : (REPORT_TYPE_LABELS[reportTypeFilter] || reportTypeFilter)}</span>
             <span style={{ margin: '0 10px', color: '#CBD5E1' }}>|</span>
-            <strong style={{ color: '#0F2A4A' }}>Department:</strong> <span style={{ color: '#334155', fontWeight: '600' }}>{departmentFilter !== 'All' ? departmentFilter : 'Plant & Machinery'}</span>
+            <strong style={{ color: '#0F2A4A' }}>Department:</strong> <span style={{ color: '#334155', fontWeight: '600' }}>{departmentFilter === 'All' ? 'All Departments' : departmentFilter}</span>
             <span style={{ margin: '0 10px', color: '#CBD5E1' }}>|</span>
-            <strong style={{ color: '#0F2A4A' }}>Project Division:</strong> <span style={{ color: '#334155', fontWeight: '600' }}>{locationFilter !== 'All' ? locationFilter : 'All Project Divisions'}</span>
+            <strong style={{ color: '#0F2A4A' }}>Project Division:</strong> <span style={{ color: '#334155', fontWeight: '600' }}>{locationFilter === 'All' ? 'All Project Divisions' : locationFilter}</span>
+            {globalFilters?.year && globalFilters.year !== 'All' && (
+              <>
+                <span style={{ margin: '0 10px', color: '#CBD5E1' }}>|</span>
+                <strong style={{ color: '#0F2A4A' }}>Year:</strong> <span style={{ color: '#334155', fontWeight: '600' }}>{globalFilters.year}</span>
+              </>
+            )}
           </div>
           <div style={{ color: '#0F2A4A', fontWeight: '700' }}>
             {pagination.totalRecords || pagination.total || records.length} Records Found
@@ -305,19 +335,7 @@ export default function DataRegister({ prefilterDept, prefilterLocation, onNavig
                   </td>
                 </tr>
               ) : (
-                records
-                  .filter(rec => {
-                    const pQ = Number(rec.petrol_quantity || (rec.data && rec.data.petrol_quantity) || 0);
-                    const dQ = Number(rec.diesel_quantity || (rec.data && rec.data.diesel_quantity) || 0);
-                    const fuelLitres = Number(rec.fuel_consumed_litres || (rec.data && rec.data.quantity) || 0);
-                    const opBal = Number(rec.opening_balance ?? (rec.data && rec.data.opening_balance) ?? 0);
-                    const cost = Number(rec.total_cost ?? (rec.data && rec.data.total_cost) ?? 0);
-                    const paid = Number(rec.paid_amount ?? (rec.data && rec.data.paid_amount) ?? rec.amount ?? 0);
-                    const clBal = Number(rec.closing_balance ?? rec.balance ?? (rec.data && (rec.data.closing_balance ?? rec.data.balance)) ?? 0);
-                    const wh = Number(rec.working_hours || (rec.data && rec.data.working_hours) || 0);
-                    return (pQ > 0 || dQ > 0 || fuelLitres > 0 || opBal > 0 || cost > 0 || paid > 0 || clBal > 0 || wh > 0);
-                  })
-                  .map((rec, index) => {
+                records.map((rec, index) => {
                   const pQ = Number(rec.petrol_quantity || (rec.data && rec.data.petrol_quantity) || 0);
                   const pR = Number(rec.petrol_rate || (rec.data && rec.data.petrol_rate) || 0);
                   const dQ = Number(rec.diesel_quantity || (rec.data && rec.data.diesel_quantity) || 0);

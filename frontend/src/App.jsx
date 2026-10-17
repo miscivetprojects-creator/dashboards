@@ -340,6 +340,7 @@ export default function App() {
               prefilterDept={route.prefilterDept} 
               prefilterLocation={route.prefilterLocation} 
               onNavigate={handleNavigate} 
+              globalFilters={filters}
             />
           )}
 

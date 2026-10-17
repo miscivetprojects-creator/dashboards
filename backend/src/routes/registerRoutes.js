@@ -26,16 +26,26 @@ function buildRegisterQuery(params = {}, user = {}) {
   if (reportType && reportType !== 'All') {
     const rtUpper = String(reportType).trim().toUpperCase();
     const rtMap = {
-      'FUEL_PURCHASE': ['FUEL_PURCHASE', 'Fuel Management', 'Fuel Purchase'],
-      'FUEL MANAGEMENT': ['FUEL_PURCHASE', 'Fuel Management', 'Fuel Purchase'],
-      'STORES_PURCHASE': ['STORES_PURCHASE', 'Material Purchase', 'Stores Purchase', 'Stores & Materials'],
-      'MATERIAL PURCHASE': ['STORES_PURCHASE', 'Material Purchase', 'Stores Purchase', 'Stores & Materials'],
+      'FUEL_PURCHASE': ['FUEL_PURCHASE', 'Fuel Management', 'Fuel Purchase', 'Fuel Purchase Log', 'FUEL PURCHASE LOG'],
+      'FUEL MANAGEMENT': ['FUEL_PURCHASE', 'Fuel Management', 'Fuel Purchase', 'Fuel Purchase Log', 'FUEL PURCHASE LOG'],
+      'FUEL PURCHASE': ['FUEL_PURCHASE', 'Fuel Management', 'Fuel Purchase', 'Fuel Purchase Log', 'FUEL PURCHASE LOG'],
+      'FUEL PURCHASE LOG': ['FUEL_PURCHASE', 'Fuel Management', 'Fuel Purchase', 'Fuel Purchase Log', 'FUEL PURCHASE LOG'],
+      'STORES_PURCHASE': ['STORES_PURCHASE', 'Material Purchase', 'Stores Purchase', 'Stores & Materials', 'Stores & Materials Purchase Log'],
+      'MATERIAL PURCHASE': ['STORES_PURCHASE', 'Material Purchase', 'Stores Purchase', 'Stores & Materials', 'Stores & Materials Purchase Log'],
+      'STORES PURCHASE': ['STORES_PURCHASE', 'Material Purchase', 'Stores Purchase', 'Stores & Materials', 'Stores & Materials Purchase Log'],
+      'STORES & MATERIALS PURCHASE LOG': ['STORES_PURCHASE', 'Material Purchase', 'Stores Purchase', 'Stores & Materials', 'Stores & Materials Purchase Log'],
       'ACCOUNTS_PAYMENT': ['ACCOUNTS_PAYMENT', 'Ledger Payments', 'Accounts Payment'],
       'LEDGER PAYMENTS': ['ACCOUNTS_PAYMENT', 'Ledger Payments', 'Accounts Payment'],
-      'ADMIN_EXPENSE': ['ADMIN_EXPENSE', 'Admin Expenditure', 'Admin Expense'],
-      'ADMIN EXPENDITURE': ['ADMIN_EXPENSE', 'Admin Expenditure', 'Admin Expense'],
-      'VEHICLE_UTILIZATION': ['VEHICLE_UTILIZATION', 'Vehicle Utilization'],
-      'PLANNING_PROGRESS': ['PLANNING_PROGRESS', 'Monthly Project Progress', 'Project Progress']
+      'ADMIN_EXPENSE': ['ADMIN_EXPENSE', 'Admin Expenditure', 'Admin Expense', 'Administration Expense Log'],
+      'ADMIN EXPENDITURE': ['ADMIN_EXPENSE', 'Admin Expenditure', 'Admin Expense', 'Administration Expense Log'],
+      'ADMIN EXPENSE': ['ADMIN_EXPENSE', 'Admin Expenditure', 'Admin Expense', 'Administration Expense Log'],
+      'ADMINISTRATION EXPENSE LOG': ['ADMIN_EXPENSE', 'Admin Expenditure', 'Admin Expense', 'Administration Expense Log'],
+      'VEHICLE_UTILIZATION': ['VEHICLE_UTILIZATION', 'Vehicle Utilization', 'Vehicle & Machinery Utilization Log'],
+      'VEHICLE UTILIZATION': ['VEHICLE_UTILIZATION', 'Vehicle Utilization', 'Vehicle & Machinery Utilization Log'],
+      'VEHICLE & MACHINERY UTILIZATION LOG': ['VEHICLE_UTILIZATION', 'Vehicle Utilization', 'Vehicle & Machinery Utilization Log'],
+      'PLANNING_PROGRESS': ['PLANNING_PROGRESS', 'Monthly Project Progress', 'Project Progress'],
+      'PROJECT PROGRESS': ['PLANNING_PROGRESS', 'Monthly Project Progress', 'Project Progress'],
+      'MONTHLY PROJECT PROGRESS': ['PLANNING_PROGRESS', 'Monthly Project Progress', 'Project Progress']
     };
     const aliases = rtMap[rtUpper] || [reportType, reportType.toUpperCase()];
     query.$and = query.$and || [];
@@ -79,7 +89,9 @@ function buildRegisterQuery(params = {}, user = {}) {
 
   if (location && location !== 'All') {
     const locClean = String(location).trim();
-    const locRegex = new RegExp(`^${locClean.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i');
+    const escaped = locClean.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const flexiblePattern = escaped.replace(/\\\(|\\\)/g, match => `\\s*\\${match}\\s*`);
+    const locRegex = new RegExp(`^${flexiblePattern}$`, 'i');
     query.$and = query.$and || [];
     query.$and.push({
       $or: [
@@ -89,12 +101,28 @@ function buildRegisterQuery(params = {}, user = {}) {
         { location_name: locRegex },
         { project_division: locClean },
         { project_division: locRegex },
+        { project_name: locClean },
+        { project_name: locRegex },
+        { site_name: locClean },
+        { site_name: locRegex },
         { 'data.location': locClean },
         { 'data.project_division': locClean },
+        { 'data.project_name': locClean },
+        { 'data.site_name': locClean },
         { 'data.location_id': locClean },
         { 'data.location_name': locClean }
       ]
     });
+  }
+
+  const fromDate = params.from_date || params.fromDate || params.from || '';
+  const toDate = params.to_date || params.toDate || params.to || '';
+  if (fromDate && toDate) {
+    query.report_date = { $gte: String(fromDate).substring(0, 10), $lte: String(toDate).substring(0, 10) };
+  } else if (fromDate) {
+    query.report_date = { $gte: String(fromDate).substring(0, 10) };
+  } else if (toDate) {
+    query.report_date = { $lte: String(toDate).substring(0, 10) };
   }
 
   if (year && year !== 'All') {
