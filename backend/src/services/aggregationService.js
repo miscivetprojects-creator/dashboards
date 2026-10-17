@@ -1423,6 +1423,8 @@ class AggregationService {
     const closingBalance = Number((openingBalance + totalFuelCost - totalFuelExp).toFixed(2));
     const vendorSet = new Set(records.map(r => r.vendor_name || r.data?.ledger_type || r.vendor_id).filter(Boolean));
     const distinctVendors = vendorSet.size;
+    const divisionSet = new Set(records.map(r => r.project_division || r.data?.project_division || r.location_name).filter(Boolean));
+    const distinctDivisions = divisionSet.size;
     const fuelTypeSet = new Set();
     records.forEach(r => {
       const ft = String(r.data?.fuel_type || r.fuel_type || (r.category === 'Fuel' ? 'Diesel (HSD)' : '')).trim();
@@ -1749,9 +1751,9 @@ class AggregationService {
         },
         distinctLedgers: {
           value: distinctVendors,
-          formatted: `${formatIndianNumber(distinctVendors, 0)} Project Divisions`,
+          formatted: `${formatIndianNumber(distinctVendors, 0)} Ledgers`,
           label: 'Project Divisions / Ledgers',
-          subtext: null
+          subtext: `${distinctDivisions} Project Divisions`
         }
       },
       charts: {
