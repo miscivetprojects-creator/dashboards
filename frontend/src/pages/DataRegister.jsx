@@ -305,7 +305,19 @@ export default function DataRegister({ prefilterDept, prefilterLocation, onNavig
                   </td>
                 </tr>
               ) : (
-                records.map((rec, index) => {
+                records
+                  .filter(rec => {
+                    const pQ = Number(rec.petrol_quantity || (rec.data && rec.data.petrol_quantity) || 0);
+                    const dQ = Number(rec.diesel_quantity || (rec.data && rec.data.diesel_quantity) || 0);
+                    const fuelLitres = Number(rec.fuel_consumed_litres || (rec.data && rec.data.quantity) || 0);
+                    const opBal = Number(rec.opening_balance ?? (rec.data && rec.data.opening_balance) ?? 0);
+                    const cost = Number(rec.total_cost ?? (rec.data && rec.data.total_cost) ?? 0);
+                    const paid = Number(rec.paid_amount ?? (rec.data && rec.data.paid_amount) ?? rec.amount ?? 0);
+                    const clBal = Number(rec.closing_balance ?? rec.balance ?? (rec.data && (rec.data.closing_balance ?? rec.data.balance)) ?? 0);
+                    const wh = Number(rec.working_hours || (rec.data && rec.data.working_hours) || 0);
+                    return (pQ > 0 || dQ > 0 || fuelLitres > 0 || opBal > 0 || cost > 0 || paid > 0 || clBal > 0 || wh > 0);
+                  })
+                  .map((rec, index) => {
                   const pQ = Number(rec.petrol_quantity || (rec.data && rec.data.petrol_quantity) || 0);
                   const pR = Number(rec.petrol_rate || (rec.data && rec.data.petrol_rate) || 0);
                   const dQ = Number(rec.diesel_quantity || (rec.data && rec.data.diesel_quantity) || 0);

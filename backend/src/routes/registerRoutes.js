@@ -163,6 +163,20 @@ function resolveRecordProjectName(rec, locProjectMap) {
   return '-';
 }
 
+function hasRecordActivity(rec) {
+  const d = rec.data || {};
+  const op = Number(rec.opening_balance ?? d.opening_balance ?? 0);
+  const dQ = Number(rec.diesel_quantity ?? d.diesel_quantity ?? (rec.fuel_type === 'Diesel' ? rec.quantity : 0) ?? 0);
+  const pQ = Number(rec.petrol_quantity ?? d.petrol_quantity ?? (rec.fuel_type === 'Petrol' ? rec.quantity : 0) ?? 0);
+  const fQ = Number(rec.fuel_consumed_litres ?? d.fuel_consumed_litres ?? rec.quantity ?? d.quantity ?? 0);
+  const cost = Number(rec.total_cost ?? d.total_cost ?? 0);
+  const paid = Number(rec.paid_amount ?? d.paid_amount ?? rec.amount ?? d.amount ?? 0);
+  const cl = Number(rec.closing_balance ?? rec.balance ?? d.closing_balance ?? d.balance ?? 0);
+  const wh = Number(rec.working_hours ?? d.working_hours ?? 0);
+  const exp = Number(rec.total_expense ?? d.total_expense ?? 0);
+  return op > 0 || dQ > 0 || pQ > 0 || fQ > 0 || cost > 0 || paid > 0 || cl > 0 || wh > 0 || exp > 0;
+}
+
 router.get('/records', async (req, res) => {
   try {
     const recordsColl = getCollection('monthly_report_records');
@@ -177,7 +191,7 @@ router.get('/records', async (req, res) => {
       .skip(skip)
       .limit(parseInt(limit))
       .toArray();
-    const records = rawRecords.map(r => {
+    const records = rawRecords.filter(hasRecordActivity).map(r => {
       const pName = resolveRecordProjectName(r, locProjectMap);
       const rawV = r.vendor_name || r.data?.vendor_name || r.data?.ledger_type || '';
       const vClean = ['na', 'n/a', '-', 'none', 'null', 'undefined', ''].includes(String(rawV).trim().toLowerCase()) ? '' : String(rawV).trim();
@@ -427,11 +441,12 @@ router.get('/export/excel', async (req, res) => {
     const recordsColl = getCollection('monthly_report_records');
     const query = buildRegisterQuery(req.query, req.user);
 
-    const records = await recordsColl
+    const rawRecords = await recordsColl
       .find(query)
       .sort({ report_date: -1 })
       .limit(3000)
       .toArray();
+    const records = rawRecords.filter(hasRecordActivity);
 
     const locProjectMap = await getMasterProjectNameMap();
 
@@ -631,11 +646,12 @@ router.get('/export/pdf', async (req, res) => {
     const recordsColl = getCollection('monthly_report_records');
     const query = buildRegisterQuery(req.query, req.user);
 
-    const records = await recordsColl
+    const rawRecords = await recordsColl
       .find(query)
       .sort({ report_date: -1 })
       .limit(1000)
       .toArray();
+    const records = rawRecords.filter(hasRecordActivity);
 
     const locProjectMap = await getMasterProjectNameMap();
 

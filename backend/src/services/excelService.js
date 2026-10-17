@@ -454,6 +454,9 @@ const excelService = {
       let opBalVal = Number(recordData.opening_balance || 0);
       let clBalVal = Number(recordData.closing_balance ?? recordData.balance ?? Number((opBalVal + totalCostVal - paidAmount).toFixed(2)));
       let fuelLiters = Number((isBoth && combinedLiters > 0) ? combinedLiters : (recordData.quantity || recordData.fuel_consumed_litres || 0));
+      if (totalCostVal === 0 && paidAmount === 0 && opBalVal === 0 && clBalVal === 0 && fuelLiters === 0 && pQ === 0 && dQ === 0) {
+        return null;
+      }
 
       recordData.location = location_name;
       recordData.location_id = location_id;
@@ -551,12 +554,16 @@ const excelService = {
       };
     });
 
-    await recordsColl.insertMany(recordsToInsert);
+    const filteredRecordsToInsert = recordsToInsert.filter(Boolean);
+    if (filteredRecordsToInsert.length === 0) {
+      throw new Error('No records with data found to import in this batch.');
+    }
+    await recordsColl.insertMany(filteredRecordsToInsert);
     activeImportBatches.delete(batchId);
 
     return {
       success: true,
-      importedCount: recordsToInsert.length,
+      importedCount: filteredRecordsToInsert.length,
       batchId
     };
   },
