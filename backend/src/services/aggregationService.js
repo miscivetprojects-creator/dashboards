@@ -1,6 +1,87 @@
 const { getCollection } = require('../db/mongoClient');
 const { getQuarter, getMonthName } = require('../models/schemas');
 const { formatIndianCurrency, formatIndianNumber } = require('../utils/formatters');
+
+function resolveRecordProjectDivision(r, activeLocations = []) {
+  if (!r) return 'Unknown';
+  const codeKey = String(r.location_code || r.location_id || '').trim().toLowerCase();
+  if (codeKey && activeLocations.length > 0) {
+    const cMatch = activeLocations.find(l => 
+      String(l.code || '').trim().toLowerCase() === codeKey ||
+      String(l.id || '').trim().toLowerCase() === codeKey
+    );
+    if (cMatch && cMatch.name) return cMatch.name;
+  }
+  const rawDiv = String(r.project_division || r.location_name || (r.data && (r.data.project_division || r.data.location_name || r.data.location)) || '').trim();
+  if (rawDiv && activeLocations.length > 0) {
+    const rawLower = rawDiv.toLowerCase();
+    const nMatch = activeLocations.find(l => 
+      String(l.name || '').trim().toLowerCase() === rawLower ||
+      String(l.alias || '').trim().toLowerCase() === rawLower ||
+      (l.project_name && String(l.project_name).trim().toLowerCase() === rawLower)
+    );
+    if (nMatch && nMatch.name) return nMatch.name;
+  }
+  return rawDiv || 'Unknown';
+}
+
+function resolveRecordProjectName(r, activeLocations = []) {
+  if (!r) return '-';
+  const divName = String(r.project_division || r.location_name || r.data?.location || '').trim().toLowerCase();
+  if (divName.includes('chennagiri')) return '-';
+  const codeKey = String(r.location_code || r.location_id || '').trim().toLowerCase();
+  if (codeKey && activeLocations.length > 0) {
+    const cMatch = activeLocations.find(l => 
+      String(l.code || '').trim().toLowerCase() === codeKey ||
+      String(l.id || '').trim().toLowerCase() === codeKey
+    );
+    if (cMatch) {
+      const p = (cMatch.project_name && cMatch.project_name !== 'Project Site' && cMatch.project_name !== '-')
+        ? cMatch.project_name
+        : ((cMatch.category && cMatch.category !== 'Project Site' && cMatch.category !== '-') ? cMatch.category : '-');
+      if (p && p !== '-') return p;
+    }
+  }
+  if (r.project_name && r.project_name !== '-' && r.project_name !== 'Project Site') return r.project_name;
+  if (r.data?.project_name && r.data.project_name !== '-' && r.data.project_name !== 'Project Site') return r.data.project_name;
+  const sName = String(r.site_name || r.data?.site_name || '').trim().toLowerCase();
+  if (sName && activeLocations.length > 0) {
+    const sMatch = activeLocations.find(l =>
+      (l.project_name && String(l.project_name).trim().toLowerCase() === sName) ||
+      (l.category && String(l.category).trim().toLowerCase() === sName)
+    );
+    if (sMatch) {
+      const p = sMatch.project_name || sMatch.category;
+      if (p && p !== '-' && p !== 'Project Site') return p;
+    }
+  }
+  const matched = (divName && activeLocations.length > 0 ? activeLocations.find(l => {
+    const lName = String(l.name || '').trim().toLowerCase();
+    const lAlias = String(l.alias || '').trim().toLowerCase();
+    const normLName = lName.replace(/[^a-z0-9]/g, '');
+    const normDiv = divName.replace(/[^a-z0-9]/g, '');
+    return lName === divName || lAlias === divName || (normDiv && normLName === normDiv);
+  }) : null) || (r.location_code || r.location_id ? activeLocations.find(l => 
+    String(l.code || '').trim().toLowerCase() === String(r.location_code || r.location_id).trim().toLowerCase() ||
+    String(l.id || '').trim().toLowerCase() === String(r.location_code || r.location_id).trim().toLowerCase()
+  ) : null);
+  if (matched) {
+    const p = (matched.project_name && matched.project_name !== 'Project Site' && matched.project_name !== '-')
+      ? matched.project_name
+      : ((matched.category && matched.category !== 'Project Site' && matched.category !== '-') ? matched.category : '-');
+    if (p && p !== '-') return p;
+  }
+  return '-';
+}
+
+function getRecProjectDivision(r, locs = []) {
+  return resolveRecordProjectDivision(r, locs);
+}
+
+function getRecProjectName(r, locs = []) {
+  return resolveRecordProjectName(r, locs);
+}
+
 class AggregationService {
   buildFilter(params = {}) {
     const filter = {
@@ -244,74 +325,8 @@ class AggregationService {
     if (activeLocations.length === 0) {
       activeLocations = await locsColl.find({}).toArray();
     }
-    const getRecProjectDivision = r => {
-      const codeKey = String(r.location_code || r.location_id || '').trim().toLowerCase();
-      if (codeKey) {
-        const cMatch = activeLocations.find(l => 
-          String(l.code || '').trim().toLowerCase() === codeKey ||
-          String(l.id || '').trim().toLowerCase() === codeKey
-        );
-        if (cMatch && cMatch.name) return cMatch.name;
-      }
-      const rawDiv = String(r.project_division || r.location_name || (r.data && (r.data.project_division || r.data.location_name || r.data.location)) || '').trim();
-      if (rawDiv) {
-        const rawLower = rawDiv.toLowerCase();
-        const nMatch = activeLocations.find(l => 
-          String(l.name || '').trim().toLowerCase() === rawLower ||
-          String(l.alias || '').trim().toLowerCase() === rawLower ||
-          (l.project_name && String(l.project_name).trim().toLowerCase() === rawLower)
-        );
-        if (nMatch && nMatch.name) return nMatch.name;
-      }
-      return rawDiv || 'Unknown';
-    };
-    const getRecProjectName = r => {
-      const divName = String(r.project_division || r.location_name || r.data?.location || '').trim().toLowerCase();
-      if (divName.includes('chennagiri')) return '-';
-      const codeKey = String(r.location_code || r.location_id || '').trim().toLowerCase();
-      if (codeKey) {
-        const cMatch = activeLocations.find(l => 
-          String(l.code || '').trim().toLowerCase() === codeKey ||
-          String(l.id || '').trim().toLowerCase() === codeKey
-        );
-        if (cMatch) {
-          const p = (cMatch.project_name && cMatch.project_name !== 'Project Site' && cMatch.project_name !== '-')
-            ? cMatch.project_name
-            : ((cMatch.category && cMatch.category !== 'Project Site' && cMatch.category !== '-') ? cMatch.category : '-');
-          if (p && p !== '-') return p;
-        }
-      }
-      if (r.project_name && r.project_name !== '-' && r.project_name !== 'Project Site') return r.project_name;
-      if (r.data?.project_name && r.data.project_name !== '-' && r.data.project_name !== 'Project Site') return r.data.project_name;
-      const sName = String(r.site_name || r.data?.site_name || '').trim().toLowerCase();
-      if (sName) {
-        const sMatch = activeLocations.find(l =>
-          (l.project_name && String(l.project_name).trim().toLowerCase() === sName) ||
-          (l.category && String(l.category).trim().toLowerCase() === sName)
-        );
-        if (sMatch) {
-          const p = sMatch.project_name || sMatch.category;
-          if (p && p !== '-' && p !== 'Project Site') return p;
-        }
-      }
-      const matched = (divName ? activeLocations.find(l => {
-        const lName = String(l.name || '').trim().toLowerCase();
-        const lAlias = String(l.alias || '').trim().toLowerCase();
-        const normLName = lName.replace(/[^a-z0-9]/g, '');
-        const normDiv = divName.replace(/[^a-z0-9]/g, '');
-        return lName === divName || lAlias === divName || (normDiv && normLName === normDiv);
-      }) : null) || (r.location_code || r.location_id ? activeLocations.find(l => 
-        String(l.code || '').trim().toLowerCase() === String(r.location_code || r.location_id).trim().toLowerCase() ||
-        String(l.id || '').trim().toLowerCase() === String(r.location_code || r.location_id).trim().toLowerCase()
-      ) : null);
-      if (matched) {
-        const p = (matched.project_name && matched.project_name !== 'Project Site' && matched.project_name !== '-')
-          ? matched.project_name
-          : ((matched.category && matched.category !== 'Project Site' && matched.category !== '-') ? matched.category : '-');
-        if (p && p !== '-') return p;
-      }
-      return '-';
-    };
+    const getRecProjectDivision = r => resolveRecordProjectDivision(r, activeLocations);
+    const getRecProjectName = r => resolveRecordProjectName(r, activeLocations);
     const reportingLocSet = new Set();
     records.forEach(r => {
       const lid = r.location_id || (r.data && (r.data.location_id || r.data.location));
@@ -1583,6 +1598,9 @@ class AggregationService {
         uniqueTargetLocations.push(l);
       }
     }
+
+    const getRecProjectDivision = r => resolveRecordProjectDivision(r, activeLocations);
+    const getRecProjectName = r => resolveRecordProjectName(r, activeLocations);
 
     const matchesLoc = (r, loc) => {
       const rDiv = getRecProjectDivision(r);
