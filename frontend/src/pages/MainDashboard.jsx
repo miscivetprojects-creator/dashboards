@@ -158,6 +158,14 @@ export default function MainDashboard({ filters, onNavigate }) {
 
   const maxLocAmt = Math.max(...activeLocSpending.map(l => l.amount || 1), 1);
   const maxSrvAmt = Math.max(...activeServiceSpending.map(s => s.amount || 1), 1);
+  const divisionDomainMax = Math.max(
+    200000000,
+    Math.ceil((maxLocAmt * 1.05) / 50000000) * 50000000
+  );
+  const divisionTicks = [];
+  for (let t = 0; t <= divisionDomainMax; t += 50000000) {
+    divisionTicks.push(t);
+  }
 
   const activeYear = (() => {
     if (filters?.from_date) {
@@ -345,13 +353,14 @@ export default function MainDashboard({ filters, onNavigate }) {
               }}>
                 <div style={{
                   minWidth: trendView === 'divisions'
-                    ? Math.max(1100, activeLocSpending.length * 56) + 'px'
+                    ? Math.max(1200, activeLocSpending.length * 62) + 'px'
                     : (isTrendMultiYear ? Math.max(900, spendingTrend.length * 75) + 'px' : '100%'),
-                  height: '480px'
+                  height: '520px',
+                  minHeight: '520px'
                 }}>
-                  <ResponsiveContainer width="100%" height="100%">
+                  <ResponsiveContainer width="100%" height={520}>
                     {trendView === 'divisions' ? (
-                      <BarChart data={activeLocSpending} margin={{ top: 14, right: 14, left: 10, bottom: 85 }}>
+                      <BarChart data={activeLocSpending} margin={{ top: 20, right: 30, left: 15, bottom: 105 }}>
                         <defs>
                           <filter id="divBar3d" x="-10%" y="-10%" width="130%" height="130%">
                             <feDropShadow dx="2" dy="3" stdDeviation="2" floodColor="#0F2A4A" floodOpacity="0.20" />
@@ -365,31 +374,44 @@ export default function MainDashboard({ filters, onNavigate }) {
                         <XAxis 
                           dataKey="location" 
                           interval={0} 
-                          angle={-45} 
-                          textAnchor="end" 
-                          height={90} 
-                          dx={-4}
-                          dy={4}
+                          height={100} 
+                          tick={({ x, y, payload }) => (
+                            <g transform={`translate(${x},${y})`}>
+                              <text
+                                x={0}
+                                y={0}
+                                dy={12}
+                                dx={-6}
+                                textAnchor="end"
+                                fill="#0F2A4A"
+                                fontSize={10}
+                                fontWeight={600}
+                                transform="rotate(-45)"
+                              >
+                                {payload.value}
+                              </text>
+                            </g>
+                          )}
                           tickLine={{ stroke: '#000000' }} 
                           axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} 
-                          tick={{ fontSize: 9.5, fill: '#0F2A4A', fontWeight: '600' }} 
                         />
                         <YAxis 
-                          domain={[0, 500000000]}
-                          ticks={[0, 50000000, 100000000, 150000000, 200000000, 250000000, 300000000, 350000000, 400000000, 450000000, 500000000]}
+                          domain={[0, divisionDomainMax]}
+                          ticks={divisionTicks}
                           tickFormatter={formatAxisINR} 
+                          width={65}
                           tickLine={{ stroke: '#000000' }} 
                           axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} 
-                          tick={{ fontSize: 10, fill: '#0F2A4A' }} 
+                          tick={{ fontSize: 10, fill: '#0F2A4A', fontWeight: 600 }} 
                         />
                         <Tooltip 
                           formatter={(val) => [formatINR(val), 'Total Paid']}
                           labelFormatter={(label) => `Project Division: ${label}`}
                         />
-                        <Bar dataKey="amount" fill="url(#divBlueGrad)" stroke="#0369A1" strokeWidth={1} filter="url(#divBar3d)" radius={[3, 3, 0, 0]} />
+                        <Bar dataKey="amount" fill="url(#divBlueGrad)" stroke="#0369A1" strokeWidth={1} filter="url(#divBar3d)" radius={[3, 3, 0, 0]} maxBarSize={40} />
                       </BarChart>
                     ) : (
-                      <LineChart data={chartMonthlyData} margin={{ top: 14, right: 20, left: 0, bottom: isTrendMultiYear ? 24 : 10 }}>
+                      <LineChart data={chartMonthlyData} margin={{ top: 20, right: 25, left: 15, bottom: isTrendMultiYear ? 35 : 15 }}>
                         <defs>
                           <filter id="mainLine3d" x="-10%" y="-10%" width="130%" height="130%">
                             <feDropShadow dx="1" dy="2" stdDeviation="1.5" floodColor="#0F2A4A" floodOpacity="0.25" />
@@ -408,9 +430,10 @@ export default function MainDashboard({ filters, onNavigate }) {
                         />
                         <YAxis 
                           tickFormatter={formatAxisINR} 
+                          width={65}
                           tickLine={{ stroke: '#000000' }} 
                           axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} 
-                          tick={{ fontSize: 10, fill: '#0F2A4A' }} 
+                          tick={{ fontSize: 10, fill: '#0F2A4A', fontWeight: 600 }} 
                         />
                         <Tooltip 
                           content={({ active, payload, label }) => {
@@ -556,8 +579,8 @@ export default function MainDashboard({ filters, onNavigate }) {
               padding: '12px 10px 6px 0',
               marginBottom: '10px'
             }}>
-              <div style={{ width: '100%', height: '260px' }}>
-                <ResponsiveContainer width="100%" height="100%">
+              <div style={{ width: '100%', height: '220px' }}>
+                <ResponsiveContainer width="100%" height={220}>
                   <BarChart data={complianceExpenses} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
                     <defs>
                       <filter id="compBar3d" x="-10%" y="-10%" width="130%" height="130%">
@@ -619,8 +642,8 @@ export default function MainDashboard({ filters, onNavigate }) {
               padding: '12px 10px 6px 0',
               marginBottom: '10px'
             }}>
-              <div style={{ width: '100%', height: '260px' }}>
-                <ResponsiveContainer width="100%" height="100%">
+              <div style={{ width: '100%', height: '220px' }}>
+                <ResponsiveContainer width="100%" height={220}>
                   <BarChart data={manpowerCosts} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
                     <defs>
                       <filter id="manpowerBar3d" x="-10%" y="-10%" width="130%" height="130%">
@@ -680,8 +703,8 @@ export default function MainDashboard({ filters, onNavigate }) {
                   padding: '10px 14px 4px 10px',
                   marginBottom: '12px'
                 }}>
-                  <div style={{ width: '100%', height: '260px' }}>
-                    <ResponsiveContainer width="100%" height="100%">
+                  <div style={{ width: '100%', height: '220px' }}>
+                    <ResponsiveContainer width="100%" height={220}>
                       <BarChart data={activeServiceSpending} layout="vertical" margin={{ top: 10, right: 10, left: 30, bottom: 0 }}>
                         <defs>
                           <filter id="mainSrvBar3d" x="-10%" y="-10%" width="130%" height="130%">

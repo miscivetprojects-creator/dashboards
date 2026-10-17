@@ -314,9 +314,9 @@ export default function DeptDashboard({ deptId = 'pm', departments = [], filters
                     padding: '10px 8px 4px 0',
                     marginBottom: '12px'
                   }}>
-                    <div style={{ width: '100%', height: '380px' }}>
+                    <div style={{ width: '100%', height: '220px' }}>
                       <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={primaryData} margin={{ top: 12, right: 12, left: -10, bottom: 10 }}>
+                        <BarChart data={primaryData} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
                           <defs>
                             <filter id="deptBar3d" x="-10%" y="-10%" width="130%" height="130%">
                               <feDropShadow dx="2" dy="3" stdDeviation="2" floodColor="#0F2A4A" floodOpacity="0.20" />
@@ -487,9 +487,9 @@ export default function DeptDashboard({ deptId = 'pm', departments = [], filters
                     padding: '10px 8px 4px 0',
                     marginBottom: '12px'
                   }}>
-                    <div style={{ width: '100%', height: '380px' }}>
+                    <div style={{ width: '100%', height: '220px' }}>
                       <ResponsiveContainer width="100%" height="100%">
-                        <LineChart data={primaryData} margin={{ top: 12, right: 12, left: -10, bottom: 10 }}>
+                        <LineChart data={primaryData} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
                           <defs>
                             <filter id="deptLine3d" x="-10%" y="-10%" width="120%" height="130%">
                               <feDropShadow dx="1" dy="3" stdDeviation="2" floodColor="#047857" floodOpacity="0.30" />
@@ -569,7 +569,7 @@ export default function DeptDashboard({ deptId = 'pm', departments = [], filters
                     padding: '10px 12px 4px 8px',
                     marginBottom: '12px'
                   }}>
-                    <div style={{ width: '100%', height: '280px' }}>
+                    <div style={{ width: '100%', height: '200px' }}>
                       <ResponsiveContainer width="100%" height="100%">
                         <BarChart data={secondaryData} layout="vertical" margin={{ top: 10, right: 10, left: 30, bottom: 0 }}>
                           <defs>
@@ -651,7 +651,7 @@ export default function DeptDashboard({ deptId = 'pm', departments = [], filters
                     marginBottom: '16px',
                     overflowX: 'auto'
                   }}>
-                    <div style={{ width: '100%', minWidth: '780px', height: `${Math.max(720, locationSpendingData.length * 44)}px` }}>
+                    <div style={{ width: '100%', minWidth: '780px', height: `${Math.max(640, locationSpendingData.length * 40)}px` }}>
                       <ResponsiveContainer width="100%" height="100%">
                         <BarChart data={locationSpendingData} layout="vertical" barCategoryGap="20%" barGap={2} margin={{ top: 10, right: 30, left: 10, bottom: 15 }}>
                           <defs>
@@ -853,9 +853,9 @@ export default function DeptDashboard({ deptId = 'pm', departments = [], filters
                     padding: '10px 8px 4px 0',
                     marginBottom: '12px'
                   }}>
-                    <div style={{ width: '100%', height: '380px' }}>
+                    <div style={{ width: '100%', height: '220px' }}>
                       <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={primaryData} margin={{ top: 12, right: 12, left: -10, bottom: 10 }}>
+                        <BarChart data={primaryData} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
                           <defs>
                             <filter id="deptOtherBar3d" x="-10%" y="-10%" width="130%" height="130%">
                               <feDropShadow dx="2" dy="3" stdDeviation="2" floodColor="#0F2A4A" floodOpacity="0.20" />
@@ -954,7 +954,7 @@ export default function DeptDashboard({ deptId = 'pm', departments = [], filters
                     padding: '10px 12px 4px 8px',
                     marginBottom: '12px'
                   }}>
-                    <div style={{ width: '100%', height: '280px' }}>
+                    <div style={{ width: '100%', height: '200px' }}>
                       <ResponsiveContainer width="100%" height="100%">
                         <BarChart data={secondaryData} layout="vertical" margin={{ top: 10, right: 10, left: 30, bottom: 0 }}>
                           <defs>
