@@ -128,39 +128,63 @@ function buildRegisterQuery(params = {}, user = {}) {
   return query;
 }
 
-async function getMasterProjectNameMap() {
+async function getMasterLocationMaps() {
   const locsColl = getCollection('project_locations');
   const masterLocs = await locsColl.find({}).toArray();
-  const locProjectMap = new Map();
+  const codeToProjectMap = new Map();
+  const codeToDivisionMap = new Map();
+  const nameToProjectMap = new Map();
+
   for (const ml of masterLocs) {
     const pName = (ml.project_name && ml.project_name !== 'Project Site' && ml.project_name !== '-')
       ? ml.project_name
       : ((ml.category && ml.category !== 'Project Site' && ml.category !== '-') ? ml.category : '-');
-    if (ml.code) locProjectMap.set(String(ml.code).trim().toLowerCase(), pName);
-    if (ml.name) locProjectMap.set(String(ml.name).trim().toLowerCase(), pName);
-    if (ml.alias) locProjectMap.set(String(ml.alias).trim().toLowerCase(), pName);
-    if (ml.id) locProjectMap.set(String(ml.id).trim().toLowerCase(), pName);
+    const divName = ml.name || '';
+    if (ml.code) {
+      const c = String(ml.code).trim().toLowerCase();
+      codeToProjectMap.set(c, pName);
+      if (divName) codeToDivisionMap.set(c, divName);
+    }
+    if (ml.id) {
+      const i = String(ml.id).trim().toLowerCase();
+      codeToProjectMap.set(i, pName);
+      if (divName) codeToDivisionMap.set(i, divName);
+    }
+    if (ml.name && !nameToProjectMap.has(String(ml.name).trim().toLowerCase())) {
+      nameToProjectMap.set(String(ml.name).trim().toLowerCase(), pName);
+    }
+    if (ml.alias && !nameToProjectMap.has(String(ml.alias).trim().toLowerCase())) {
+      nameToProjectMap.set(String(ml.alias).trim().toLowerCase(), pName);
+    }
+    if (pName && pName !== '-' && !nameToProjectMap.has(pName.trim().toLowerCase())) {
+      nameToProjectMap.set(pName.trim().toLowerCase(), pName);
+    }
   }
-  return locProjectMap;
+  return { codeToProjectMap, codeToDivisionMap, nameToProjectMap };
 }
 
-function resolveRecordProjectName(rec, locProjectMap) {
+function resolveRecordProjectName(rec, maps) {
   const divKey = String(rec.project_division || rec.location_name || rec.data?.location || '').trim().toLowerCase();
   if (divKey.includes('chennagiri')) return '-';
+  const codeKey = String(rec.location_code || rec.location_id || '').trim().toLowerCase();
+  if (codeKey && maps.codeToProjectMap.has(codeKey)) {
+    const p = maps.codeToProjectMap.get(codeKey);
+    if (p && p !== '-') return p;
+  }
   if (rec.project_name && rec.project_name !== '-' && rec.project_name !== 'Project Site') return rec.project_name;
   if (rec.data?.project_name && rec.data.project_name !== '-' && rec.data.project_name !== 'Project Site') return rec.data.project_name;
   const siteKey = String(rec.site_name || rec.data?.site_name || '').trim().toLowerCase();
-  if (siteKey && locProjectMap.has(siteKey)) return locProjectMap.get(siteKey);
-  if (divKey && locProjectMap.has(divKey)) return locProjectMap.get(divKey);
-  const cleanDivKey = divKey.replace(/[^a-z0-9]/g, '');
-  if (cleanDivKey) {
-    for (const [k, v] of locProjectMap.entries()) {
-      if (k.replace(/[^a-z0-9]/g, '') === cleanDivKey) return v;
-    }
-  }
-  const codeKey = String(rec.location_code || rec.location_id || '').trim().toLowerCase();
-  if (codeKey && locProjectMap.has(codeKey)) return locProjectMap.get(codeKey);
+  if (siteKey && maps.nameToProjectMap.has(siteKey)) return maps.nameToProjectMap.get(siteKey);
+  if (divKey && maps.nameToProjectMap.has(divKey)) return maps.nameToProjectMap.get(divKey);
   return '-';
+}
+
+function resolveRecordDivision(rec, maps) {
+  const codeKey = String(rec.location_code || rec.location_id || '').trim().toLowerCase();
+  if (codeKey && maps.codeToDivisionMap.has(codeKey)) {
+    return maps.codeToDivisionMap.get(codeKey);
+  }
+  return rec.project_division || rec.location_name || rec.data?.location || '-';
 }
 
 function hasRecordActivity(rec) {
@@ -184,7 +208,7 @@ router.get('/records', async (req, res) => {
     const query = buildRegisterQuery(req.query, req.user);
     const skip = (parseInt(page) - 1) * parseInt(limit);
     const totalCount = await recordsColl.countDocuments(query);
-    const locProjectMap = await getMasterProjectNameMap();
+    const maps = await getMasterLocationMaps();
     const rawRecords = await recordsColl
       .find(query)
       .sort({ report_date: -1, created_at: -1 })
@@ -192,13 +216,15 @@ router.get('/records', async (req, res) => {
       .limit(parseInt(limit))
       .toArray();
     const records = rawRecords.filter(hasRecordActivity).map(r => {
-      const pName = resolveRecordProjectName(r, locProjectMap);
+      const pName = resolveRecordProjectName(r, maps);
+      const divName = resolveRecordDivision(r, maps);
       const rawV = r.vendor_name || r.data?.vendor_name || r.data?.ledger_type || '';
       const vClean = ['na', 'n/a', '-', 'none', 'null', 'undefined', ''].includes(String(rawV).trim().toLowerCase()) ? '' : String(rawV).trim();
-      const divLower = String(r.project_division || r.location_name || '').toLowerCase();
+      const divLower = String(divName || r.project_division || r.location_name || '').toLowerCase();
       const finalVendor = vClean || (divLower.includes('chennagiri') ? 'Chennagiri Fuel Bunk' : (r.vendor_name || '-'));
       return {
         ...r,
+        project_division: divName,
         project_name: pName,
         vendor_name: finalVendor
       };
@@ -448,7 +474,7 @@ router.get('/export/excel', async (req, res) => {
       .toArray();
     const records = rawRecords.filter(hasRecordActivity);
 
-    const locProjectMap = await getMasterProjectNameMap();
+    const maps = await getMasterLocationMaps();
 
     const reportTypeRaw = String(req.query.reportType || req.query.report_type || records[0]?.report_type_id || 'FUEL_PURCHASE').trim();
     const reportTypeLabels = {
@@ -550,8 +576,8 @@ router.get('/export/excel', async (req, res) => {
       row.values = [
         formatDateDDMMYYYY(rec.report_date),
         cleanStr(rec.department_name || rec.department_id || 'Plant & Machinery'),
-        cleanStr(rec.project_division || rec.location_name || rec.location_id),
-        cleanStr(resolveRecordProjectName(rec, locProjectMap)),
+        cleanStr(resolveRecordDivision(rec, maps)),
+        cleanStr(resolveRecordProjectName(rec, maps)),
         ledger,
         opBal,
         dQty,
@@ -653,19 +679,9 @@ router.get('/export/pdf', async (req, res) => {
       .toArray();
     const records = rawRecords.filter(hasRecordActivity);
 
-    const locProjectMap = await getMasterProjectNameMap();
-
-    const reportTypeRaw = String(req.query.reportType || req.query.report_type || records[0]?.report_type_id || 'FUEL_PURCHASE').trim();
-    const reportTypeLabels = {
-      'FUEL_PURCHASE': 'Fuel Purchase Log',
-      'VEHICLE_UTILIZATION': 'Vehicle & Machinery Utilization Log',
-      'STORES_PURCHASE': 'Stores & Materials Purchase Log',
-      'ADMIN_EXPENSE': 'Administration Expense Log',
-      'ACCOUNTS_PAYMENT': 'Accounts & Financial Disbursements'
-    };
-    const reportTypeName = reportTypeLabels[reportTypeRaw] || reportTypeRaw;
-    const deptName = req.query.department && req.query.department !== 'All' ? req.query.department : 'Plant & Machinery';
     const locName = req.query.location && req.query.location !== 'All' ? req.query.location : 'All Project Divisions';
+
+    const maps = await getMasterLocationMaps();
 
     const headers = [
       'Date',
@@ -686,6 +702,7 @@ router.get('/export/pdf', async (req, res) => {
     let sumOp = 0, sumDQty = 0, sumDAmt = 0, sumPQty = 0, sumPAmt = 0, sumTotalCost = 0, sumPaid = 0, sumClosing = 0;
 
     const rows = records.map(rec => {
+      const data = rec.data || {};
       const rawLedger = cleanStr(data.ledger_type || data.vendor_name || data.vendor || rec.ledger_type || rec.vendor_name || '');
       const vClean = ['na', 'n/a', '-', 'none', 'null', 'undefined', ''].includes(rawLedger.toLowerCase()) ? '' : rawLedger;
       const ledger = vClean || (String(rec.project_division || rec.location_name || '').toLowerCase().includes('chennagiri') ? 'Chennagiri Fuel Bunk' : '-');
@@ -710,8 +727,8 @@ router.get('/export/pdf', async (req, res) => {
 
       return [
         formatDateDDMMYYYY(rec.report_date),
-        cleanStr(rec.project_division || rec.location_name || rec.location_id),
-        cleanStr(resolveRecordProjectName(rec, locProjectMap)),
+        cleanStr(resolveRecordDivision(rec, maps)),
+        cleanStr(resolveRecordProjectName(rec, maps)),
         ledger,
         opBal > 0 ? ('Rs. ' + Math.round(opBal).toLocaleString('en-IN')) : '-',
         dQty > 0 ? Math.round(dQty).toLocaleString('en-IN') : '-',

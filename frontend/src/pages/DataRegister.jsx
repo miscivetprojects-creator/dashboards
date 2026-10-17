@@ -352,16 +352,17 @@ export default function DataRegister({ prefilterDept, prefilterLocation, onNavig
                   )) || '';
                   const divName = String(rec.project_division || rec.location_name || rec.data?.location || '').trim().toLowerCase();
                   const locCode = String(rec.location_code || rec.location_id || '').trim().toLowerCase();
-                  const matchedLoc = (divName ? locations.find(l => {
+                  const matchedLoc = (locCode ? locations.find(l => 
+                    String(l.code || '').trim().toLowerCase() === locCode ||
+                    String(l.id || '').trim().toLowerCase() === locCode
+                  ) : null) || (divName ? locations.find(l => {
                     const lName = String(l.name || '').trim().toLowerCase();
                     const lAlias = String(l.alias || '').trim().toLowerCase();
                     const normLName = lName.replace(/[^a-z0-9]/g, '');
                     const normDiv = divName.replace(/[^a-z0-9]/g, '');
                     return lName === divName || lAlias === divName || (normDiv && normLName === normDiv);
-                  }) : null) || (locCode ? locations.find(l => 
-                    String(l.code || '').trim().toLowerCase() === locCode ||
-                    String(l.id || '').trim().toLowerCase() === locCode
-                  ) : null);
+                  }) : null);
+                  const divisionDisplay = matchedLoc ? matchedLoc.name : (rec.project_division || rec.location_name || rec.location_id);
                   const vendor = rawVendor || (divName.includes('chennagiri') ? 'Chennagiri Fuel Bunk' : '-');
                   const pFromMaster = matchedLoc 
                     ? ((matchedLoc.project_name && matchedLoc.project_name !== 'Project Site' && matchedLoc.project_name !== '-') ? matchedLoc.project_name : ((matchedLoc.category && matchedLoc.category !== 'Project Site' && matchedLoc.category !== '-') ? matchedLoc.category : '-'))
@@ -383,7 +384,7 @@ export default function DataRegister({ prefilterDept, prefilterLocation, onNavig
                     <tr key={rec._id} style={{ borderBottom: '1px solid #000000' }}>
                       <td style={{ fontWeight: '600', whiteSpace: 'nowrap', backgroundColor: isEven ? '#FFFFFF' : '#F8FAFC', border: '1px solid #000000' }}>{formatDateDisplay(rec.report_date)}</td>
                       <td style={{ fontWeight: '600', color: '#0F2A4A', backgroundColor: isEven ? '#FFFFFF' : '#F8FAFC', border: '1px solid #000000' }}>{rec.department_name || rec.department_id || 'Plant & Machinery'}</td>
-                      <td style={{ fontWeight: '600', backgroundColor: isEven ? '#FFFFFF' : '#EFF6FF', border: '1px solid #000000' }}>{rec.project_division || rec.location_name || rec.location_id}</td>
+                      <td style={{ fontWeight: '600', backgroundColor: isEven ? '#FFFFFF' : '#EFF6FF', border: '1px solid #000000' }}>{divisionDisplay}</td>
                       <td style={{ color: '#0F2A4A', backgroundColor: isEven ? '#FFFFFF' : '#F8FAFC', border: '1px solid #000000' }}>{projectDisplay}</td>
                       <td style={{ color: '#0F2A4A', backgroundColor: isEven ? '#FFFFFF' : '#F8FAFC', border: '1px solid #000000' }}>{vendor}</td>
                       <td style={{ textAlign: 'right', fontVariantNumeric: 'tabular-nums', fontWeight: '600', color: '#92400E', backgroundColor: isEven ? '#FEF9C3' : '#FEF08A', border: '1px solid #000000' }}>
@@ -576,7 +577,21 @@ export default function DataRegister({ prefilterDept, prefilterLocation, onNavig
               </div>
               <div>
                 <span style={{ color: '#8395A7', display: 'block' }}>Project Division</span>
-                <strong>{selectedRecord.project_division || selectedRecord.location_name || selectedRecord.location_id}</strong>
+                <strong>{(() => {
+                  const sLocCode = String(selectedRecord.location_code || selectedRecord.location_id || '').trim().toLowerCase();
+                  const sDivName = String(selectedRecord.project_division || selectedRecord.location_name || selectedRecord.data?.location || '').trim().toLowerCase();
+                  const sMatch = (sLocCode ? locations.find(l => 
+                    String(l.code || '').trim().toLowerCase() === sLocCode ||
+                    String(l.id || '').trim().toLowerCase() === sLocCode
+                  ) : null) || (sDivName ? locations.find(l => {
+                    const lName = String(l.name || '').trim().toLowerCase();
+                    const lAlias = String(l.alias || '').trim().toLowerCase();
+                    const normLName = lName.replace(/[^a-z0-9]/g, '');
+                    const normDiv = sDivName.replace(/[^a-z0-9]/g, '');
+                    return lName === sDivName || lAlias === sDivName || (normDiv && normLName === normDiv);
+                  }) : null);
+                  return sMatch ? sMatch.name : (selectedRecord.project_division || selectedRecord.location_name || selectedRecord.location_id);
+                })()}</strong>
               </div>
               <div>
                 <span style={{ color: '#8395A7', display: 'block' }}>Project Name</span>
@@ -584,16 +599,16 @@ export default function DataRegister({ prefilterDept, prefilterLocation, onNavig
                   const sDivName = String(selectedRecord.project_division || selectedRecord.location_name || selectedRecord.data?.location || '').trim().toLowerCase();
                   if (sDivName.includes('chennagiri')) return '-';
                   const sLocCode = String(selectedRecord.location_code || selectedRecord.location_id || '').trim().toLowerCase();
-                  const sMatch = (sDivName ? locations.find(l => {
+                  const sMatch = (sLocCode ? locations.find(l => 
+                    String(l.code || '').trim().toLowerCase() === sLocCode ||
+                    String(l.id || '').trim().toLowerCase() === sLocCode
+                  ) : null) || (sDivName ? locations.find(l => {
                     const lName = String(l.name || '').trim().toLowerCase();
                     const lAlias = String(l.alias || '').trim().toLowerCase();
                     const normLName = lName.replace(/[^a-z0-9]/g, '');
                     const normDiv = sDivName.replace(/[^a-z0-9]/g, '');
                     return lName === sDivName || lAlias === sDivName || (normDiv && normLName === normDiv);
-                  }) : null) || (sLocCode ? locations.find(l => 
-                    String(l.code || '').trim().toLowerCase() === sLocCode ||
-                    String(l.id || '').trim().toLowerCase() === sLocCode
-                  ) : null);
+                  }) : null);
                   const sPFromMaster = sMatch 
                     ? ((sMatch.project_name && sMatch.project_name !== 'Project Site' && sMatch.project_name !== '-') ? sMatch.project_name : ((sMatch.category && sMatch.category !== 'Project Site' && sMatch.category !== '-') ? sMatch.category : '-'))
                     : '-';

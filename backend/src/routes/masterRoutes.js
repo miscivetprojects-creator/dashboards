@@ -643,6 +643,32 @@ function createMasterCrudRoutes(collectionName) {
       }
       delete updateData._id;
       await coll.updateOne({ _id: current._id }, { $set: updateData });
+      if (collectionName === 'project_locations') {
+        const locCode = current.code || current.id;
+        const newDivName = updateData.name || current.name;
+        const pVal = updateData.project_name !== undefined ? updateData.project_name : updateData.category;
+        const newProjName = (pVal && pVal !== '-' && pVal !== 'Project Site') ? pVal : '-';
+        const recordsColl = getCollection('monthly_report_records');
+        await recordsColl.updateMany(
+          {
+            $or: [
+              { location_code: locCode },
+              { location_id: locCode }
+            ]
+          },
+          {
+            $set: {
+              project_division: newDivName,
+              location_name: newDivName,
+              project_name: newProjName,
+              'data.project_division': newDivName,
+              'data.location_name': newDivName,
+              'data.location': newDivName,
+              'data.project_name': newProjName
+            }
+          }
+        );
+      }
       res.json({ success: true });
     } catch (err) {
       res.status(400).json({ error: err.message });

@@ -244,9 +244,43 @@ class AggregationService {
     if (activeLocations.length === 0) {
       activeLocations = await locsColl.find({}).toArray();
     }
+    const getRecProjectDivision = r => {
+      const codeKey = String(r.location_code || r.location_id || '').trim().toLowerCase();
+      if (codeKey) {
+        const cMatch = activeLocations.find(l => 
+          String(l.code || '').trim().toLowerCase() === codeKey ||
+          String(l.id || '').trim().toLowerCase() === codeKey
+        );
+        if (cMatch && cMatch.name) return cMatch.name;
+      }
+      const rawDiv = String(r.project_division || r.location_name || (r.data && (r.data.project_division || r.data.location_name || r.data.location)) || '').trim();
+      if (rawDiv) {
+        const rawLower = rawDiv.toLowerCase();
+        const nMatch = activeLocations.find(l => 
+          String(l.name || '').trim().toLowerCase() === rawLower ||
+          String(l.alias || '').trim().toLowerCase() === rawLower ||
+          (l.project_name && String(l.project_name).trim().toLowerCase() === rawLower)
+        );
+        if (nMatch && nMatch.name) return nMatch.name;
+      }
+      return rawDiv || 'Unknown';
+    };
     const getRecProjectName = r => {
       const divName = String(r.project_division || r.location_name || r.data?.location || '').trim().toLowerCase();
       if (divName.includes('chennagiri')) return '-';
+      const codeKey = String(r.location_code || r.location_id || '').trim().toLowerCase();
+      if (codeKey) {
+        const cMatch = activeLocations.find(l => 
+          String(l.code || '').trim().toLowerCase() === codeKey ||
+          String(l.id || '').trim().toLowerCase() === codeKey
+        );
+        if (cMatch) {
+          const p = (cMatch.project_name && cMatch.project_name !== 'Project Site' && cMatch.project_name !== '-')
+            ? cMatch.project_name
+            : ((cMatch.category && cMatch.category !== 'Project Site' && cMatch.category !== '-') ? cMatch.category : '-');
+          if (p && p !== '-') return p;
+        }
+      }
       if (r.project_name && r.project_name !== '-' && r.project_name !== 'Project Site') return r.project_name;
       if (r.data?.project_name && r.data.project_name !== '-' && r.data.project_name !== 'Project Site') return r.data.project_name;
       const sName = String(r.site_name || r.data?.site_name || '').trim().toLowerCase();
@@ -349,7 +383,7 @@ class AggregationService {
 
     const locSpendSummary = {};
     records.forEach(r => {
-      const divName = r.project_division || r.location_name || (r.data && (r.data.project_division || r.data.location_name || r.data.location)) || r.location_id || 'Unknown';
+      const divName = getRecProjectDivision(r);
       if (divName && divName !== 'Unknown') {
         locSpendSummary[divName] = (locSpendSummary[divName] || 0) + getRecPaid(r);
       }
@@ -420,10 +454,10 @@ class AggregationService {
       const divBreakdown = {};
       const projBreakdown = {};
       mRecs.forEach(r => {
-        const rDiv = r.project_division || r.location_name || (r.data && (r.data.project_division || r.data.location_name || r.data.location)) || r.location_id;
+        const rDiv = getRecProjectDivision(r);
         const resolvedPName = getRecProjectName(r);
         const rPaid = getRecPaid(r);
-        if (rDiv) {
+        if (rDiv && rDiv !== 'Unknown') {
           const k = String(rDiv).trim();
           divBreakdown[k] = Number(((divBreakdown[k] || 0) + rPaid).toFixed(2));
         }
@@ -511,18 +545,12 @@ class AggregationService {
     });
     records.forEach(r => {
       const recPaid = getRecPaid(r);
-      const lId = r.project_division || r.location_name || r.location_id || (r.data && (r.data.project_division || r.data.location_name || r.data.location));
-      if (lId) {
-        const lIdLower = String(lId).trim().toLowerCase();
-        const matchedLoc = activeLocations.find(l => 
-          String(l.name || '').trim().toLowerCase() === lIdLower ||
-          String(l.id || '').trim().toLowerCase() === lIdLower || 
-          (l.code && String(l.code).trim().toLowerCase() === lIdLower)
-        );
-        const targetName = matchedLoc ? matchedLoc.name : (r.project_division || r.location_name || lId);
+      const targetName = getRecProjectDivision(r);
+      if (targetName && targetName !== 'Unknown') {
         const targetKey = String(targetName).trim().toLowerCase();
+        const matchedLoc = activeLocations.find(l => String(l.name || '').trim().toLowerCase() === targetKey);
         if (!locSpendMap[targetKey]) {
-          locSpendMap[targetKey] = { id: matchedLoc ? matchedLoc.id : targetKey, name: targetName, amount: 0 };
+          locSpendMap[targetKey] = { id: matchedLoc ? (matchedLoc.id || matchedLoc.code) : targetKey, name: targetName, amount: 0 };
         }
         locSpendMap[targetKey].amount += recPaid;
       }
@@ -1546,18 +1574,30 @@ class AggregationService {
         String(l.id).trim().toLowerCase() === locClean
       );
     }
+    const seenLocDivNames = new Set();
+    const uniqueTargetLocations = [];
+    for (const l of targetLocations) {
+      const normN = String(l.name || '').trim().toLowerCase();
+      if (!seenLocDivNames.has(normN)) {
+        seenLocDivNames.add(normN);
+        uniqueTargetLocations.push(l);
+      }
+    }
 
     const matchesLoc = (r, loc) => {
-      const rLoc = String(r.location_name || r.location_id || (r.data && (r.data.location_name || r.data.location || r.data.location_id)) || '').trim().toLowerCase();
+      const rDiv = getRecProjectDivision(r);
       const lName = String(loc.name || '').trim().toLowerCase();
+      if (rDiv && rDiv !== 'Unknown' && rDiv.toLowerCase() === lName) return true;
+      const rLoc = String(r.location_name || r.location_id || (r.data && (r.data.location_name || r.data.location || r.data.location_id)) || '').trim().toLowerCase();
       const lCode = String(loc.code || '').trim().toLowerCase();
       const lId = String(loc.id || '').trim().toLowerCase();
       return (lName && rLoc === lName) || (lCode && rLoc === lCode) || (lId && rLoc === lId);
     };
 
-    const locationSpending = await Promise.all(targetLocations.map(async locDoc => {
+    const locationSpending = await Promise.all(uniqueTargetLocations.map(async locDoc => {
       const locName = locDoc.name;
-      let runningLocBal = Number(locDoc.opening_balance || 0);
+      const sameDivLocs = activeLocations.filter(al => String(al.name || '').trim().toLowerCase() === String(locDoc.name || '').trim().toLowerCase());
+      let runningLocBal = sameDivLocs.reduce((sum, al) => sum + Number(al.opening_balance || 0), 0);
       let locOp = 0;
       let locCost = 0;
       let locPaid = 0;

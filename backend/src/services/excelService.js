@@ -428,14 +428,17 @@ const excelService = {
         const lName = String(l.name || '').toLowerCase();
         const lAlias = String(l.alias || '').toLowerCase();
         const lCode = String(l.code || '').toLowerCase();
+        const lProj = String(l.project_name || l.category || '').toLowerCase();
         const normLName = lName.replace(/[^a-z0-9]/g, '');
         const normRaw = rawLocLower.replace(/[^a-z0-9]/g, '');
         return lId === rawLocLower || lName === rawLocLower || lAlias === rawLocLower || lCode === rawLocLower ||
+          (lProj && lProj !== 'project site' && lProj !== '-' && (lProj === rawLocLower || (normRaw && normRaw === lProj.replace(/[^a-z0-9]/g, '')))) ||
           (normRaw && normLName === normRaw) || (normRaw && normLName.startsWith(normRaw));
       });
 
       const location_id = matchedLoc ? (matchedLoc.code || matchedLoc.id) : rawLoc.toUpperCase().replace(/\s+/g, '_');
       const location_name = matchedLoc ? (matchedLoc.alias || matchedLoc.name) : rawLoc;
+      const resolvedProjectName = matchedLoc ? ((matchedLoc.project_name && matchedLoc.project_name !== 'Project Site' && matchedLoc.project_name !== '-') ? matchedLoc.project_name : '-') : (recordData.project_name || '-');
 
       const department_id = isFuel ? 'PM' : (batch.department || recordData.department_id || 'PM').toUpperCase();
       const isBoth = isFuel && String(recordData.fuel_type || '').toLowerCase().includes('both');
@@ -462,7 +465,7 @@ const excelService = {
       recordData.location_id = location_id;
       recordData.project_division = location_name;
       recordData.project_division_id = location_id;
-      recordData.project_name = recordData.project_name || recordData.site_name || '';
+      recordData.project_name = resolvedProjectName;
       recordData.report_date = reportDate;
       recordData.total_cost = totalCostVal;
       recordData.paid_amount = paidAmount;
@@ -504,10 +507,11 @@ const excelService = {
         report_type_id: batch.reportType,
         department_id,
         location_id,
+        location_code: location_id,
         location_name,
         project_division: location_name,
         project_division_id: location_id,
-        project_name: recordData.project_name || recordData.site_name || '',
+        project_name: resolvedProjectName,
         report_date: reportDate,
         reporting_year,
         reporting_month,
