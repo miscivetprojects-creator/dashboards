@@ -245,6 +245,19 @@ class AggregationService {
       activeLocations = await locsColl.find({}).toArray();
     }
     const getRecProjectName = r => {
+      if (r.project_name && r.project_name !== '-' && r.project_name !== 'Project Site') return r.project_name;
+      if (r.data?.project_name && r.data.project_name !== '-' && r.data.project_name !== 'Project Site') return r.data.project_name;
+      const sName = String(r.site_name || r.data?.site_name || '').trim().toLowerCase();
+      if (sName) {
+        const sMatch = activeLocations.find(l =>
+          (l.project_name && String(l.project_name).trim().toLowerCase() === sName) ||
+          (l.category && String(l.category).trim().toLowerCase() === sName)
+        );
+        if (sMatch) {
+          const p = sMatch.project_name || sMatch.category;
+          if (p && p !== '-' && p !== 'Project Site') return p;
+        }
+      }
       const lid = r.location_code || r.location_id || r.project_division || r.location_name || r.data?.location;
       const lIdLower = String(lid || '').trim().toLowerCase();
       const matched = activeLocations.find(l => 
@@ -258,8 +271,6 @@ class AggregationService {
           : ((matched.category && matched.category !== 'Project Site' && matched.category !== '-') ? matched.category : '-');
         if (p && p !== '-') return p;
       }
-      if (r.project_name && r.project_name !== '-' && r.project_name !== 'Project Site') return r.project_name;
-      if (r.data?.project_name && r.data.project_name !== '-' && r.data.project_name !== 'Project Site') return r.data.project_name;
       return '-';
     };
     const reportingLocSet = new Set();
@@ -487,21 +498,26 @@ class AggregationService {
       .sort((a, b) => b.amount - a.amount);
     const locSpendMap = {};
     activeLocations.forEach(l => {
-      locSpendMap[l.id] = { id: l.id, name: l.name, amount: 0 };
+      const normName = String(l.name || '').trim();
+      const key = normName.toLowerCase();
+      if (!locSpendMap[key]) {
+        locSpendMap[key] = { id: l.id || l.code || normName, name: normName, amount: 0 };
+      }
     });
     records.forEach(r => {
       const recPaid = getRecPaid(r);
-      const lId = r.location_id || (r.data && (r.data.location_id || r.data.location));
+      const lId = r.project_division || r.location_name || r.location_id || (r.data && (r.data.project_division || r.data.location_name || r.data.location));
       if (lId) {
-        const lIdLower = String(lId).toLowerCase();
+        const lIdLower = String(lId).trim().toLowerCase();
         const matchedLoc = activeLocations.find(l => 
-          String(l.id).toLowerCase() === lIdLower || 
-          String(l.name).toLowerCase() === lIdLower || 
-          (l.code && String(l.code).toLowerCase() === lIdLower)
+          String(l.name || '').trim().toLowerCase() === lIdLower ||
+          String(l.id || '').trim().toLowerCase() === lIdLower || 
+          (l.code && String(l.code).trim().toLowerCase() === lIdLower)
         );
-        const targetKey = matchedLoc ? matchedLoc.id : lId;
+        const targetName = matchedLoc ? matchedLoc.name : (r.project_division || r.location_name || lId);
+        const targetKey = String(targetName).trim().toLowerCase();
         if (!locSpendMap[targetKey]) {
-          locSpendMap[targetKey] = { id: targetKey, name: r.location_name || lId, amount: 0 };
+          locSpendMap[targetKey] = { id: matchedLoc ? matchedLoc.id : targetKey, name: targetName, amount: 0 };
         }
         locSpendMap[targetKey].amount += recPaid;
       }

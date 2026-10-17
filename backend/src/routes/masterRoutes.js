@@ -445,11 +445,18 @@ function createMasterCrudRoutes(collectionName) {
       const deduplicated = [];
       for (const item of sanitized) {
         const cKey = (item.code || '').trim().toLowerCase();
+        const pKey = (item.project_name || item.category || '').trim().toLowerCase();
         const nKey = (item.name || item.full_name || item.report_name || item.item_name || '').trim().toLowerCase();
         if (cKey && seenCodes.has(cKey)) continue;
-        if (nKey && seenNames.has(nKey)) continue;
+        if (collectionName === 'project_locations') {
+          const comboKey = `${nKey}:::${pKey}`;
+          if (comboKey && seenNames.has(comboKey)) continue;
+          if (comboKey) seenNames.add(comboKey);
+        } else {
+          if (nKey && seenNames.has(nKey)) continue;
+          if (nKey) seenNames.add(nKey);
+        }
         if (cKey) seenCodes.add(cKey);
-        if (nKey) seenNames.add(nKey);
         deduplicated.push(item);
       }
 
@@ -464,7 +471,24 @@ function createMasterCrudRoutes(collectionName) {
       const coll = getCollection(collectionName);
       const name = (req.body.name || req.body.full_name || req.body.report_name || '').trim();
 
-      if (name) {
+      if (collectionName === 'project_locations') {
+        const pVal = (req.body.project_name !== undefined ? req.body.project_name : req.body.category || '').trim();
+        if (name && pVal && pVal !== '-' && pVal !== 'Project Site') {
+          const escapedName = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+          const escapedPVal = pVal.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+          const existingCombo = await coll.findOne({
+            status: { $ne: 'inactive' },
+            name: { $regex: new RegExp(`^${escapedName}$`, 'i') },
+            $or: [
+              { project_name: { $regex: new RegExp(`^${escapedPVal}$`, 'i') } },
+              { category: { $regex: new RegExp(`^${escapedPVal}$`, 'i') } }
+            ]
+          });
+          if (existingCombo) {
+            return res.status(409).json({ error: `An item with project division "${name}" and project name "${pVal}" already exists.` });
+          }
+        }
+      } else if (name) {
         const escapedName = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
         const existingName = await coll.findOne({
           status: { $ne: 'inactive' },
@@ -548,7 +572,29 @@ function createMasterCrudRoutes(collectionName) {
 
       const name = (req.body.name || req.body.full_name || req.body.report_name || '').trim();
       const currentName = (current.name || current.full_name || current.report_name || '').trim();
-      if (name && name.toLowerCase() !== currentName.toLowerCase()) {
+      if (collectionName === 'project_locations') {
+        const pVal = (req.body.project_name !== undefined ? req.body.project_name : req.body.category || '').trim();
+        const currentPVal = (current.project_name !== undefined ? current.project_name : current.category || '').trim();
+        if ((name && name.toLowerCase() !== currentName.toLowerCase()) || (pVal && pVal.toLowerCase() !== currentPVal.toLowerCase())) {
+          if (name && pVal && pVal !== '-' && pVal !== 'Project Site') {
+            const escapedName = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            const escapedPVal = pVal.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            const excludeIds = [current._id, id, objectId].filter(Boolean);
+            const existingCombo = await coll.findOne({
+              _id: { $nin: excludeIds },
+              status: { $ne: 'inactive' },
+              name: { $regex: new RegExp(`^${escapedName}$`, 'i') },
+              $or: [
+                { project_name: { $regex: new RegExp(`^${escapedPVal}$`, 'i') } },
+                { category: { $regex: new RegExp(`^${escapedPVal}$`, 'i') } }
+              ]
+            });
+            if (existingCombo) {
+              return res.status(409).json({ error: `Another item with project division "${name}" and project name "${pVal}" already exists.` });
+            }
+          }
+        }
+      } else if (name && name.toLowerCase() !== currentName.toLowerCase()) {
         const escapedName = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
         const excludeIds = [current._id, id, objectId].filter(Boolean);
         const existingName = await coll.findOne({

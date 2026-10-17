@@ -144,7 +144,13 @@ async function getMasterProjectNameMap() {
 }
 
 function resolveRecordProjectName(rec, locProjectMap) {
-  const divKey = String(rec.location_code || rec.location_id || rec.project_division || rec.location_name || rec.data?.location || '').trim().toLowerCase();
+  if (rec.project_name && rec.project_name !== '-' && rec.project_name !== 'Project Site') return rec.project_name;
+  if (rec.data?.project_name && rec.data.project_name !== '-' && rec.data.project_name !== 'Project Site') return rec.data.project_name;
+  const siteKey = String(rec.site_name || rec.data?.site_name || '').trim().toLowerCase();
+  if (siteKey && locProjectMap.has(siteKey)) return locProjectMap.get(siteKey);
+  const codeKey = String(rec.location_code || rec.location_id || '').trim().toLowerCase();
+  if (codeKey && locProjectMap.has(codeKey)) return locProjectMap.get(codeKey);
+  const divKey = String(rec.project_division || rec.location_name || rec.data?.location || '').trim().toLowerCase();
   return locProjectMap.get(divKey) || '-';
 }
 

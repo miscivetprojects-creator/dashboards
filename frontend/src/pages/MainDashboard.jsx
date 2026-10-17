@@ -651,70 +651,66 @@ export default function MainDashboard({ filters, onNavigate }) {
         </div>
       )}
 
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: isPlantOrAll ? 'repeat(auto-fit, minmax(460px, 1fr))' : '1fr',
-          gap: '16px'
-        }}>
-          <div className="civet-card" style={{ border: '1px solid #000000', padding: '16px 20px', backgroundColor: '#F3E8FF' }}>
+        {isPlantOrAll && (
+          <div className="civet-card" style={{ border: '1px solid #000000', padding: '16px 20px', backgroundColor: '#BAE6FD' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
               <div>
-                <h2 className="text-h2">Project Division Payments</h2>
+                <h2 className="text-h2">Fuel & Operational Breakdown</h2>
               </div>
             </div>
-            {activeLocSpending.length === 0 ? (
-              <EmptyState message="No project division spending data recorded for this period." />
+            {activeServiceSpending.length === 0 ? (
+              <EmptyState message="No service-type payments recorded for this period." />
             ) : (
               <div>
                 <div style={{
-                  backgroundColor: '#DDD6FE',
+                  backgroundColor: '#E0F2FE',
                   border: '1px solid #000000',
                   borderRadius: '6px',
-                  padding: '10px 8px 4px 0',
+                  padding: '10px 14px 4px 10px',
                   marginBottom: '12px'
                 }}>
                   <div style={{ width: '100%', height: '190px' }}>
                     <ResponsiveContainer width="100%" height="100%">
-                      <BarChart data={activeLocSpending} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+                      <BarChart data={activeServiceSpending} layout="vertical" margin={{ top: 10, right: 10, left: 30, bottom: 0 }}>
                         <defs>
-                          <filter id="mainLocBar3d" x="-10%" y="-10%" width="130%" height="130%">
+                          <filter id="mainSrvBar3d" x="-10%" y="-10%" width="130%" height="130%">
                             <feDropShadow dx="2" dy="3" stdDeviation="2" floodColor="#0F2A4A" floodOpacity="0.20" />
                           </filter>
-                          <linearGradient id="mainLocPurpleGrad" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="0%" stopColor="#A78BFA" />
-                            <stop offset="100%" stopColor="#7C3AED" />
+                          <linearGradient id="mainSrvBlueGrad" x1="0" y1="0" x2="1" y2="0">
+                            <stop offset="0%" stopColor="#38BDF8" />
+                            <stop offset="100%" stopColor="#0284C7" />
                           </linearGradient>
                         </defs>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#CBD5E1" />
-                        <XAxis dataKey="location" tickLine={{ stroke: '#000000' }} axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} tick={{ fontSize: 9.5, fill: '#0F2A4A' }} />
-                        <YAxis tickFormatter={formatAxisINR} tickLine={{ stroke: '#000000' }} axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} tick={{ fontSize: 9.5, fill: '#0F2A4A' }} />
-                        <Tooltip formatter={(val) => [formatINR(val), 'Spending']} />
-                        <Bar dataKey="amount" fill="url(#mainLocPurpleGrad)" stroke="#5B21B6" strokeWidth={1} filter="url(#mainLocBar3d)" radius={[3, 3, 0, 0]} />
+                        <CartesianGrid strokeDasharray="3 3" stroke="#BAE6FD" />
+                        <XAxis type="number" tickFormatter={formatAxisINR} tickLine={{ stroke: '#000000' }} axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} tick={{ fontSize: 9.5, fill: '#0F2A4A' }} />
+                        <YAxis dataKey="service" type="category" tickLine={{ stroke: '#000000' }} axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} tick={{ fontSize: 9.5, fill: '#0F2A4A' }} width={80} />
+                        <Tooltip formatter={(val) => [formatINR(val), 'Amount']} />
+                        <Bar dataKey="amount" fill="url(#mainSrvBlueGrad)" stroke="#0369A1" strokeWidth={1} filter="url(#mainSrvBar3d)" radius={[0, 3, 3, 0]} />
                       </BarChart>
                     </ResponsiveContainer>
                   </div>
                 </div>
 
                 <div style={{
-                  backgroundColor: '#FAF5FF',
+                  backgroundColor: '#F0F9FF',
                   border: '1px solid #000000',
                   borderRadius: '4px',
                   padding: '10px 12px'
                 }}>
                   <span style={{ fontSize: '10.5px', fontWeight: '700', color: '#0F2A4A', display: 'block', marginBottom: '6px' }}>
-                    Top Project Divisions:
+                    Service Category Allocation:
                   </span>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-                    {activeLocSpending.slice(0, 4).map(loc => {
-                      const pct = Math.round(((loc.amount || 0) / maxLocAmt) * 100);
+                    {activeServiceSpending.slice(0, 4).map(srv => {
+                      const pct = Math.round(((srv.amount || 0) / maxSrvAmt) * 100);
                       return (
-                        <div key={loc.location} style={{ fontSize: '10.5px' }}>
+                        <div key={srv.service} style={{ fontSize: '10.5px' }}>
                           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2px' }}>
-                            <span style={{ color: '#1C2733' }}>{loc.location}</span>
-                            <strong style={{ color: '#0F2A4A' }}>{formatINR(loc.amount)}</strong>
+                            <span style={{ color: '#1C2733' }}>{srv.service}</span>
+                            <strong style={{ color: '#0F2A4A' }}>{formatINR(srv.amount)}</strong>
                           </div>
                           <div style={{ width: '100%', height: '5px', backgroundColor: '#E2E8F0', borderRadius: '3px', overflow: 'hidden' }}>
-                            <div style={{ width: `${pct}%`, height: '100%', backgroundColor: '#7C3AED', border: '1px solid #5B21B6', borderRadius: '3px', boxShadow: '0 1px 2px rgba(0,0,0,0.12)' }} />
+                            <div style={{ width: `${pct}%`, height: '100%', backgroundColor: '#0284C7', border: '1px solid #0369A1', borderRadius: '3px', boxShadow: '0 1px 2px rgba(0,0,0,0.12)' }} />
                           </div>
                         </div>
                       );
@@ -724,78 +720,7 @@ export default function MainDashboard({ filters, onNavigate }) {
               </div>
             )}
           </div>
-
-          {isPlantOrAll && (
-            <div className="civet-card" style={{ border: '1px solid #000000', padding: '16px 20px', backgroundColor: '#BAE6FD' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                <div>
-                  <h2 className="text-h2">Fuel & Operational Breakdown</h2>
-                </div>
-              </div>
-              {activeServiceSpending.length === 0 ? (
-                <EmptyState message="No service-type payments recorded for this period." />
-              ) : (
-                <div>
-                  <div style={{
-                    backgroundColor: '#E0F2FE',
-                    border: '1px solid #000000',
-                    borderRadius: '6px',
-                    padding: '10px 14px 4px 10px',
-                    marginBottom: '12px'
-                  }}>
-                    <div style={{ width: '100%', height: '190px' }}>
-                      <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={activeServiceSpending} layout="vertical" margin={{ top: 10, right: 10, left: 30, bottom: 0 }}>
-                          <defs>
-                            <filter id="mainSrvBar3d" x="-10%" y="-10%" width="130%" height="130%">
-                              <feDropShadow dx="2" dy="3" stdDeviation="2" floodColor="#0F2A4A" floodOpacity="0.20" />
-                            </filter>
-                            <linearGradient id="mainSrvBlueGrad" x1="0" y1="0" x2="1" y2="0">
-                              <stop offset="0%" stopColor="#38BDF8" />
-                              <stop offset="100%" stopColor="#0284C7" />
-                            </linearGradient>
-                          </defs>
-                          <CartesianGrid strokeDasharray="3 3" stroke="#BAE6FD" />
-                          <XAxis type="number" tickFormatter={formatAxisINR} tickLine={{ stroke: '#000000' }} axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} tick={{ fontSize: 9.5, fill: '#0F2A4A' }} />
-                          <YAxis dataKey="service" type="category" tickLine={{ stroke: '#000000' }} axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} tick={{ fontSize: 9.5, fill: '#0F2A4A' }} width={80} />
-                          <Tooltip formatter={(val) => [formatINR(val), 'Amount']} />
-                          <Bar dataKey="amount" fill="url(#mainSrvBlueGrad)" stroke="#0369A1" strokeWidth={1} filter="url(#mainSrvBar3d)" radius={[0, 3, 3, 0]} />
-                        </BarChart>
-                      </ResponsiveContainer>
-                    </div>
-                  </div>
-
-                  <div style={{
-                    backgroundColor: '#F0F9FF',
-                    border: '1px solid #000000',
-                    borderRadius: '4px',
-                    padding: '10px 12px'
-                  }}>
-                    <span style={{ fontSize: '10.5px', fontWeight: '700', color: '#0F2A4A', display: 'block', marginBottom: '6px' }}>
-                      Service Category Allocation:
-                    </span>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-                      {activeServiceSpending.slice(0, 4).map(srv => {
-                        const pct = Math.round(((srv.amount || 0) / maxSrvAmt) * 100);
-                        return (
-                          <div key={srv.service} style={{ fontSize: '10.5px' }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2px' }}>
-                              <span style={{ color: '#1C2733' }}>{srv.service}</span>
-                              <strong style={{ color: '#0F2A4A' }}>{formatINR(srv.amount)}</strong>
-                            </div>
-                            <div style={{ width: '100%', height: '5px', backgroundColor: '#E2E8F0', borderRadius: '3px', overflow: 'hidden' }}>
-                              <div style={{ width: `${pct}%`, height: '100%', backgroundColor: '#0284C7', border: '1px solid #0369A1', borderRadius: '3px', boxShadow: '0 1px 2px rgba(0,0,0,0.12)' }} />
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
+        )}
       </div>
 
       <RecordPreviewModal
