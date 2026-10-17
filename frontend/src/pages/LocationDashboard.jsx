@@ -257,7 +257,7 @@ export default function LocationDashboard({
           <div style={{ fontSize: '11.5px', fontWeight: '600', color: '#0F2A4A', textAlign: 'center', marginBottom: '6px' }}>
             A. Monthly Project Division Payments (INR)
           </div>
-          <div style={{ width: '100%', height: '180px' }}>
+          <div style={{ width: '100%', height: '260px' }}>
             {monthlySpending.length === 0 ? (
               <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94A3B8', fontSize: '11px' }}>
                 No payments recorded for this project division.
@@ -289,7 +289,7 @@ export default function LocationDashboard({
           <div style={{ fontSize: '11.5px', fontWeight: '600', color: '#0F2A4A', textAlign: 'center', marginBottom: '6px' }}>
             B. Department-wise Amount (INR)
           </div>
-          <div style={{ width: '100%', height: '180px' }}>
+          <div style={{ width: '100%', height: '260px' }}>
             {departmentSpending.length === 0 ? (
               <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94A3B8', fontSize: '11px' }}>
                 No departmental payments recorded.
@@ -327,7 +327,7 @@ export default function LocationDashboard({
           <div style={{ fontSize: '11.5px', fontWeight: '600', color: '#0F2A4A', textAlign: 'center', marginBottom: '6px' }}>
             C. Fuel Distribution
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', height: '180px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', height: '240px' }}>
             {serviceSpending.length === 0 ? (
               <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94A3B8', fontSize: '11px' }}>
                 No fuel recorded.
@@ -469,7 +469,7 @@ export default function LocationDashboard({
                 Top {Math.min(vendorSpending.length, 5)} Ledgers
               </span>
             </div>
-            <div style={{ width: '100%', height: '205px' }}>
+            <div style={{ width: '100%', height: '280px' }}>
               {(!vendorSpending || vendorSpending.length === 0) ? (
                 <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94A3B8', fontSize: '11px' }}>
                   No vendor payments recorded.

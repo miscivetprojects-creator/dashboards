@@ -85,7 +85,7 @@ export default function CashAndCarryChart({ data = [], analytics = {} }) {
           display: 'flex',
           flexDirection: 'column'
         }}>
-          <div style={{ width: '100%', height: '240px' }}>
+          <div style={{ width: '100%', height: '360px' }}>
             <ResponsiveContainer width="100%" height="100%">
               <ComposedChart data={chartPoints} margin={{ top: 20, right: 10, left: 10, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#CBD5E1" />

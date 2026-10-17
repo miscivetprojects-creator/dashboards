@@ -345,13 +345,13 @@ export default function MainDashboard({ filters, onNavigate }) {
               }}>
                 <div style={{
                   minWidth: trendView === 'divisions'
-                    ? Math.max(1000, activeLocSpending.length * 52) + 'px'
+                    ? Math.max(1100, activeLocSpending.length * 56) + 'px'
                     : (isTrendMultiYear ? Math.max(900, spendingTrend.length * 75) + 'px' : '100%'),
-                  height: '340px'
+                  height: '480px'
                 }}>
                   <ResponsiveContainer width="100%" height="100%">
                     {trendView === 'divisions' ? (
-                      <BarChart data={activeLocSpending} margin={{ top: 14, right: 14, left: 10, bottom: 65 }}>
+                      <BarChart data={activeLocSpending} margin={{ top: 14, right: 14, left: 10, bottom: 85 }}>
                         <defs>
                           <filter id="divBar3d" x="-10%" y="-10%" width="130%" height="130%">
                             <feDropShadow dx="2" dy="3" stdDeviation="2" floodColor="#0F2A4A" floodOpacity="0.20" />
@@ -367,7 +367,9 @@ export default function MainDashboard({ filters, onNavigate }) {
                           interval={0} 
                           angle={-45} 
                           textAnchor="end" 
-                          height={70} 
+                          height={90} 
+                          dx={-4}
+                          dy={4}
                           tickLine={{ stroke: '#000000' }} 
                           axisLine={{ stroke: '#000000', strokeWidth: 1.5 }} 
                           tick={{ fontSize: 9.5, fill: '#0F2A4A', fontWeight: '600' }} 
@@ -554,7 +556,7 @@ export default function MainDashboard({ filters, onNavigate }) {
               padding: '12px 10px 6px 0',
               marginBottom: '10px'
             }}>
-              <div style={{ width: '100%', height: '190px' }}>
+              <div style={{ width: '100%', height: '260px' }}>
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={complianceExpenses} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
                     <defs>
@@ -617,7 +619,7 @@ export default function MainDashboard({ filters, onNavigate }) {
               padding: '12px 10px 6px 0',
               marginBottom: '10px'
             }}>
-              <div style={{ width: '100%', height: '190px' }}>
+              <div style={{ width: '100%', height: '260px' }}>
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={manpowerCosts} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
                     <defs>
@@ -678,7 +680,7 @@ export default function MainDashboard({ filters, onNavigate }) {
                   padding: '10px 14px 4px 10px',
                   marginBottom: '12px'
                 }}>
-                  <div style={{ width: '100%', height: '190px' }}>
+                  <div style={{ width: '100%', height: '260px' }}>
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart data={activeServiceSpending} layout="vertical" margin={{ top: 10, right: 10, left: 30, bottom: 0 }}>
                         <defs>
