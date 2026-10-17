@@ -18,61 +18,27 @@ function getPrimaryLocalIp() {
 }
 
 function resolveInstallerPath() {
-  const candidates = [
-    'c:\\Users\\USER\\Documents\\Civet Applications\\dashboards\\desktop\\dist\\Civet MIS Setup 1.0.8.exe',
-    'c:\\Users\\USER\\Documents\\Civet Applications\\dashboards\\desktop\\dist\\Civet MIS Setup 1.0.7.exe',
-    'c:\\Users\\USER\\Documents\\Civet Applications\\dashboards\\desktop\\dist\\Civet MIS Setup 1.0.6.exe',
-    'c:\\Users\\USER\\Documents\\Civet Applications\\dashboards\\desktop\\dist\\Civet MIS Setup 1.0.5.exe',
-    'c:\\Users\\USER\\Documents\\Civet Applications\\dashboards\\desktop\\dist\\Civet MIS Setup 1.0.4.exe',
-    'c:\\Users\\USER\\Documents\\Civet Applications\\dashboards\\desktop\\dist\\Civet MIS Setup 1.0.3.exe',
-    'c:\\Users\\USER\\Documents\\Civet Applications\\dashboards\\desktop\\dist\\Civet MIS Setup 1.0.2.exe',
-    'c:\\Users\\USER\\Documents\\Civet Applications\\dashboards\\desktop\\dist\\Civet MIS Setup 1.0.1.exe',
-    path.resolve(__dirname, '../../../desktop/dist/Civet MIS Setup 1.0.8.exe'),
-    path.resolve(__dirname, '../../../desktop/dist/Civet MIS Setup 1.0.7.exe'),
-    path.resolve(__dirname, '../../../desktop/dist/Civet MIS Setup 1.0.6.exe'),
-    path.resolve(__dirname, '../../../desktop/dist/Civet MIS Setup 1.0.5.exe'),
-    path.resolve(__dirname, '../../../desktop/dist/Civet MIS Setup 1.0.4.exe'),
-    path.resolve(__dirname, '../../../desktop/dist/Civet MIS Setup 1.0.3.exe'),
-    path.resolve(__dirname, '../../../desktop/dist/Civet MIS Setup 1.0.2.exe'),
-    path.resolve(__dirname, '../../../desktop/dist/Civet MIS Setup 1.0.1.exe'),
-    path.resolve(process.cwd(), 'desktop/dist/Civet MIS Setup 1.0.8.exe'),
-    path.resolve(process.cwd(), 'desktop/dist/Civet MIS Setup 1.0.7.exe'),
-    path.resolve(process.cwd(), 'desktop/dist/Civet MIS Setup 1.0.6.exe'),
-    path.resolve(process.cwd(), 'desktop/dist/Civet MIS Setup 1.0.5.exe'),
-    path.resolve(process.cwd(), 'desktop/dist/Civet MIS Setup 1.0.4.exe'),
-    path.resolve(process.cwd(), 'desktop/dist/Civet MIS Setup 1.0.3.exe'),
-    path.resolve(process.cwd(), 'desktop/dist/Civet MIS Setup 1.0.2.exe'),
-    path.resolve(process.cwd(), 'desktop/dist/Civet MIS Setup 1.0.1.exe'),
-    path.resolve(process.cwd(), '../desktop/dist/Civet MIS Setup 1.0.8.exe'),
-    path.resolve(process.cwd(), '../desktop/dist/Civet MIS Setup 1.0.7.exe'),
-    path.resolve(process.cwd(), '../desktop/dist/Civet MIS Setup 1.0.6.exe'),
-    path.resolve(process.cwd(), '../desktop/dist/Civet MIS Setup 1.0.5.exe'),
-    path.resolve(process.cwd(), '../desktop/dist/Civet MIS Setup 1.0.4.exe'),
-    path.resolve(process.cwd(), '../desktop/dist/Civet MIS Setup 1.0.3.exe'),
-    path.resolve(process.cwd(), '../desktop/dist/Civet MIS Setup 1.0.2.exe'),
-    path.resolve(process.cwd(), '../desktop/dist/Civet MIS Setup 1.0.1.exe'),
-    path.resolve(process.resourcesPath || '', 'Civet MIS Setup 1.0.8.exe'),
-    path.resolve(process.resourcesPath || '', 'Civet MIS Setup 1.0.7.exe'),
-    path.resolve(process.resourcesPath || '', 'Civet MIS Setup 1.0.6.exe'),
-    path.resolve(process.resourcesPath || '', 'Civet MIS Setup 1.0.5.exe'),
-    path.resolve(process.resourcesPath || '', 'Civet MIS Setup 1.0.4.exe'),
-    path.resolve(process.resourcesPath || '', 'Civet MIS Setup 1.0.3.exe'),
-    path.resolve(process.resourcesPath || '', 'Civet MIS Setup 1.0.2.exe'),
-    path.resolve(process.resourcesPath || '', 'Civet MIS Setup 1.0.1.exe')
+  const distDirCandidates = [
+    path.resolve(__dirname, '../../../desktop/dist'),
+    path.resolve(process.cwd(), 'desktop/dist'),
+    path.resolve(process.cwd(), '../desktop/dist'),
+    'c:\\Users\\USER\\Documents\\Civet Applications\\dashboards\\desktop\\dist'
   ];
 
-  for (const candidate of candidates) {
-    if (fs.existsSync(candidate)) {
-      return candidate;
-    }
-  }
+  for (const distDir of distDirCandidates) {
+    if (fs.existsSync(distDir)) {
+      const files = fs.readdirSync(distDir)
+        .filter(f => f.endsWith('.exe') && !f.includes('blockmap'))
+        .map(f => {
+          const fullPath = path.join(distDir, f);
+          const stat = fs.statSync(fullPath);
+          return { fullPath, mtime: stat.mtimeMs };
+        })
+        .sort((a, b) => b.mtime - a.mtime);
 
-  const distDir = path.resolve(__dirname, '../../../desktop/dist');
-  if (fs.existsSync(distDir)) {
-    const files = fs.readdirSync(distDir);
-    const exe = files.find(f => f.endsWith('.exe') && !f.includes('blockmap'));
-    if (exe) {
-      return path.join(distDir, exe);
+      if (files.length > 0) {
+        return files[0].fullPath;
+      }
     }
   }
 
