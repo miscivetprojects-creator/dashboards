@@ -328,22 +328,36 @@ export default function DataRegister({ prefilterDept, prefilterLocation, onNavig
 
                   const fuelTypeStr = String(rec.fuel_type || (rec.data && rec.data.fuel_type) || '').trim().toLowerCase();
                   const isBoth = fuelTypeStr === 'both' || (pQ > 0 && dQ > 0);
-                  const rawVendor = (rec.vendor_name && rec.vendor_name !== '-') ? rec.vendor_name : (rec.data && (
-                    (rec.data.ledger_type && rec.data.ledger_type !== '-') ? rec.data.ledger_type :
-                    (rec.data.vendor_name && rec.data.vendor_name !== '-') ? rec.data.vendor_name :
-                    (rec.data.vendor && rec.data.vendor !== '-') ? rec.data.vendor : null
-                  ));
-                  const vendor = rawVendor || '-';
-                  const divKey = String(rec.location_code || rec.location_id || rec.project_division || rec.location_name || rec.data?.location || '').trim().toLowerCase();
-                  const matchedLoc = locations.find(l => 
-                    String(l.code || '').trim().toLowerCase() === divKey ||
-                    String(l.name || '').trim().toLowerCase() === divKey ||
-                    String(l.id || '').trim().toLowerCase() === divKey
-                  );
+                  const cleanVendor = (v) => {
+                    if (!v) return '';
+                    const s = String(v).trim();
+                    return ['na', 'n/a', '-', 'none', 'null', 'undefined', ''].includes(s.toLowerCase()) ? '' : s;
+                  };
+                  const rawVendor = cleanVendor(rec.vendor_name) || (rec.data && (
+                    cleanVendor(rec.data.ledger_type) ||
+                    cleanVendor(rec.data.vendor_name) ||
+                    cleanVendor(rec.data.vendor) || ''
+                  )) || '';
+                  const divName = String(rec.project_division || rec.location_name || rec.data?.location || '').trim().toLowerCase();
+                  const locCode = String(rec.location_code || rec.location_id || '').trim().toLowerCase();
+                  const matchedLoc = (divName ? locations.find(l => {
+                    const lName = String(l.name || '').trim().toLowerCase();
+                    const lAlias = String(l.alias || '').trim().toLowerCase();
+                    const normLName = lName.replace(/[^a-z0-9]/g, '');
+                    const normDiv = divName.replace(/[^a-z0-9]/g, '');
+                    return lName === divName || lAlias === divName || (normDiv && normLName === normDiv);
+                  }) : null) || (locCode ? locations.find(l => 
+                    String(l.code || '').trim().toLowerCase() === locCode ||
+                    String(l.id || '').trim().toLowerCase() === locCode
+                  ) : null);
+                  const vendor = rawVendor || (divName.includes('chennagiri') ? 'Chennagiri Fuel Bunk' : '-');
                   const pFromMaster = matchedLoc 
                     ? ((matchedLoc.project_name && matchedLoc.project_name !== 'Project Site' && matchedLoc.project_name !== '-') ? matchedLoc.project_name : ((matchedLoc.category && matchedLoc.category !== 'Project Site' && matchedLoc.category !== '-') ? matchedLoc.category : '-'))
                     : '-';
-                  const projectDisplay = (pFromMaster && pFromMaster !== '-') ? pFromMaster : ((rec.project_name && rec.project_name !== '-' && rec.project_name !== 'Project Site') ? rec.project_name : '-');
+                  const recProjName = (rec.project_name && rec.project_name !== '-' && rec.project_name !== 'Project Site') ? rec.project_name : '';
+                  const projectDisplay = (divName.includes('chennagiri')) 
+                    ? '-' 
+                    : ((pFromMaster && pFromMaster !== '-') ? pFromMaster : (recProjName || '-'));
                   const isMerchant = String(vendor).toLowerCase().includes('merchant');
                   const rawPType = rec.payment_type || (rec.data && rec.data.payment_type) || '';
                   const ccField = rec.cash_and_carry || (rec.data && rec.data.cash_and_carry) || '';
@@ -555,12 +569,19 @@ export default function DataRegister({ prefilterDept, prefilterLocation, onNavig
               <div>
                 <span style={{ color: '#8395A7', display: 'block' }}>Project Name</span>
                 <strong>{(() => {
-                  const sDivKey = String(selectedRecord.location_code || selectedRecord.location_id || selectedRecord.project_division || selectedRecord.location_name || selectedRecord.data?.location || '').trim().toLowerCase();
-                  const sMatch = locations.find(l => 
-                    String(l.code || '').trim().toLowerCase() === sDivKey ||
-                    String(l.name || '').trim().toLowerCase() === sDivKey ||
-                    String(l.id || '').trim().toLowerCase() === sDivKey
-                  );
+                  const sDivName = String(selectedRecord.project_division || selectedRecord.location_name || selectedRecord.data?.location || '').trim().toLowerCase();
+                  if (sDivName.includes('chennagiri')) return '-';
+                  const sLocCode = String(selectedRecord.location_code || selectedRecord.location_id || '').trim().toLowerCase();
+                  const sMatch = (sDivName ? locations.find(l => {
+                    const lName = String(l.name || '').trim().toLowerCase();
+                    const lAlias = String(l.alias || '').trim().toLowerCase();
+                    const normLName = lName.replace(/[^a-z0-9]/g, '');
+                    const normDiv = sDivName.replace(/[^a-z0-9]/g, '');
+                    return lName === sDivName || lAlias === sDivName || (normDiv && normLName === normDiv);
+                  }) : null) || (sLocCode ? locations.find(l => 
+                    String(l.code || '').trim().toLowerCase() === sLocCode ||
+                    String(l.id || '').trim().toLowerCase() === sLocCode
+                  ) : null);
                   const sPFromMaster = sMatch 
                     ? ((sMatch.project_name && sMatch.project_name !== 'Project Site' && sMatch.project_name !== '-') ? sMatch.project_name : ((sMatch.category && sMatch.category !== 'Project Site' && sMatch.category !== '-') ? sMatch.category : '-'))
                     : '-';

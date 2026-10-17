@@ -138,20 +138,29 @@ async function getMasterProjectNameMap() {
       : ((ml.category && ml.category !== 'Project Site' && ml.category !== '-') ? ml.category : '-');
     if (ml.code) locProjectMap.set(String(ml.code).trim().toLowerCase(), pName);
     if (ml.name) locProjectMap.set(String(ml.name).trim().toLowerCase(), pName);
+    if (ml.alias) locProjectMap.set(String(ml.alias).trim().toLowerCase(), pName);
     if (ml.id) locProjectMap.set(String(ml.id).trim().toLowerCase(), pName);
   }
   return locProjectMap;
 }
 
 function resolveRecordProjectName(rec, locProjectMap) {
+  const divKey = String(rec.project_division || rec.location_name || rec.data?.location || '').trim().toLowerCase();
+  if (divKey.includes('chennagiri')) return '-';
   if (rec.project_name && rec.project_name !== '-' && rec.project_name !== 'Project Site') return rec.project_name;
   if (rec.data?.project_name && rec.data.project_name !== '-' && rec.data.project_name !== 'Project Site') return rec.data.project_name;
   const siteKey = String(rec.site_name || rec.data?.site_name || '').trim().toLowerCase();
   if (siteKey && locProjectMap.has(siteKey)) return locProjectMap.get(siteKey);
+  if (divKey && locProjectMap.has(divKey)) return locProjectMap.get(divKey);
+  const cleanDivKey = divKey.replace(/[^a-z0-9]/g, '');
+  if (cleanDivKey) {
+    for (const [k, v] of locProjectMap.entries()) {
+      if (k.replace(/[^a-z0-9]/g, '') === cleanDivKey) return v;
+    }
+  }
   const codeKey = String(rec.location_code || rec.location_id || '').trim().toLowerCase();
   if (codeKey && locProjectMap.has(codeKey)) return locProjectMap.get(codeKey);
-  const divKey = String(rec.project_division || rec.location_name || rec.data?.location || '').trim().toLowerCase();
-  return locProjectMap.get(divKey) || '-';
+  return '-';
 }
 
 router.get('/records', async (req, res) => {
@@ -168,10 +177,18 @@ router.get('/records', async (req, res) => {
       .skip(skip)
       .limit(parseInt(limit))
       .toArray();
-    const records = rawRecords.map(r => ({
-      ...r,
-      project_name: resolveRecordProjectName(r, locProjectMap)
-    }));
+    const records = rawRecords.map(r => {
+      const pName = resolveRecordProjectName(r, locProjectMap);
+      const rawV = r.vendor_name || r.data?.vendor_name || r.data?.ledger_type || '';
+      const vClean = ['na', 'n/a', '-', 'none', 'null', 'undefined', ''].includes(String(rawV).trim().toLowerCase()) ? '' : String(rawV).trim();
+      const divLower = String(r.project_division || r.location_name || '').toLowerCase();
+      const finalVendor = vClean || (divLower.includes('chennagiri') ? 'Chennagiri Fuel Bunk' : (r.vendor_name || '-'));
+      return {
+        ...r,
+        project_name: pName,
+        vendor_name: finalVendor
+      };
+    });
     res.json({
       records,
       pagination: {
@@ -205,6 +222,10 @@ router.get('/record/:id', async (req, res) => {
     }
     const locProjectMap = await getMasterProjectNameMap();
     record.project_name = resolveRecordProjectName(record, locProjectMap);
+    const rawV = record.vendor_name || record.data?.vendor_name || record.data?.ledger_type || '';
+    const vClean = ['na', 'n/a', '-', 'none', 'null', 'undefined', ''].includes(String(rawV).trim().toLowerCase()) ? '' : String(rawV).trim();
+    const divLower = String(record.project_division || record.location_name || '').toLowerCase();
+    record.vendor_name = vClean || (divLower.includes('chennagiri') ? 'Chennagiri Fuel Bunk' : (record.vendor_name || '-'));
     const schemasColl = getCollection('report_schemas');
     const schemaDoc = await schemasColl.findOne({
       $or: [{ report_type_id: record.report_type_id }, { reportType: record.report_type_id }]
@@ -486,7 +507,9 @@ router.get('/export/excel', async (req, res) => {
 
     records.forEach((rec, idx) => {
       const data = rec.data || {};
-      const ledger = cleanStr(data.ledger_type || data.vendor_name || data.vendor || rec.ledger_type || rec.vendor_name || '-');
+      const rawLedger = cleanStr(data.ledger_type || data.vendor_name || data.vendor || rec.ledger_type || rec.vendor_name || '');
+      const vClean = ['na', 'n/a', '-', 'none', 'null', 'undefined', ''].includes(rawLedger.toLowerCase()) ? '' : rawLedger;
+      const ledger = vClean || (String(rec.project_division || rec.location_name || '').toLowerCase().includes('chennagiri') ? 'Chennagiri Fuel Bunk' : '-');
       const opBal = Number(rec.opening_balance ?? data.opening_balance ?? 0);
       const dQty = Number(rec.diesel_quantity ?? data.diesel_quantity ?? (rec.fuel_type === 'Diesel' ? rec.quantity : 0) ?? 0);
       const dRate = Number(rec.diesel_rate ?? data.diesel_rate ?? 0);
@@ -647,8 +670,9 @@ router.get('/export/pdf', async (req, res) => {
     let sumOp = 0, sumDQty = 0, sumDAmt = 0, sumPQty = 0, sumPAmt = 0, sumTotalCost = 0, sumPaid = 0, sumClosing = 0;
 
     const rows = records.map(rec => {
-      const data = rec.data || {};
-      const ledger = cleanStr(data.ledger_type || data.vendor_name || data.vendor || rec.ledger_type || rec.vendor_name || '-');
+      const rawLedger = cleanStr(data.ledger_type || data.vendor_name || data.vendor || rec.ledger_type || rec.vendor_name || '');
+      const vClean = ['na', 'n/a', '-', 'none', 'null', 'undefined', ''].includes(rawLedger.toLowerCase()) ? '' : rawLedger;
+      const ledger = vClean || (String(rec.project_division || rec.location_name || '').toLowerCase().includes('chennagiri') ? 'Chennagiri Fuel Bunk' : '-');
       const opBal = Number(rec.opening_balance ?? data.opening_balance ?? 0);
       const dQty = Number(rec.diesel_quantity ?? data.diesel_quantity ?? (rec.fuel_type === 'Diesel' ? rec.quantity : 0) ?? 0);
       const dAmt = Number(rec.diesel_total_cost ?? data.diesel_total_cost ?? 0);

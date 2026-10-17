@@ -423,14 +423,19 @@ const excelService = {
         rawLoc = 'Jadcherla';
       }
       const rawLocLower = rawLoc.toLowerCase();
-      const matchedLoc = projectLocations.find(l => 
-        String(l.id).toLowerCase() === rawLocLower || 
-        String(l.name).toLowerCase() === rawLocLower || 
-        (l.code && String(l.code).toLowerCase() === rawLocLower)
-      );
+      const matchedLoc = projectLocations.find(l => {
+        const lId = String(l.id || '').toLowerCase();
+        const lName = String(l.name || '').toLowerCase();
+        const lAlias = String(l.alias || '').toLowerCase();
+        const lCode = String(l.code || '').toLowerCase();
+        const normLName = lName.replace(/[^a-z0-9]/g, '');
+        const normRaw = rawLocLower.replace(/[^a-z0-9]/g, '');
+        return lId === rawLocLower || lName === rawLocLower || lAlias === rawLocLower || lCode === rawLocLower ||
+          (normRaw && normLName === normRaw) || (normRaw && normLName.startsWith(normRaw));
+      });
 
-      const location_id = matchedLoc ? matchedLoc.id : rawLoc.toUpperCase().replace(/\s+/g, '_');
-      const location_name = matchedLoc ? matchedLoc.name : rawLoc;
+      const location_id = matchedLoc ? (matchedLoc.code || matchedLoc.id) : rawLoc.toUpperCase().replace(/\s+/g, '_');
+      const location_name = matchedLoc ? (matchedLoc.alias || matchedLoc.name) : rawLoc;
 
       const department_id = isFuel ? 'PM' : (batch.department || recordData.department_id || 'PM').toUpperCase();
       const isBoth = isFuel && String(recordData.fuel_type || '').toLowerCase().includes('both');
@@ -465,7 +470,15 @@ const excelService = {
         recordData.category = 'Fuel';
         recordData.department = recordData.department || recordData.department_beneficiary || 'Plant & Machinery';
         recordData.department_beneficiary = recordData.department;
-        recordData.vendor_name = recordData.ledger_type || recordData.vendor_name || '';
+        let rawVName = recordData.ledger_type || recordData.vendor_name || '';
+        if (['na', 'n/a', '-', 'none', 'null', 'undefined'].includes(String(rawVName).trim().toLowerCase())) {
+          rawVName = '';
+        }
+        if (!rawVName && location_name.toLowerCase().includes('chennagiri')) {
+          rawVName = 'Chennagiri Fuel Bunk';
+        }
+        recordData.vendor_name = rawVName;
+        recordData.ledger_type = rawVName;
         recordData.petrol_quantity = pQ;
         recordData.petrol_rate = pR;
         recordData.petrol_total_cost = pCost;

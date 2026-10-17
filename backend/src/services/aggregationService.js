@@ -245,6 +245,8 @@ class AggregationService {
       activeLocations = await locsColl.find({}).toArray();
     }
     const getRecProjectName = r => {
+      const divName = String(r.project_division || r.location_name || r.data?.location || '').trim().toLowerCase();
+      if (divName.includes('chennagiri')) return '-';
       if (r.project_name && r.project_name !== '-' && r.project_name !== 'Project Site') return r.project_name;
       if (r.data?.project_name && r.data.project_name !== '-' && r.data.project_name !== 'Project Site') return r.data.project_name;
       const sName = String(r.site_name || r.data?.site_name || '').trim().toLowerCase();
@@ -258,13 +260,16 @@ class AggregationService {
           if (p && p !== '-' && p !== 'Project Site') return p;
         }
       }
-      const lid = r.location_code || r.location_id || r.project_division || r.location_name || r.data?.location;
-      const lIdLower = String(lid || '').trim().toLowerCase();
-      const matched = activeLocations.find(l => 
-        String(l.id || '').trim().toLowerCase() === lIdLower ||
-        String(l.name || '').trim().toLowerCase() === lIdLower ||
-        String(l.code || '').trim().toLowerCase() === lIdLower
-      );
+      const matched = (divName ? activeLocations.find(l => {
+        const lName = String(l.name || '').trim().toLowerCase();
+        const lAlias = String(l.alias || '').trim().toLowerCase();
+        const normLName = lName.replace(/[^a-z0-9]/g, '');
+        const normDiv = divName.replace(/[^a-z0-9]/g, '');
+        return lName === divName || lAlias === divName || (normDiv && normLName === normDiv);
+      }) : null) || (r.location_code || r.location_id ? activeLocations.find(l => 
+        String(l.code || '').trim().toLowerCase() === String(r.location_code || r.location_id).trim().toLowerCase() ||
+        String(l.id || '').trim().toLowerCase() === String(r.location_code || r.location_id).trim().toLowerCase()
+      ) : null);
       if (matched) {
         const p = (matched.project_name && matched.project_name !== 'Project Site' && matched.project_name !== '-')
           ? matched.project_name
